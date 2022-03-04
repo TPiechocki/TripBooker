@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.WebApi", "TripBooker.WebApi\TripBooker.WebApi.csproj", "{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5D1E0B38-5BAE-4A47-B1F6-92E2BFD0A9A6}
+	EndGlobalSection
+EndGlobal
