@@ -1,0 +1,72 @@
+version: "3.4"
+
+services:
+    rabbitmq:
+        image: rabbitmq:3-management-alpine
+        container_name: rabbitmq
+        volumes:
+            - ./rabbitmq/etc/:/etc/rabbitmq/
+            - rabbitmq-data:/var/lib/rabbitmq/
+            - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+        ports:
+            - 5672:5672
+            - 15672:15672
+        networks:
+            - network
+
+    postgres:
+        image: postgres
+        container_name: postgres
+        restart: always
+        env_file:
+            - postgres.env
+        volumes:
+            - postgres-data:/var/lib/postgresql/data/
+            - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+        ports:
+            - 5472:5472
+        networks:
+            - network
+    adminer:
+        image: adminer
+        container_name: adminer
+        restart: always
+        ports:
+            - 26016:8080
+        networks:
+            - network
+
+    mongodb:
+        image : mongo:5.0
+        container_name: mongodb
+        env_file:
+            - mongo.env
+        volumes:
+            - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+            - mongodb-data:/data/db
+        ports:
+            - 27017:27017
+        restart: unless-stopped
+        networks:
+            - network
+    mongo-express:
+        image: mongo-express
+        container_name: mongo-express
+        ports:
+            - 28018:8081
+        depends_on:
+            - mongodb
+        env_file:
+            - mongo_express.env
+        volumes:
+            - mongodb-data:/data/db
+        networks:
+            - network
+
+networks:
+    network: {}
+
+volumes:
+    postgres-data:
+    mongodb-data:
+    rabbitmq-data:
