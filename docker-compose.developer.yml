@@ -1,6 +1,16 @@
 version: "3.4"
 
 services:
+    transport-service:
+        container_name: transport-service
+        build:
+            context: backend
+            dockerfile: TripBooker.TransportService/Dockerfile
+        ports:
+            - 8082:80
+        networks:
+            - network
+
     rabbitmq:
         image: rabbitmq:3-management-alpine
         container_name: rabbitmq
