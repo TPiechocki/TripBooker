@@ -1,11 +1,11 @@
 ﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "TripBooker.WebApi": {
+    "TripBooker.TransportService": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "https://localhost:8081",
+      "applicationUrl": "https://localhost:8082",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

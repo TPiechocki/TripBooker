@@ -24,7 +24,7 @@ services:
             - postgres-data:/var/lib/postgresql/data/
             - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
         ports:
-            - 5472:5472
+            - 5432:5432
         networks:
             - network
     adminer:

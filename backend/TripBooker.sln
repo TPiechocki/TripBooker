@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.WebApi", "TripBooker.WebApi\TripBooker.WebApi.csproj", "{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.WebApi", "TripBooker.WebApi\TripBooker.WebApi.csproj", "{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.TransportService", "TripBooker.TransportService\TripBooker.TransportService.csproj", "{86960794-92DA-492F-9872-3619AD83B7D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.Common", "TripBooker.Common\TripBooker.Common.csproj", "{93278898-5520-4CA0-B513-1FC00F5D3B15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E90EB93-D158-4F46-A875-4213274B5360}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		..\docker-compose.developer.yml = ..\docker-compose.developer.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +25,14 @@ Global
 		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04AE809D-56A0-440D-A8DD-3A86DB7D6FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86960794-92DA-492F-9872-3619AD83B7D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86960794-92DA-492F-9872-3619AD83B7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86960794-92DA-492F-9872-3619AD83B7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86960794-92DA-492F-9872-3619AD83B7D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93278898-5520-4CA0-B513-1FC00F5D3B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93278898-5520-4CA0-B513-1FC00F5D3B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93278898-5520-4CA0-B513-1FC00F5D3B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93278898-5520-4CA0-B513-1FC00F5D3B15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
