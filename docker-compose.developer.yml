@@ -8,6 +8,11 @@ services:
             dockerfile: TripBooker.TransportService/Dockerfile
         ports:
             - 8082:80
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641;Username=admin;Password=password"
+            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
         networks:
             - network
 

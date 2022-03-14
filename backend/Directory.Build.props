@@ -4,4 +4,8 @@
 		<LangVersion>10</LangVersion>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>CA2254</NoWarn>
+	</PropertyGroup>
 </Project>

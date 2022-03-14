@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TripBooker.Common.Transport;
+﻿using TripBooker.Common.Transport;
 
 namespace TripBooker.TransportService.Model.Events;
 

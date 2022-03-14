@@ -1,4 +1,6 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using TripBooker.TransportService.Infrastructure;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
@@ -16,11 +18,13 @@ internal class TransportCommandRepository : ITransportCommandRepository
 {
     private readonly SqlDbContext _dbContext;
     private readonly IBus _bus;
+    private readonly ILogger<TransportCommandRepository> _logger;
 
-    public TransportCommandRepository(SqlDbContext dbContext, IBus bus)
+    public TransportCommandRepository(SqlDbContext dbContext, IBus bus, ILogger<TransportCommandRepository> logger)
     {
         _dbContext = dbContext;
         _bus = bus;
+        _logger = logger;
     }
 
     public void AddTransport(Transport transport)
@@ -33,7 +37,13 @@ internal class TransportCommandRepository : ITransportCommandRepository
     {
         await _dbContext.Transport.AddAsync(transport, cancellationToken);
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add a new Transport: {JsonConvert.SerializeObject(transport)}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
 
         await PublishNewTransportEvent(transport, cancellationToken);
     }

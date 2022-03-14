@@ -6,6 +6,8 @@ internal static class RepositoriesRegistration
     {
         return services
             .AddScoped<ITransportCommandRepository, TransportCommandRepository>()
-            .AddScoped<ITransportViewUpdateRepository, TransportViewUpdateRepository>();
+            .AddScoped<ITransportViewUpdateRepository, TransportViewUpdateRepository>()
+            .AddScoped<ITransportQueryRepository, TransportQueryRepository>()
+            .AddScoped<ITransportReservationsRepository, TransportReservationsRepository>();
     }
 }

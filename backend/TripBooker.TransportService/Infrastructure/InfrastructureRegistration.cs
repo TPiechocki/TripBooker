@@ -1,5 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
+using TripBooker.Common;
 using TripBooker.TransportService.EventConsumers;
 
 namespace TripBooker.TransportService.Infrastructure;
@@ -9,11 +13,28 @@ internal static class InfrastructureRegistration
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         return services.AddDbContext<SqlDbContext>(opt =>
-            opt
-                .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
-                .EnableSensitiveDataLogging())
-            .AddBus(configuration);
+                opt
+                    .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
+                    .EnableSensitiveDataLogging())
+            .AddBus(configuration)
+            // mongoDB
+            .AddSingleton(s =>
+            {
+                var connectionString = configuration.GetConnectionString("MongoDb");
+                var settings = MongoClientSettings.FromConnectionString(connectionString);
+                settings.ClusterConfigurator = cb =>
+                {
+                    cb.Subscribe<CommandStartedEvent>(e =>
+                    {
+                        var logger = s.GetRequiredService<ILogger<IMongoClient>>();
+                        logger.LogInformation($"MongoLog: {e.CommandName} - {e.Command.ToJson()}");
+                    });
+                };
+
+                var mongoClient = new MongoClient(settings);
+                return mongoClient.GetDatabase(GlobalConstants.MongoDbName);
+            });
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)
