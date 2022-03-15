@@ -1,1 +1,1 @@
-drop table if exists "Transport", "TransportOptions", "TransportView";
+drop table if exists "Transport", "TransportOption", "TransportView", "TransportReservation";

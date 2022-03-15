@@ -8,7 +8,7 @@ using TripBooker.TransportService.EventConsumers;
 
 namespace TripBooker.TransportService.Infrastructure;
 
-internal static class InfrastructureRegistration
+internal static class ServicesRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -18,7 +18,8 @@ internal static class InfrastructureRegistration
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
-            // mongoDB
+
+            // mongoDB TODO: remove if not needed
             .AddSingleton(s =>
             {
                 var connectionString = configuration.GetConnectionString("MongoDb");

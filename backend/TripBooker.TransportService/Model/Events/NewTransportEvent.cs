@@ -2,6 +2,8 @@
 
 namespace TripBooker.TransportService.Model.Events;
 
+// TODO: remove if not used
+
 internal class NewTransportEvent
 {
     public int TransportId { get; }

@@ -1,40 +1,21 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TripBooker.Common.Transport;
 
 namespace TripBooker.TransportService.Model;
 
-internal class TransportReservations
-{
-    [BsonId]
-    [BsonRepresentation(BsonType.Int32)]
-    public int TransportId { get; set; }
-
-    public ICollection<TransportReservation> Reservations { get; set; } = null!;
-}
-
 internal class TransportReservation
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.Int32)]
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public ReservationStatus Status { get; set; }
+    public int TranportId { get; set; }
+
+    [ForeignKey("TranportId")]
+    public Transport Transport { get; set; } = null!;
 
     public int Places { get; set; }
 
-    public ICollection<ReservationStatusChange> StatusHistory { get; set; } = null!;
-}
-
-internal class ReservationStatusChange
-{
-    public ReservationStatus NewStatus { get; }
-
-    public DateTime TimeStamp { get; set; }
-
-    public ReservationStatusChange(ReservationStatus newStatus)
-    {
-        NewStatus = newStatus;
-        TimeStamp = DateTime.UtcNow;
-    }
+    public ReservationStatus Status { get; set; } = ReservationStatus.New;
 }

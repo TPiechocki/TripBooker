@@ -1,5 +1,6 @@
 using TripBooker.TransportService.Infrastructure;
 using TripBooker.TransportService.Repositories;
+using TripBooker.TransportService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddInfrastructure(builder.Configuration)
-    .AddRepositories();
+    .AddRepositories()
+    .AddServices();
 
 
 var app = builder.Build();
@@ -44,10 +46,10 @@ static void CreateDbIfNotExists(IHost host)
     try
     {
         var context = services.GetRequiredService<SqlDbContext>();
-        var transportRepository = ActivatorUtilities.CreateInstance(services, typeof(TransportCommandRepository), context)
-            as ITransportCommandRepository;
+        var transportService = services.GetRequiredService<ITransportService>();
+        var reservationService = services.GetRequiredService<ITransportReservationService>();
 
-        SqlDbInitializer.Initialize(context, transportRepository!);
+        SqlDbInitializer.Initialize(context, transportService, reservationService);
     }
     catch (Exception ex)
     {

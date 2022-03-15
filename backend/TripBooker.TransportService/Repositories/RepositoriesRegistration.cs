@@ -5,9 +5,10 @@ internal static class RepositoriesRegistration
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         return services
-            .AddScoped<ITransportCommandRepository, TransportCommandRepository>()
-            .AddScoped<ITransportViewUpdateRepository, TransportViewUpdateRepository>()
-            .AddScoped<ITransportQueryRepository, TransportQueryRepository>()
-            .AddScoped<ITransportReservationsRepository, TransportReservationsRepository>();
+            .AddScoped<ITransportOptionRepository, TransportOptionRepository>()
+            .AddScoped<ITransportCommandRepository, TransportRepository>()
+            .AddScoped<ITransportViewUpdateRepository, TransportViewRepository>()
+            .AddScoped<ITransportReservationRepository, TransportReservationRepository>()
+            .AddScoped<ITransportReservationsRepository, MongoTransportReservationsRepository>();
     }
 }

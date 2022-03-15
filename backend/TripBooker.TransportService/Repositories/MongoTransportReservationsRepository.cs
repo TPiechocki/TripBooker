@@ -3,6 +3,8 @@ using TripBooker.TransportService.Model;
 
 namespace TripBooker.TransportService.Repositories;
 
+// TODO: remove if not used
+
 internal interface ITransportReservationsRepository
 {
     Task<IEnumerable<TransportReservations>> QueryAll(CancellationToken cancellationToken);
@@ -10,14 +12,12 @@ internal interface ITransportReservationsRepository
     Task CreateOne(int transportId, CancellationToken cancellationToken);
 }
 
-internal class TransportReservationsRepository : ITransportReservationsRepository
+internal class MongoTransportReservationsRepository : ITransportReservationsRepository
 {
     private readonly IMongoCollection<TransportReservations> _reservations;
-    private readonly ILogger<TransportReservationsRepository> _logger;
 
-    public TransportReservationsRepository(ILogger<TransportReservationsRepository> logger, IMongoDatabase mongoDatabase)
+    public MongoTransportReservationsRepository(IMongoDatabase mongoDatabase)
     {
-        _logger = logger;
         _reservations = mongoDatabase.GetCollection<TransportReservations>("transport_reservations");
     }
 
@@ -40,7 +40,7 @@ internal class TransportReservationsRepository : ITransportReservationsRepositor
         await _reservations.InsertOneAsync(new TransportReservations
         {
             TransportId = transportId,
-            Reservations = new List<TransportReservation>()
+            Reservations = new List<MongoTransportReservation>()
         }, new InsertOneOptions(), cancellationToken);
     }
 }

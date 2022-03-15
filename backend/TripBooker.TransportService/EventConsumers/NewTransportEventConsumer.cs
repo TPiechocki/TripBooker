@@ -7,6 +7,9 @@ using TripBooker.TransportService.Repositories;
 
 namespace TripBooker.TransportService.EventConsumers;
 
+// TODO: remove if not used
+
+// published through IBus
 internal class NewTransportEventConsumer : IConsumer<NewTransportEvent>
 {
     private readonly ILogger<NewTransportEventConsumer> _logger;
@@ -30,7 +33,7 @@ internal class NewTransportEventConsumer : IConsumer<NewTransportEvent>
     {
         _logger.LogInformation($"NewTransportEvent consumed: {JsonConvert.SerializeObject(context.Message)}");
 
-        await _viewRepository.AddNewTransportAsync(_mapper.Map<TransportView>(context.Message),
+        await _viewRepository.AddAsync(_mapper.Map<TransportView>(context.Message),
             context.CancellationToken);
 
         await _reservationsRepository.CreateOne(context.Message.TransportId, context.CancellationToken);
