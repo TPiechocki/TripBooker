@@ -45,11 +45,11 @@ static void CreateDbIfNotExists(IHost host)
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<SqlDbContext>();
+        var transportContext = services.GetRequiredService<TransportDbContext>();
         var transportService = services.GetRequiredService<ITransportService>();
         var reservationService = services.GetRequiredService<ITransportReservationService>();
 
-        SqlDbInitializer.Initialize(context, transportService, reservationService);
+        SqlDbInitializer.Initialize(transportContext, transportService, reservationService);
     }
     catch (Exception ex)
     {

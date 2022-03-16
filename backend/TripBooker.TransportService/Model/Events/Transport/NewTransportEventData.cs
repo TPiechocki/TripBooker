@@ -1,30 +1,29 @@
 ﻿using TripBooker.Common.Transport;
 
-namespace TripBooker.TransportService.Model.Events;
+namespace TripBooker.TransportService.Model.Events.Transport;
 
-// TODO: remove if not used
-
-internal class NewTransportEvent
+internal class NewTransportEventData
 {
-    public int TransportId { get; }
-
     public DateOnly DepartureDate { get; }
 
     public string DeparturePlace { get; }
 
     public string Destination { get; }
 
+    public int TransportOptionId { get; }
+
     public TransportType Type { get; }
 
     public int AvailablePlaces { get; }
 
-    public NewTransportEvent(int transportId, DateOnly departureDate, string departurePlace, string destination,
+    public NewTransportEventData(DateOnly departureDate, 
+        string departurePlace, string destination, int transportOptionId,
         TransportType type, int availablePlaces)
     {
-        TransportId = transportId;
         DepartureDate = departureDate;
         DeparturePlace = departurePlace;
         Destination = destination;
+        TransportOptionId = transportOptionId;
         Type = type;
         AvailablePlaces = availablePlaces;
     }

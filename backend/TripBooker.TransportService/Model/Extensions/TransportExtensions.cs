@@ -1,8 +1,11 @@
-﻿namespace TripBooker.TransportService.Model.Extensions;
+﻿using TripBooker.TransportService.Contract;
+using TripBooker.TransportService.Model.Events.Transport;
+
+namespace TripBooker.TransportService.Model.Extensions;
 
 internal static class TransportExtensions
 {
-    public static TransportView MapToTransportView(this Transport transport, TransportOption transportOption)
+    public static NewTransportEventData MapToNewTransportEventData(this NewTransportContract transport, TransportOption transportOption)
     {
         string destination;
         string departure;
@@ -17,14 +20,7 @@ internal static class TransportExtensions
             destination = transportOption.Destination;
         }
 
-        return new TransportView
-        {
-            Id = transport.Id,
-            DeparturePlace = departure,
-            Destination = destination,
-            DepartureDate = transport.DepartureDate,
-            AvailablePlaces = transport.NumberOfSeats,
-            Type = transportOption.Type
-        };
+        return new NewTransportEventData(transport.DepartureDate, departure, destination, transport.TransportOptionId,
+            transportOption.Type, transport.Places);
     }
 }

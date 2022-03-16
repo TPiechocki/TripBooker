@@ -6,9 +6,9 @@ internal static class RepositoriesRegistration
     {
         return services
             .AddScoped<ITransportOptionRepository, TransportOptionRepository>()
-            .AddScoped<ITransportCommandRepository, TransportRepository>()
+            .AddScoped<ITransportEventRepository, TransportEventRepository>()
             .AddScoped<ITransportViewUpdateRepository, TransportViewRepository>()
-            .AddScoped<ITransportReservationRepository, TransportReservationRepository>()
+            .AddScoped<IReservationEventRepository, ReservationEventRepository>()
             .AddScoped<ITransportReservationsRepository, MongoTransportReservationsRepository>();
     }
 }

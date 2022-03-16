@@ -10,9 +10,9 @@ internal interface ITransportOptionRepository
 
 internal class TransportOptionRepository : ITransportOptionRepository
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TransportDbContext _dbContext;
 
-    public TransportOptionRepository(SqlDbContext dbContext)
+    public TransportOptionRepository(TransportDbContext dbContext)
     {
         _dbContext = dbContext;
     }

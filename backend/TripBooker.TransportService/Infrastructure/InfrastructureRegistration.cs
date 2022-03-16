@@ -12,7 +12,8 @@ internal static class ServicesRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        return services.AddDbContext<SqlDbContext>(opt =>
+        return services
+            .AddDbContext<TransportDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))

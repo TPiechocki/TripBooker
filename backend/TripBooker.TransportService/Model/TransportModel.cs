@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TripBooker.Common.Transport;
+﻿using TripBooker.Common.Transport;
 
 namespace TripBooker.TransportService.Model;
 
-public class TransportView
+public class TransportModel
 {
-    [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public DateOnly DepartureDate { get; set; }
 
@@ -17,4 +15,6 @@ public class TransportView
     public TransportType Type { get; set; }
 
     public int AvailablePlaces { get; set; }
+
+    public int Version { get; set; }
 }

@@ -7,27 +7,27 @@ namespace TripBooker.TransportService.Repositories;
 
 internal interface ITransportViewUpdateRepository
 {
-    Task AddAsync(TransportView transport, CancellationToken cancellationToken);
+    Task AddAsync(TransportModel transport, CancellationToken cancellationToken);
 
-    Task<TransportView?> QueryByIdAsync(int id, CancellationToken cancellationToken);
+    Task<TransportModel?> QueryByIdAsync(int id, CancellationToken cancellationToken);
 
-    Task<IEnumerable<TransportView>> QueryAllAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<TransportModel>> QueryAllAsync(CancellationToken cancellationToken);
 
-    void Update(TransportView transport);
+    void Update(TransportModel transport);
 }
 
 internal class TransportViewRepository : ITransportViewUpdateRepository
 {
-    private readonly SqlDbContext _dbContext;
+    private readonly TransportDbContext _dbContext;
     private readonly ILogger<TransportViewRepository> _logger;
 
-    public TransportViewRepository(SqlDbContext dbContext, ILogger<TransportViewRepository> logger)
+    public TransportViewRepository(TransportDbContext dbContext, ILogger<TransportViewRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
     }
 
-    public async Task AddAsync(TransportView transport, CancellationToken cancellationToken)
+    public async Task AddAsync(TransportModel transport, CancellationToken cancellationToken)
     {
         await _dbContext.TransportView.AddAsync(transport, cancellationToken);
 
@@ -40,17 +40,17 @@ internal class TransportViewRepository : ITransportViewUpdateRepository
         }
     }
 
-    public async Task<TransportView?> QueryByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<TransportModel?> QueryByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _dbContext.TransportView.FindAsync(new object[] { id }, cancellationToken);
     }
 
-    public async Task<IEnumerable<TransportView>> QueryAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<TransportModel>> QueryAllAsync(CancellationToken cancellationToken)
     {
         return await _dbContext.TransportView.Select(x => x).ToListAsync(cancellationToken);
     }
 
-    public void Update(TransportView transport)
+    public void Update(TransportModel transport)
     {
         _dbContext.TransportView.Update(transport);
     }

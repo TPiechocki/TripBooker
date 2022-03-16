@@ -1,4 +1,5 @@
 ﻿using TripBooker.Common.Transport;
+using TripBooker.TransportService.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Services;
 
@@ -6,14 +7,15 @@ namespace TripBooker.TransportService.Infrastructure;
 
 internal static class SqlDbInitializer
 {
-    public static void Initialize(SqlDbContext context, ITransportService transportService,
+    public static void Initialize(
+        TransportDbContext transportContext, 
+        ITransportService transportService,
         ITransportReservationService reservationService)
     {
-        context.Database.EnsureCreated();
-
+        transportContext.Database.EnsureCreated();
 
         // Transport options
-        if (!context.TransportOption.Any())
+        if (!transportContext.TransportOption.Any())
         {
             var transportOptions = new[]
             {
@@ -25,49 +27,43 @@ internal static class SqlDbInitializer
                     Carrier = "Enter Air"
                 }
             };
-            context.TransportOption.AddRange(transportOptions);
+            transportContext.TransportOption.AddRange(transportOptions);
         }
-        context.SaveChanges();
+        transportContext.SaveChanges();
 
-
+        var transportId = new List<Guid>();
         // Transports
-        if (!context.Transport.Any())
+        if (!transportContext.TransportEvent.Any())
         {
-            transportService.AddNewTransport(new Transport
-            {
-                OptionId = 1,
-                DepartureDate = new DateOnly(2022, 07, 01),
-                IsReturn = false,
-                NumberOfSeats = 180
-            }, default).GetAwaiter().GetResult();
+            transportId.Add(transportService.AddNewTransport(
+                    new NewTransportContract(new DateOnly(2022, 07, 01), false, 100, 1),
+                    default)
+                .GetAwaiter().GetResult());
 
-            transportService.AddNewTransport(new Transport
-            {
-                OptionId = 1,
-                DepartureDate = new DateOnly(2022, 07, 08),
-                IsReturn = true,
-                NumberOfSeats = 180
-            }, default).GetAwaiter().GetResult();
+            transportId.Add(transportService.AddNewTransport(
+                    new NewTransportContract(new DateOnly(2022, 07, 08), true, 200, 1),
+                    default)
+                .GetAwaiter().GetResult());
 
-            transportService.AddNewTransport(new Transport
-            {
-                OptionId = 1,
-                DepartureDate = new DateOnly(2022, 08, 01),
-                IsReturn = false,
-                NumberOfSeats = 180
-            }, default).GetAwaiter().GetResult();
+            transportId.Add(transportService.AddNewTransport(
+                    new NewTransportContract(new DateOnly(2022, 08, 01), false, 300, 1),
+                    default)
+                .GetAwaiter().GetResult());
         }
 
         // Reservations
-        if (!context.TransportReservation.Any())
+        if (!transportContext.ReservationEvent.Any())
         {
-            reservationService.AddNewReservation(new TransportReservation
-            {
-                TranportId = 2,
-                Places = 7
-            }, default).GetAwaiter().GetResult();
+            reservationService.AddNewReservation(
+                    new NewReservationContract(transportId[1], 7),
+                    default)
+                .GetAwaiter().GetResult();
+            reservationService.AddNewReservation(
+                    new NewReservationContract(transportId[1], 4),
+                    default)
+                .GetAwaiter().GetResult();
         }
 
-        context.SaveChanges();
+        transportContext.SaveChanges();
     }
 }
