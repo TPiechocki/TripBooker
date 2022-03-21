@@ -1,6 +1,6 @@
-﻿using System.Transactions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using System.Transactions;
 using TripBooker.TransportService.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
@@ -12,7 +12,7 @@ namespace TripBooker.TransportService.Services;
 
 internal interface ITransportReservationService
 {
-    Task<Guid> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken);
+    Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken);
 }
 
 internal class TransportReservationService : ITransportReservationService
@@ -28,7 +28,7 @@ internal class TransportReservationService : ITransportReservationService
         _reservationEventRepository = reservationEventRepository;
     }
 
-    public async Task<Guid> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken)
+    public async Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken)
     {
         // add reservation
         var data = new NewReservationEventData(reservation.TransportId, reservation.Places);
@@ -44,6 +44,13 @@ internal class TransportReservationService : ITransportReservationService
                 await _transportRepository.GetTransportEvents(reservation.TransportId, cancellationToken);
             var transportItem = TransportBuilder.Build(transportEvents);
 
+            if (transportItem.AvailablePlaces < reservation.Places)
+            {
+                // if there is not enough free places
+                await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
+                break;
+            }
+
             try
             {
                 await ValidateNewReservationTransaction(reservationStreamId, reservation, transportItem,
@@ -53,7 +60,8 @@ internal class TransportReservationService : ITransportReservationService
             {
                 if (e.GetBaseException() is PostgresException { SqlState: "23505" })
                 {
-                    // repeat if there was version violation, so read must not be inside transaction
+                    // repeat if there was version violation, so the db read and business logic
+                    // does not need to be inside transaction
                     tryTransaction = true;
                 }
                 else
@@ -63,9 +71,9 @@ internal class TransportReservationService : ITransportReservationService
             }
         }
 
-        // TODO: response with status
-
-        return reservationStreamId;
+        var reservationEvents = 
+            await _reservationEventRepository.GetReservationEvents(reservationStreamId, cancellationToken);
+        return ReservationBuilder.Build(reservationEvents);
     }
 
     private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation,
@@ -82,7 +90,7 @@ internal class TransportReservationService : ITransportReservationService
         await _transportRepository.AddAsync(transportEvent, reservation.TransportId, transportItem.Version,
             cancellationToken);
 
-        // TODO: set accepted/rejected status
+        await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
 
         transaction.Complete();
     }

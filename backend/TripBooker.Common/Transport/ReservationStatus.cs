@@ -10,7 +10,7 @@ public enum ReservationStatus
     /// <summary>
     /// Reservation has reserved places and is waiting for the payment.
     /// </summary>
-    AwaitingPayment,
+    Accepted,
     
     /// <summary>
     /// Reservation is paid and confirmed.

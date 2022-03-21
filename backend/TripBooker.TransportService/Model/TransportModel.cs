@@ -1,11 +1,10 @@
-﻿using TripBooker.Common.Transport;
+﻿using TripBooker.Common;
+using TripBooker.Common.Transport;
 
 namespace TripBooker.TransportService.Model;
 
-public class TransportModel
+internal class TransportModel : EventModel
 {
-    public Guid Id { get; set; }
-
     public DateOnly DepartureDate { get; set; }
 
     public string DeparturePlace { get; set; } = null!;
@@ -15,6 +14,4 @@ public class TransportModel
     public TransportType Type { get; set; }
 
     public int AvailablePlaces { get; set; }
-
-    public int Version { get; set; }
 }

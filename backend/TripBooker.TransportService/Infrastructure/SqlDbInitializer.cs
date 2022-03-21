@@ -59,7 +59,7 @@ internal static class SqlDbInitializer
                     default)
                 .GetAwaiter().GetResult();
             reservationService.AddNewReservation(
-                    new NewReservationContract(transportId[1], 4),
+                    new NewReservationContract(transportId[1], 500),
                     default)
                 .GetAwaiter().GetResult();
         }
