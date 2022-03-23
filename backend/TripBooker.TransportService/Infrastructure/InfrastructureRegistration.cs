@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
+using Quartz;
 using TripBooker.Common;
 using TripBooker.TransportService.EventConsumers;
 
@@ -19,8 +20,6 @@ internal static class ServicesRegistration
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
-
-            // mongoDB TODO: remove if not needed
             .AddSingleton(s =>
             {
                 var connectionString = configuration.GetConnectionString("MongoDb");
@@ -36,7 +35,8 @@ internal static class ServicesRegistration
 
                 var mongoClient = new MongoClient(settings);
                 return mongoClient.GetDatabase(GlobalConstants.MongoDbName);
-            });
+            })
+            .AddQuartz();
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)
@@ -45,7 +45,7 @@ internal static class ServicesRegistration
 
         return services.AddMassTransit(x =>
                 {
-                    x.AddConsumer<NewTransportEventConsumer>();
+                    x.AddConsumer<TransportViewUpdateEventConsumer>();
 
                     x.UsingRabbitMq((context, cfg) =>
                         {
@@ -56,5 +56,23 @@ internal static class ServicesRegistration
                 }
             )
             .AddMassTransitHostedService(true);
+    }
+
+    private static IServiceCollection AddQuartz(this IServiceCollection services)
+    {
+        return services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                var jobKey = new JobKey(nameof(UpdateViewJob));
+                q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
+                q.AddTrigger(opt => opt
+                    .ForJob(jobKey)
+                    .WithIdentity(jobKey + "-trigger")
+                    .WithSimpleSchedule(x => x
+                        .WithIntervalInSeconds(15)
+                        .RepeatForever()));
+            })
+            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
 }

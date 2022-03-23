@@ -41,7 +41,7 @@ internal class TransportReservationService : ITransportReservationService
             tryTransaction = false;
 
             var transportEvents =
-                await _transportRepository.GetTransportEvents(reservation.TransportId, cancellationToken);
+                await _transportRepository.GetTransportEventsAsync(reservation.TransportId, cancellationToken);
             var transportItem = TransportBuilder.Build(transportEvents);
 
             if (transportItem.AvailablePlaces < reservation.Places)

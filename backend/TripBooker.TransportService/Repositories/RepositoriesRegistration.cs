@@ -7,8 +7,8 @@ internal static class RepositoriesRegistration
         return services
             .AddScoped<ITransportOptionRepository, TransportOptionRepository>()
             .AddScoped<ITransportEventRepository, TransportEventRepository>()
-            .AddScoped<ITransportViewUpdateRepository, TransportViewRepository>()
+            .AddScoped<ITransportViewRepository, TransportViewRepository>()
             .AddScoped<IReservationEventRepository, ReservationEventRepository>()
-            .AddScoped<ITransportReservationsRepository, MongoTransportReservationsRepository>();
+            .AddScoped<IEventTimestampRepository, EventTimestampRepository>();
     }
 }

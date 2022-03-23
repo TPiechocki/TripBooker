@@ -36,17 +36,23 @@ internal static class SqlDbInitializer
         if (!transportContext.TransportEvent.Any())
         {
             transportId.Add(transportService.AddNewTransport(
-                    new NewTransportContract(new DateOnly(2022, 07, 01), false, 100, 1),
+                    new NewTransportContract(
+                        DateTime.SpecifyKind(new DateTime(2022, 07, 01), DateTimeKind.Utc).Date,
+                        false, 100, 1),
                     default)
                 .GetAwaiter().GetResult());
 
             transportId.Add(transportService.AddNewTransport(
-                    new NewTransportContract(new DateOnly(2022, 07, 08), true, 200, 1),
+                    new NewTransportContract(
+                        DateTime.SpecifyKind(new DateTime(2022, 07, 08), DateTimeKind.Utc).Date, 
+                        true, 200, 1),
                     default)
                 .GetAwaiter().GetResult());
 
             transportId.Add(transportService.AddNewTransport(
-                    new NewTransportContract(new DateOnly(2022, 08, 01), false, 300, 1),
+                    new NewTransportContract(
+                        DateTime.SpecifyKind(new DateTime(2022, 08, 01), DateTimeKind.Utc).Date, 
+                        false, 300, 1),
                     default)
                 .GetAwaiter().GetResult());
         }

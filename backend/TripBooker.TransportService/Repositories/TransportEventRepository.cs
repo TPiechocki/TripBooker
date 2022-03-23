@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TripBooker.TransportService.Infrastructure;
+using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Transport;
 
 namespace TripBooker.TransportService.Repositories;
@@ -12,20 +14,25 @@ internal interface ITransportEventRepository
     Task AddAsync(TransportPlaceUpdateEvent placeUpdateEvent, Guid streamId, int previousVersion,
         CancellationToken cancellationToken);
 
-    Task<ICollection<TransportEvent>> GetTransportEvents(Guid streamId, CancellationToken cancellationToken);
+    Task<ICollection<TransportEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken);
+
+    Task<ICollection<TransportEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken);
 }
 
 internal class TransportEventRepository : ITransportEventRepository
 {
     private readonly TransportDbContext _dbContext;
     private readonly ILogger<TransportEventRepository> _logger;
+    private readonly IBus _bus;
 
     public TransportEventRepository(
         TransportDbContext dbContext, 
-        ILogger<TransportEventRepository> logger)
+        ILogger<TransportEventRepository> logger, 
+        IBus bus)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _bus = bus;
     }
 
     public async Task<Guid> AddNewAsync(
@@ -65,13 +72,22 @@ internal class TransportEventRepository : ITransportEventRepository
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
+
+        await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
     }
 
-    public async Task<ICollection<TransportEvent>> GetTransportEvents(Guid streamId, CancellationToken cancellationToken)
+    public async Task<ICollection<TransportEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken)
     {
         return await _dbContext.TransportEvent
             .Where(x => x.StreamId == streamId)
-            .OrderBy(x => x.Timestamp)
+            .OrderBy(x => x.Version)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ICollection<TransportEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken)
+    {
+        return await _dbContext.TransportEvent
+            .Where(x => x.Timestamp >= timestamp)
             .ToListAsync(cancellationToken);
     }
 }

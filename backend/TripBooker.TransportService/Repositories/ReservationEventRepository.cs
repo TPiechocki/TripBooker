@@ -89,7 +89,7 @@ internal class ReservationEventRepository : IReservationEventRepository
     {
         return await _dbContext.ReservationEvent
             .Where(x => x.StreamId == streamId)
-            .OrderBy(x => x.Timestamp)
+            .OrderBy(x => x.Version)
             .ToListAsync(cancellationToken);
     }
 }

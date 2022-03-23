@@ -18,7 +18,6 @@ builder.Services.AddInfrastructure(builder.Configuration)
     .AddRepositories()
     .AddServices();
 
-
 var app = builder.Build();
 
 CreateDbIfNotExists(app);

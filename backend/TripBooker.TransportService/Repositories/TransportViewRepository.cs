@@ -5,7 +5,7 @@ using TripBooker.TransportService.Model;
 
 namespace TripBooker.TransportService.Repositories;
 
-internal interface ITransportViewUpdateRepository
+internal interface ITransportViewRepository
 {
     Task AddAsync(TransportModel transport, CancellationToken cancellationToken);
 
@@ -13,10 +13,10 @@ internal interface ITransportViewUpdateRepository
 
     Task<IEnumerable<TransportModel>> QueryAllAsync(CancellationToken cancellationToken);
 
-    void Update(TransportModel transport);
+    Task AddOrUpdateAsync(TransportModel transport, CancellationToken cancellationToken);
 }
 
-internal class TransportViewRepository : ITransportViewUpdateRepository
+internal class TransportViewRepository : ITransportViewRepository
 {
     private readonly TransportDbContext _dbContext;
     private readonly ILogger<TransportViewRepository> _logger;
@@ -50,8 +50,16 @@ internal class TransportViewRepository : ITransportViewUpdateRepository
         return await _dbContext.TransportView.Select(x => x).ToListAsync(cancellationToken);
     }
 
-    public void Update(TransportModel transport)
+    public async Task AddOrUpdateAsync(TransportModel transport, CancellationToken cancellationToken)
     {
-        _dbContext.TransportView.Update(transport);
+        if (await _dbContext.TransportView.AnyAsync(x => x.Id == transport.Id, cancellationToken))
+        {
+            _dbContext.TransportView.Update(transport);
+        }
+        else
+        {
+            await AddAsync(transport, cancellationToken);
+        }
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

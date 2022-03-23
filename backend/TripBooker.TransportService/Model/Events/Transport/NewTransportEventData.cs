@@ -4,7 +4,7 @@ namespace TripBooker.TransportService.Model.Events.Transport;
 
 internal class NewTransportEventData
 {
-    public DateOnly DepartureDate { get; }
+    public DateTime DepartureDate { get; }
 
     public string DeparturePlace { get; }
 
@@ -16,7 +16,7 @@ internal class NewTransportEventData
 
     public int AvailablePlaces { get; }
 
-    public NewTransportEventData(DateOnly departureDate, 
+    public NewTransportEventData(DateTime departureDate, 
         string departurePlace, string destination, int transportOptionId,
         TransportType type, int availablePlaces)
     {

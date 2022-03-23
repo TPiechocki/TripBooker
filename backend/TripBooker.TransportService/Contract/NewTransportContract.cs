@@ -2,7 +2,7 @@
 
 public class NewTransportContract
 {
-    public NewTransportContract(DateOnly departureDate, bool isReturn, int places, int transportOptionId)
+    public NewTransportContract(DateTime departureDate, bool isReturn, int places, int transportOptionId)
     {
         DepartureDate = departureDate;
         IsReturn = isReturn;
@@ -10,7 +10,7 @@ public class NewTransportContract
         TransportOptionId = transportOptionId;
     }
 
-    public DateOnly DepartureDate { get; }
+    public DateTime DepartureDate { get; }
 
     public bool IsReturn { get; }
 

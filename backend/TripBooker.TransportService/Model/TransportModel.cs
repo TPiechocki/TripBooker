@@ -5,7 +5,7 @@ namespace TripBooker.TransportService.Model;
 
 internal class TransportModel : EventModel
 {
-    public DateOnly DepartureDate { get; set; }
+    public DateTime DepartureDate { get; set; }
 
     public string DeparturePlace { get; set; } = null!;
 
