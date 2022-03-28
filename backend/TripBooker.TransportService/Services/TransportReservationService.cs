@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Transactions;
-using TripBooker.TransportService.Contract;
+using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Reservation;
