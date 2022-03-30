@@ -1,4 +1,5 @@
 ﻿using TripBooker.Common.Transport;
+using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Services;

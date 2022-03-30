@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Repositories;
 
-namespace TripBooker.TransportService.EventConsumers;
+namespace TripBooker.TransportService.EventConsumers.Internal;
 
 internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateEvent>
 {

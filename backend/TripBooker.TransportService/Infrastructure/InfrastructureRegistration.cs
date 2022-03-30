@@ -5,7 +5,10 @@ using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
+using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.EventConsumers;
+using TripBooker.TransportService.EventConsumers.Internal;
+using TripBooker.TransportService.EventConsumers.Public;
 
 namespace TripBooker.TransportService.Infrastructure;
 
@@ -45,12 +48,17 @@ internal static class ServicesRegistration
 
         return services.AddMassTransit(x =>
                 {
+                    // public
+                    x.AddConsumer<NewReservationEventConsumer>();
+
+                    // internal
                     x.AddConsumer<TransportViewUpdateEventConsumer>();
 
                     x.UsingRabbitMq((context, cfg) =>
                         {
                             cfg.Host(host);
                             cfg.ConfigureEndpoints(context);
+                            cfg.UseRawJsonSerializer();
                         }
                     );
                 }
