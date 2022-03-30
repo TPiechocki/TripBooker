@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TripBooker.Common.Transport.Contract;
+namespace TripBooker.Common.Transport.Contract.Command;
 
 public class NewReservationContract : ContractBase
 {

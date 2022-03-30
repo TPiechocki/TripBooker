@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using TripBooker.Common.Transport;
-using TripBooker.Common.Transport.Contract;
+using TripBooker.Common.Transport.Contract.Command;
+using TripBooker.Common.Transport.Contract.Response;
 using TripBooker.TransportService.Services;
 
 namespace TripBooker.TransportService.EventConsumers.Public;

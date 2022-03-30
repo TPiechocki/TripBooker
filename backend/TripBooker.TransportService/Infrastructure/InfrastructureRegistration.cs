@@ -20,7 +20,10 @@ internal static class ServicesRegistration
             .AddDbContext<TransportDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSimpleConsole(opt =>
+                    {
+                        opt.TimestampFormat = "[HH:mm:ss.fff] ";
+                    })))
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
             .AddSingleton(s =>
@@ -50,6 +53,7 @@ internal static class ServicesRegistration
                 {
                     // public
                     x.AddConsumer<NewReservationEventConsumer>();
+                    x.AddConsumer<CancelReservationEventConsumer>();
 
                     // internal
                     x.AddConsumer<TransportViewUpdateEventConsumer>();
@@ -68,6 +72,7 @@ internal static class ServicesRegistration
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)
     {
+        // configure job to create update view event every 15s
         return services.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();

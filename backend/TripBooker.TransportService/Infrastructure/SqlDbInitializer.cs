@@ -1,5 +1,5 @@
 ﻿using TripBooker.Common.Transport;
-using TripBooker.Common.Transport.Contract;
+using TripBooker.Common.Transport.Contract.Command;
 using TripBooker.TransportService.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Services;
@@ -61,14 +61,24 @@ internal static class SqlDbInitializer
         // Reservations
         if (!transportContext.ReservationEvent.Any())
         {
+            // correct reservation example
             reservationService.AddNewReservation(
-                    new NewReservationContract(transportId[1], 7),
+                    new NewReservationContract(new Guid(), transportId[1], 7),
                     default)
                 .GetAwaiter().GetResult();
+            // reject reservation example
             reservationService.AddNewReservation(
-                    new NewReservationContract(transportId[1], 500),
+                    new NewReservationContract(new Guid(), transportId[1], 500),
                     default)
                 .GetAwaiter().GetResult();
+
+            // cancel reservation example
+            var reservation = reservationService.AddNewReservation(
+                    new NewReservationContract(new Guid(), transportId[0], 4),
+                    default)
+                .GetAwaiter().GetResult();
+            reservationService.Cancel(reservation.Id, default).GetAwaiter().GetResult();
+
         }
 
         transportContext.SaveChanges();
