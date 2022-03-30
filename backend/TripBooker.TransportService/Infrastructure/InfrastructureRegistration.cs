@@ -56,7 +56,11 @@ internal static class ServicesRegistration
                     x.AddConsumer<CancelReservationEventConsumer>();
 
                     // internal
-                    x.AddConsumer<TransportViewUpdateEventConsumer>();
+                    x.AddConsumer<TransportViewUpdateEventConsumer>(opt =>
+                    {
+                        // do not reload the view concurrently
+                        opt.UseConcurrentMessageLimit(1);
+                    });
 
                     x.UsingRabbitMq((context, cfg) =>
                         {
