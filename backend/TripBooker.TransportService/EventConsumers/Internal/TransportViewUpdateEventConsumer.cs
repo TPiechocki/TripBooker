@@ -28,9 +28,32 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
     {
         var cancellationToken = context.CancellationToken;
 
-        var oldTimestamp = await UpdateTimestamp(cancellationToken);
+        const string timestampKey = TransportViewUpdateEventConstants.TimestampKey;
 
-        // read all events after timestamp
+        // query current timestamp
+        var eventTimestamp = await _timestampRepository.QueryOne(timestampKey, cancellationToken);
+        var oldTimestamp = eventTimestamp?.Timestamp ?? DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
+        var newTimestamp = DateTime.UtcNow;
+
+        await ConsumeEventsSince(oldTimestamp, cancellationToken);
+
+        // save new timestamp after successful consume
+        if (eventTimestamp == null)
+        {
+            await _timestampRepository.CreateOne(timestampKey, newTimestamp, cancellationToken);
+        }
+        else
+        {
+            eventTimestamp.Timestamp = newTimestamp;
+            await _timestampRepository.UpdateOne(eventTimestamp, cancellationToken);
+        }
+    }
+
+    private async Task ConsumeEventsSince(DateTime oldTimestamp, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"Started consuming events since {oldTimestamp}.");
+
+        // read all events after old timestamp
         var newEvents = await _transportRepository.GetEventsSinceAsync(oldTimestamp, cancellationToken);
         var transportIdsToUpdate = newEvents.Select(x => x.StreamId).Distinct().ToList();
 
@@ -46,27 +69,5 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +
                                $"Updated rows (count={transportIdsToUpdate.Count}): {JsonConvert.SerializeObject(transportIdsToUpdate)}");
-    }
-
-    private async Task<DateTime> UpdateTimestamp(CancellationToken cancellationToken)
-    {
-        const string timestampKey = TransportViewUpdateEventConstants.TimestampKey;
-
-        var eventTimestamp = await _timestampRepository.QueryOne(timestampKey, cancellationToken);
-        var oldTimestamp = eventTimestamp?.Timestamp ?? DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
-        _logger.LogInformation($"Started consuming events since {oldTimestamp}.");
-
-        var newTimestamp = DateTime.UtcNow;
-        if (eventTimestamp == null)
-        {
-            await _timestampRepository.CreateOne(timestampKey, newTimestamp, cancellationToken);
-        }
-        else
-        {
-            eventTimestamp.Timestamp = newTimestamp;
-            await _timestampRepository.UpdateOne(eventTimestamp, cancellationToken);
-        }
-
-        return oldTimestamp;
     }
 }
