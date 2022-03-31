@@ -15,7 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\docker-compose.developer.yml = ..\docker-compose.developer.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.HotelService", "TripBooker.HotelService\TripBooker.HotelService.csproj", "{90A75427-92A2-4217-886D-147CF25D3121}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.HotelService", "TripBooker.HotelService\TripBooker.HotelService.csproj", "{90A75427-92A2-4217-886D-147CF25D3121}"
+	ProjectSection(ProjectDependencies) = postProject
+		{93278898-5520-4CA0-B513-1FC00F5D3B15} = {93278898-5520-4CA0-B513-1FC00F5D3B15}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
