@@ -20,13 +20,7 @@ internal class HotelOption
 
     public int Rating { get; set; }
 
-    public double PriceStudio { get; set; }
+    public double PriceModifier { get; set; }
 
-    public double PriceSmall { get; set; }
-
-    public double PriceMedium { get; set; }
-
-    public double PriceLarge { get; set; }
-
-    public double PriceApartment { get; set; }
+    public List<RoomOption> Rooms { get; set; }
 }
