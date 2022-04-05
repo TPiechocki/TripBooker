@@ -1,4 +1,6 @@
 using TripBooker.HotelService.Infrastructure;
+using TripBooker.HotelService.Repositories;
+using TripBooker.HotelService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration)
+    .AddRepositories()
+    .AddServices();
 
 var app = builder.Build();
 
