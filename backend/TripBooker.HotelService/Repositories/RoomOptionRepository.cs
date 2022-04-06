@@ -7,8 +7,6 @@ namespace TripBooker.HotelService.Repositories;
 internal interface IRoomOptionRepository
 {
     Task<RoomOption?> GetById(int id, CancellationToken cancellationToken);
-
-    Task<ICollection<RoomOption>> GetByHotelId(int hotelId, CancellationToken cancellationToken);
 }
 
 internal class RoomOptionRepository : IRoomOptionRepository
@@ -23,10 +21,5 @@ internal class RoomOptionRepository : IRoomOptionRepository
     public async Task<RoomOption?> GetById(int id, CancellationToken cancellationToken)
     {
         return await _dbContext.RoomOption.FindAsync(id, cancellationToken);
-    }
-
-    public async Task<ICollection<RoomOption>> GetByHotelId(int hotelId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.RoomOption.Where(x => x.HotelId == hotelId).ToListAsync(cancellationToken);
     }
 }

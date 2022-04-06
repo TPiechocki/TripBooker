@@ -22,5 +22,5 @@ internal class HotelOption
 
     public double PriceModifier { get; set; }
 
-    public List<RoomOption> Rooms { get; set; }
+    public List<RoomOption> Rooms { get; set; } = new List<RoomOption>();
 }

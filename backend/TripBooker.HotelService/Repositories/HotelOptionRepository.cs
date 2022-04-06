@@ -1,4 +1,5 @@
-﻿using TripBooker.HotelService.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore;
+using TripBooker.HotelService.Infrastructure;
 using TripBooker.HotelService.Model;
 
 namespace TripBooker.HotelService.Repositories;
@@ -6,7 +7,7 @@ namespace TripBooker.HotelService.Repositories;
 internal interface IHotelOptionRepository
 {
     Task AddAsyc(HotelOption hotelOption, CancellationToken cancellationToken);
-    Task<HotelOption?> GetById(int id, CancellationToken cancellationToken);
+    Task<HotelOption?> GetByIdAsync(int id, CancellationToken cancellationToken);
 }
 
 internal class HotelOptionRepository : IHotelOptionRepository
@@ -23,8 +24,9 @@ internal class HotelOptionRepository : IHotelOptionRepository
         await _dbContext.HotelOption.AddAsync(hotelOption, cancellationToken);
     }
 
-    public async Task<HotelOption?> GetById(int id, CancellationToken cancellationToken)
+    public async Task<HotelOption?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.HotelOption.FindAsync(id, cancellationToken);
+        // Retrieves Hotels with the Rooms loaded
+        return await _dbContext.HotelOption.Include(h => h.Rooms).FirstOrDefaultAsync(h => h.Id == id, cancellationToken);
     }
 }

@@ -6,7 +6,8 @@ internal static class RepositoriesRegistration
     {
         return services
             .AddScoped<IHotelOptionRepository, HotelOptionRepository>()
-            .AddScoped<IRoomOptionRepository, RoomOptionRepository>();
+            .AddScoped<IRoomOptionRepository, RoomOptionRepository>()
+            .AddScoped<IHotelOccupationModelRepository, HotelOccupationModelRepository>();
     }
     
 }
