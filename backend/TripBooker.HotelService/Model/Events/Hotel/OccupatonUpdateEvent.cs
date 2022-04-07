@@ -1,12 +1,8 @@
-﻿using TripBooker.Common;
+﻿namespace TripBooker.HotelService.Model.Events.Hotel;
 
-namespace TripBooker.HotelService.Model;
-
-internal class HotelOccupationModel : EventModel
+internal class OccupatonUpdateEvent
 {
-    public Guid HotelId { get; set; }
-    
-    public DateTime Date { get; set; }
+    public Guid ReservationEventId { get; }
 
     public int RoomsStudio { get; set; }
 

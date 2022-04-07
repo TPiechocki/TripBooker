@@ -10,9 +10,9 @@ internal interface IHotelOccupationModelRepository
 
     Task<HotelOccupationModel?> GetAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<HotelOccupationModel?> GetByHotelIdAndDateAsync(int hotelId, DateTime day, CancellationToken cancellationToken);
+    Task<HotelOccupationModel?> GetByHotelIdAndDateAsync(Guid hotelId, DateTime day, CancellationToken cancellationToken);
 
-    Task<ICollection<HotelOccupationModel>> GetByHotelIdAsync(int hotelId, CancellationToken cancellationToken);
+    Task<ICollection<HotelOccupationModel>> GetByHotelIdAsync(Guid hotelId, CancellationToken cancellationToken);
 }
 
 internal class HotelOccupationModelRepository : IHotelOccupationModelRepository
@@ -34,14 +34,14 @@ internal class HotelOccupationModelRepository : IHotelOccupationModelRepository
         return await _dbContext.HotelOccupationModels.FindAsync(cancellationToken, id);
     }
 
-    public async Task<ICollection<HotelOccupationModel>> GetByHotelIdAsync(int hotelId, CancellationToken cancellationToken)
+    public async Task<ICollection<HotelOccupationModel>> GetByHotelIdAsync(Guid hotelId, CancellationToken cancellationToken)
     {
         return await _dbContext.HotelOccupationModels
             .Where(om => om.HotelId == hotelId)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<HotelOccupationModel?> GetByHotelIdAndDateAsync(int hotelId, DateTime day, CancellationToken cancellationToken)
+    public async Task<HotelOccupationModel?> GetByHotelIdAndDateAsync(Guid hotelId, DateTime day, CancellationToken cancellationToken)
     {
         return await _dbContext.HotelOccupationModels
             .Where(om => om.HotelId == hotelId && om.Date == day)
