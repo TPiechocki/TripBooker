@@ -5,6 +5,12 @@ using TripBooker.TransportService.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddInfrastructure(builder.Configuration)
+    .AddRepositories()
+    .AddServices();
+
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
@@ -12,11 +18,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddInfrastructure(builder.Configuration)
-    .AddRepositories()
-    .AddServices();
 
 var app = builder.Build();
 
@@ -30,8 +32,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// app.UseAuthorization();
 
 app.MapControllers();
 
