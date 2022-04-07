@@ -21,9 +21,4 @@
   <ItemGroup>
     <ProjectReference Include="..\TripBooker.Common\TripBooker.Common.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Model\Mappings\" />
-  </ItemGroup>
-
 </Project>
