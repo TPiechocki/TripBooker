@@ -1,24 +1,20 @@
-using TripBooker.TransportService.Infrastructure;
-using TripBooker.TransportService.Repositories;
-using TripBooker.TransportService.Services;
+using TripBooker.TravelAgencyService.Infrastructure;
+using TripBooker.TravelAgencyService.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddInfrastructure(builder.Configuration)
-    .AddRepositories()
-    .AddServices();
-
+builder.Services
+    .AddInfrastructure(builder.Configuration)
+    .AddRepositories();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 var app = builder.Build();
 
@@ -33,10 +29,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
 app.MapControllers();
 
 app.Run();
-
 
 static void CreateDbIfNotExists(IHost host)
 {
@@ -44,11 +40,9 @@ static void CreateDbIfNotExists(IHost host)
     var services = scope.ServiceProvider;
     try
     {
-        var transportContext = services.GetRequiredService<TransportDbContext>();
-        var transportService = services.GetRequiredService<ITransportService>();
-        var reservationService = services.GetRequiredService<ITransportReservationService>();
+        var dbContext = services.GetRequiredService<TravelAgencyDbContext>();
 
-        SqlDbInitializer.Initialize(transportContext, transportService, reservationService);
+        SqlDbInitializer.Initialize(dbContext);
     }
     catch (Exception ex)
     {

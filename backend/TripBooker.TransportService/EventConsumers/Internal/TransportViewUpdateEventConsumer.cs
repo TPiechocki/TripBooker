@@ -1,5 +1,7 @@
-﻿using MassTransit;
+﻿using AutoMapper;
+using MassTransit;
 using Newtonsoft.Json;
+using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Repositories;
 
@@ -11,17 +13,23 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
     private readonly IEventTimestampRepository _timestampRepository;
     private readonly ITransportEventRepository _transportRepository;
     private readonly ITransportViewRepository _viewRepository;
+    private readonly IBus _bus;
+    private readonly IMapper _mapper;
 
     public TransportViewUpdateEventConsumer(
         ILogger<TransportViewUpdateEventConsumer> logger,
         IEventTimestampRepository timestampRepository, 
         ITransportEventRepository transportRepository, 
-        ITransportViewRepository viewRepository)
+        ITransportViewRepository viewRepository, 
+        IBus bus, 
+        IMapper mapper)
     {
         _logger = logger;
         _timestampRepository = timestampRepository;
         _transportRepository = transportRepository;
         _viewRepository = viewRepository;
+        _bus = bus;
+        _mapper = mapper;
     }
 
     public async Task Consume(ConsumeContext<TransportViewUpdateEvent> context)
@@ -64,7 +72,7 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
                 await _transportRepository.GetTransportEventsAsync(transportId, cancellationToken));
 
             await _viewRepository.AddOrUpdateAsync(transportModel, cancellationToken);
-            // TODO: publish event with updated data for other services' views
+            await _bus.Publish(_mapper.Map<TransportViewContract>(transportModel), cancellationToken);
         }
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +

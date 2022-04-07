@@ -5,8 +5,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
-using TripBooker.Common.Transport.Contract;
-using TripBooker.TransportService.EventConsumers;
 using TripBooker.TransportService.EventConsumers.Internal;
 using TripBooker.TransportService.EventConsumers.Public;
 
