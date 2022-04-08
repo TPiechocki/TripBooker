@@ -67,8 +67,7 @@ internal static class ServicesRegistration
                         }
                     );
                 }
-            )
-            .AddMassTransitHostedService(true);
+            );
     }
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)

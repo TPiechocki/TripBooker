@@ -40,7 +40,6 @@ internal static class ServicesRegistration
                         cfg.ConfigureEndpoints(context);
                     }
                 );
-            })
-            .AddMassTransitHostedService(true);
+            });
     }
 }

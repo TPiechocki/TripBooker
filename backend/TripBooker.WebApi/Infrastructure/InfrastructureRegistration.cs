@@ -1,5 +1,4 @@
 ﻿using MassTransit;
-using TripBooker.Common.TravelAgency;
 using TripBooker.Common.TravelAgency.Folder.Query;
 
 namespace TripBooker.WebApi.Infrastructure
@@ -31,8 +30,7 @@ namespace TripBooker.WebApi.Infrastructure
                             }
                         );
                     }
-                )
-                .AddMassTransitHostedService(true);
+                );
         }
     }
 }
