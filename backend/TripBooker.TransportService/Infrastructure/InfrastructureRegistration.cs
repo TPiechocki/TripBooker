@@ -64,7 +64,6 @@ internal static class ServicesRegistration
                         {
                             cfg.Host(host);
                             cfg.ConfigureEndpoints(context);
-                            cfg.UseRawJsonSerializer();
                         }
                     );
                 }

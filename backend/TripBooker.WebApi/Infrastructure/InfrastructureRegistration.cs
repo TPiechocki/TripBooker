@@ -22,14 +22,12 @@ namespace TripBooker.WebApi.Infrastructure
                         // public
 
                         // request client needs defined endpoint to work properly
-                        x.AddRequestClient<DestinationsQueryContract>(
-                            new Uri($"rabbitmq://{host}/{TravelAgencyConstants.Endpoints.Destinations}"));
+                        x.AddRequestClient<DestinationsQueryContract>();
 
                         x.UsingRabbitMq((context, cfg) =>
                             {
                                 cfg.Host(host);
                                 cfg.ConfigureEndpoints(context);
-                                cfg.UseRawJsonSerializer();
                             }
                         );
                     }

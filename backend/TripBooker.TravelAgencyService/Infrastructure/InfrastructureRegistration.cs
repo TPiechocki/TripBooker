@@ -32,18 +32,12 @@ internal static class ServicesRegistration
                 // public
                 x.AddConsumer<TransportViewContractConsumer>();
 
+                x.AddConsumer<DestinationsQueryConsumer>();
+
                 x.UsingRabbitMq((context, cfg) =>
                     {
                         cfg.Host(host);
                         cfg.ConfigureEndpoints(context);
-                        cfg.UseRawJsonSerializer();
-
-                        cfg.ReceiveEndpoint(TravelAgencyConstants.Endpoints.Destinations, e =>
-                        {
-                            e.Consumer(() => new DestinationsQueryConsumer(
-                                context.GetRequiredService<ILogger<DestinationsQueryConsumer>>(),
-                                context.GetRequiredService<IDestinationsService>()));
-                        });
                     }
                 );
             })
