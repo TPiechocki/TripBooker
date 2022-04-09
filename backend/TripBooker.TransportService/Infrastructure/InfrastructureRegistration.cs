@@ -67,7 +67,11 @@ internal static class ServicesRegistration
                         }
                     );
                 }
-            );
+            )
+            .Configure<MassTransitHostOptions>(x =>
+            {
+                x.WaitUntilStarted = true;
+            });
     }
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)

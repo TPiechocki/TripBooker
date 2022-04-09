@@ -1,8 +1,7 @@
-﻿using AutoMapper;
-using MassTransit;
+﻿using MassTransit;
 using Newtonsoft.Json;
-using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.Model.Events;
+using TripBooker.TransportService.Model.Mappings;
 using TripBooker.TransportService.Repositories;
 
 namespace TripBooker.TransportService.EventConsumers.Internal;
@@ -14,22 +13,22 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
     private readonly ITransportEventRepository _transportRepository;
     private readonly ITransportViewRepository _viewRepository;
     private readonly IBus _bus;
-    private readonly IMapper _mapper;
+    private readonly ITransportOptionRepository _transportOptionRepository;
 
     public TransportViewUpdateEventConsumer(
         ILogger<TransportViewUpdateEventConsumer> logger,
         IEventTimestampRepository timestampRepository, 
         ITransportEventRepository transportRepository, 
         ITransportViewRepository viewRepository, 
-        IBus bus, 
-        IMapper mapper)
+        IBus bus,
+        ITransportOptionRepository transportOptionRepository)
     {
         _logger = logger;
         _timestampRepository = timestampRepository;
         _transportRepository = transportRepository;
         _viewRepository = viewRepository;
         _bus = bus;
-        _mapper = mapper;
+        _transportOptionRepository = transportOptionRepository;
     }
 
     public async Task Consume(ConsumeContext<TransportViewUpdateEvent> context)
@@ -72,7 +71,15 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
                 await _transportRepository.GetTransportEventsAsync(transportId, cancellationToken));
 
             await _viewRepository.AddOrUpdateAsync(transportModel, cancellationToken);
-            await _bus.Publish(_mapper.Map<TransportViewContract>(transportModel), cancellationToken);
+
+            var transportOption = await _transportOptionRepository.GetById(transportModel.TransportOptionId);
+            if (transportOption == null)
+            {
+                throw new InvalidOperationException("Cannot map transport without defined transport option." +
+                                                    $"(missingOptionId={transportModel.TransportOptionId}");
+            }
+
+            await _bus.Publish(TransportViewContractMapper.MapFrom(transportModel, transportOption), cancellationToken);
         }
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +

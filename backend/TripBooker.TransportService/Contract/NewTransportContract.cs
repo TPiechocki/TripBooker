@@ -2,17 +2,14 @@
 
 public class NewTransportContract
 {
-    public NewTransportContract(DateTime departureDate, bool isReturn, int places, int transportOptionId)
+    public NewTransportContract(int transportOptionId, DateTime departureDate, int places)
     {
         DepartureDate = departureDate;
-        IsReturn = isReturn;
         Places = places;
         TransportOptionId = transportOptionId;
     }
 
     public DateTime DepartureDate { get; }
-
-    public bool IsReturn { get; }
 
     public int Places { get; }
 
