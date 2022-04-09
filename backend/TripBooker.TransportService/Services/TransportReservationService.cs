@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Transactions;
-using TripBooker.TransportService.Contract;
+using TripBooker.Common;
+using TripBooker.Common.Transport;
+using TripBooker.Common.Transport.Contract.Command;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Reservation;
@@ -13,6 +15,8 @@ namespace TripBooker.TransportService.Services;
 internal interface ITransportReservationService
 {
     Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken);
+
+    Task Cancel(Guid reservationId, CancellationToken cancellationToken);
 }
 
 internal class TransportReservationService : ITransportReservationService
@@ -58,7 +62,7 @@ internal class TransportReservationService : ITransportReservationService
             }
             catch (DbUpdateException e)
             {
-                if (e.GetBaseException() is PostgresException { SqlState: "23505" })
+                if (e.GetBaseException() is PostgresException { SqlState: GlobalConstants.PostgresUniqueViolationCode })
                 {
                     // repeat if there was version violation, so the db read and business logic
                     // does not need to be inside transaction
@@ -71,9 +75,49 @@ internal class TransportReservationService : ITransportReservationService
             }
         }
 
+        // read can be safely outside transaction as reservationId is not known by anybody else at this point
         var reservationEvents = 
             await _reservationEventRepository.GetReservationEvents(reservationStreamId, cancellationToken);
         return ReservationBuilder.Build(reservationEvents);
+    }
+
+    public async Task Cancel(Guid reservationId, CancellationToken cancellationToken) 
+    {
+        var reservationEvents =
+            await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
+        var reservation = ReservationBuilder.Build(reservationEvents);
+
+        if (reservation.Status != ReservationStatus.Accepted && reservation.Status != ReservationStatus.Confirmed)
+            return;
+
+        var tryTransaction = true;
+        while (tryTransaction)
+        {
+            tryTransaction = false;
+
+            var transportEvents =
+                await _transportRepository.GetTransportEventsAsync(reservation.TransportId, cancellationToken);
+
+            var transportItem = TransportBuilder.Build(transportEvents);
+
+            try
+            {
+                await ValidateCancelReservationTransaction(reservation, transportItem, cancellationToken);
+            }
+            catch (DbUpdateException e)
+            {
+                if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode })
+                {
+                    // repeat if there was version violation, so the db read and business logic
+                    // does not need to be inside transaction
+                    tryTransaction = true;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
     }
 
     private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation,
@@ -91,6 +135,25 @@ internal class TransportReservationService : ITransportReservationService
             cancellationToken);
 
         await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
+
+        transaction.Complete();
+    }
+
+    private async Task ValidateCancelReservationTransaction(ReservationModel reservation,
+        TransportModel transportItem,
+        CancellationToken cancellationToken)
+    {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var transportEvent = new TransportPlaceUpdateEvent(
+            transportItem.AvailablePlaces + reservation.Places,
+            reservation.Places,
+            reservation.Id);
+
+        await _transportRepository.AddAsync(transportEvent, reservation.TransportId, transportItem.Version,
+            cancellationToken);
+
+        await _reservationEventRepository.AddCancelledAsync(reservation.Id, reservation.Version, cancellationToken);
 
         transaction.Complete();
     }

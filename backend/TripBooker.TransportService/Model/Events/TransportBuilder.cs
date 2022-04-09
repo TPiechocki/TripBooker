@@ -36,9 +36,7 @@ internal static class TransportBuilder
 
         item.AvailablePlaces = data.AvailablePlaces;
         item.DepartureDate = data.DepartureDate;
-        item.DeparturePlace = data.DeparturePlace;
-        item.Destination = data.Destination;
-        item.Type = data.Type;
+        item.TransportOptionId = data.TransportOptionId;
     }
 
     private static void ApplyPlaceUpdate(this TransportModel item, BaseEvent @event)

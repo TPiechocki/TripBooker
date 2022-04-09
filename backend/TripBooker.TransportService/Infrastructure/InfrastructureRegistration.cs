@@ -5,7 +5,8 @@ using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
-using TripBooker.TransportService.EventConsumers;
+using TripBooker.TransportService.EventConsumers.Internal;
+using TripBooker.TransportService.EventConsumers.Public;
 
 namespace TripBooker.TransportService.Infrastructure;
 
@@ -17,7 +18,10 @@ internal static class ServicesRegistration
             .AddDbContext<TransportDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSimpleConsole(opt =>
+                    {
+                        opt.TimestampFormat = "[HH:mm:ss.fff] ";
+                    })))
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
             .AddSingleton(s =>
@@ -45,7 +49,16 @@ internal static class ServicesRegistration
 
         return services.AddMassTransit(x =>
                 {
-                    x.AddConsumer<TransportViewUpdateEventConsumer>();
+                    // public
+                    x.AddConsumer<NewReservationEventConsumer>();
+                    x.AddConsumer<CancelReservationEventConsumer>();
+
+                    // internal
+                    x.AddConsumer<TransportViewUpdateEventConsumer>(opt =>
+                    {
+                        // do not reload the view concurrently
+                        opt.UseConcurrentMessageLimit(1);
+                    });
 
                     x.UsingRabbitMq((context, cfg) =>
                         {
@@ -55,11 +68,15 @@ internal static class ServicesRegistration
                     );
                 }
             )
-            .AddMassTransitHostedService(true);
+            .Configure<MassTransitHostOptions>(x =>
+            {
+                x.WaitUntilStarted = true;
+            });
     }
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)
     {
+        // configure job to create update view event every 15s
         return services.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();
