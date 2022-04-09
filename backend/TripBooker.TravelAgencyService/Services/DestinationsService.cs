@@ -21,6 +21,6 @@ internal class DestinationsService : IDestinationsService
     {
         var allTransports = _repository.QueryAll();
         // TODO: consider hotel localizations 
-        return await allTransports.Select(x => x.Destination).Distinct().ToListAsync(cancellationToken);
+        return await allTransports.Select(x => x.DestinationAirportName).Distinct().ToListAsync(cancellationToken);
     }
 }
