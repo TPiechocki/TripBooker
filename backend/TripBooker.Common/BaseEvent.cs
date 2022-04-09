@@ -39,7 +39,7 @@ public class BaseEvent
     public DateTime Timestamp { get; set; }
 
     [Required] 
-    public string Type { get; set; } = null!;
+    public string Type { get; set; }
 
-    public string Data { get; set; } = null!;
+    public string Data { get; set; }
 }

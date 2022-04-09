@@ -31,12 +31,10 @@ internal class TransportService : ITransportService
                 nameof(transport));
         }
 
-        var newTransportEvent = transport.MapToNewTransportEventData(transportOption);
+        var newTransportEvent = transport.MapToNewTransportEventData();
 
         var guid = await _eventRepository.AddNewAsync(
             newTransportEvent, cancellationToken);
-
-        // TODO: update view based on event table with internal bus
 
         return guid;
     }

@@ -1,15 +1,55 @@
 version: "3.4"
 
 services:
+    webapi:
+        container_name: webapi
+        build:
+            context: backend
+            dockerfile: TripBooker.WebApi/Dockerfile
+        depends_on:
+            - "rabbitmq"
+            - "travel-agency-service"
+        ports:
+            - 8081:80
+        environment:
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+
     transport-service:
         container_name: transport-service
         build:
             context: backend
             dockerfile: TripBooker.TransportService/Dockerfile
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+            - "mongodb"
+            - "travel-agency-service"           # remove if travel agency will query the data on startup
         ports:
             - 8082:80
         environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641;Username=admin;Password=password"
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Transport;Username=admin;Password=password"
+            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    travel-agency-service:
+        container_name: travel-agency-service
+        build:
+            context: backend
+            dockerfile: TripBooker.TravelAgencyService/Dockerfile
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+        ports:
+            - 8083:80
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TravelAgency;Username=admin;Password=password"
             ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
