@@ -1,0 +1,367 @@
+DepartureAirportName,DepartureAirportCode,DepartureAirportCountry,DestinationAirportName,DestinationAirportCode,DestinationAirportCountry,Duration
+Podgorica,TGD,Czarnogóra,Gdańsk,GDN,Polska,255
+Warszawa-Chopina,WAW,Polska,Milas-Bodrum,BJV,Turcja,160
+Samos,SMI,Grecja,Warszawa-Chopina,WAW,Polska,160
+Mauritius,MRU,Mauritius,Warszawa-Chopina,WAW,Polska,1330
+Rodos,RHO,Grecja,Warszawa-Chopina,WAW,Polska,170
+Heraklion,HER,Grecja,Wrocław,WRO,Polska,165
+Hurghada,HRG,Egipt,Katowice,KTW,Polska,250
+Poznań,POZ,Polska,Rodos,RHO,Grecja,175
+Funchal,FNC,Portugalia,Katowice,KTW,Polska,305
+Warszawa-Chopina,WAW,Polska,Burgas,BOJ,Bułgaria,130
+Warszawa-Chopina,WAW,Polska,Teneryfa,TFS,Wyspy Kanaryjskie,345
+Hurghada,HRG,Egipt,Warszawa-Chopina,WAW,Polska,260
+Warszawa-Chopina,WAW,Polska,Punta Cana,PUJ,Dominikana,1020
+Izmir,ADB,Turcja,Katowice,KTW,Polska,145
+Katowice,KTW,Polska,Dubrownik,DBV,Chorwacja,760
+Warszawa-Chopina,WAW,Polska,Denpasar,DPS,Indonezja - Bali,1295
+Dubai,DXB,Zjednoczone Emiraty Arabskie,Katowice,KTW,Polska,330
+Gran Canaria,LPA,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,345
+Hurghada,HRG,Egipt,Katowice,KTW,Polska,245
+Sri Lanka,CMB,Sri Lanka,Warszawa-Chopina,WAW,Polska,1065
+Hurghada,HRG,Egipt,Wrocław,WRO,Polska,255
+Rodos,RHO,Grecja,Poznań,POZ,Polska,175
+Sri Lanka,CMB,Sri Lanka,Warszawa-Chopina,WAW,Polska,845
+Rzeszów,RZE,Polska,Podgorica,TGD,Czarnogóra,250
+Katowice,KTW,Polska,Rodos,RHO,Grecja,160
+Enfidha,NBE,Tunezja,Warszawa-Chopina,WAW,Polska,185
+Wrocław,WRO,Polska,Burgas,BOJ,Bułgaria,125
+Katowice,KTW,Polska,Gran Canaria,LPA,Wyspy Kanaryjskie,345
+Katowice,KTW,Polska,Varadero,VRA,Kuba,845
+Dalaman,DLM,Turcja,Warszawa-Chopina,WAW,Polska,175
+Fuerteventura,FUE,Wyspy Kanaryjskie,Katowice,KTW,Polska,315
+Izmir,ADB,Turcja,Wrocław,WRO,Polska,145
+Sharm El Sheikh,SSH,Egipt,Warszawa-Chopina,WAW,Polska,250
+Male,MLE,Malediwy,Kraków,KRK,Polska,885
+Warszawa-Chopina,WAW,Polska,Djerba,DJE,Tunezja,185
+Gran Canaria,LPA,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,340
+Katowice,KTW,Polska,Dubai,DXB,Zjednoczone Emiraty Arabskie,330
+Phuket,HKT,Tajlandia,Kraków,KRK,Polska,1940
+Katowice,KTW,Polska,Gran Canaria,LPA,Wyspy Kanaryjskie,295
+Katowice,KTW,Polska,Funchal,FNC,Portugalia,305
+Minorka,MAH,Hiszpania,Warszawa-Chopina,WAW,Polska,185
+Warszawa-Chopina,WAW,Polska,Lanzarote,ACE,Wyspy Kanaryjskie,330
+Araxos,GPA,Grecja,Warszawa-Chopina,WAW,Polska,150
+Warna,VAR,Bułgaria,Katowice,KTW,Polska,110
+Katowice,KTW,Polska,Dalaman,DLM,Turcja,165
+Dalaman,DLM,Turcja,Warszawa-Chopina,WAW,Polska,170
+Warszawa-Chopina,WAW,Polska,Dubai,DXB,Zjednoczone Emiraty Arabskie,360
+Antalya,AYT,Turcja,Warszawa-Chopina,WAW,Polska,180
+Gdańsk,GDN,Polska,Aruba,AUA,Aruba,1030
+Warszawa-Chopina,WAW,Polska,Mahe,SEZ,Seszele,770
+Fuerteventura,FUE,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,320
+Zakynthos,ZTH,Grecja,Katowice,KTW,Polska,165
+Gdańsk,GDN,Polska,Mauritius,MRU,Mauritius,1270
+Poznań,POZ,Polska,Cancun,CUN,Meksyk,835
+Cancun,CUN,Meksyk,Kraków,KRK,Polska,1050
+Katowice,KTW,Polska,Marsa Alam,RMF,Egipt,270
+Antalya,AYT,Turcja,Warszawa-Chopina,WAW,Polska,175
+Warszawa-Chopina,WAW,Polska,Dalaman,DLM,Turcja,175
+Warszawa-Chopina,WAW,Polska,Sharm El Sheikh,SSH,Egipt,250
+Gdańsk,GDN,Polska,Aruba,AUA,Aruba,1025
+Sri Lanka,CMB,Sri Lanka,Kraków,KRK,Polska,750
+Antalya,AYT,Turcja,Kraków,KRK,Polska,170
+Aruba,AUA,Aruba,Gdańsk,GDN,Polska,1030
+Katowice,KTW,Polska,Punta Cana,PUJ,Dominikana,680
+Warszawa-Chopina,WAW,Polska,Pafos,PFO,Cypr,190
+Wrocław,WRO,Polska,Izmir,ADB,Turcja,145
+Funchal,FNC,Portugalia,Warszawa-Chopina,WAW,Polska,315
+Warszawa-Chopina,WAW,Polska,Mauritius,MRU,Mauritius,895
+Kraków,KRK,Polska,Male,MLE,Malediwy,1110
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,945
+Warszawa-Chopina,WAW,Polska,Montego Bay,MBJ,Jamajka,1070
+Hurghada,HRG,Egipt,Poznań,POZ,Polska,265
+Wrocław,WRO,Polska,Antalya,AYT,Turcja,175
+Warszawa-Chopina,WAW,Polska,Mombasa,MBA,Kenia,620
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,1120
+Warszawa-Chopina,WAW,Polska,Cancun,CUN,Meksyk,720
+Warszawa-Chopina,WAW,Polska,Dalaman,DLM,Turcja,170
+Marsa Alam,RMF,Egipt,Katowice,KTW,Polska,280
+Antalya,AYT,Turcja,Kraków,KRK,Polska,165
+Aruba,AUA,Aruba,Gdańsk,GDN,Polska,1025
+Gran Canaria,LPA,Wyspy Kanaryjskie,Katowice,KTW,Polska,345
+Poznań,POZ,Polska,Dubai,DXB,Zjednoczone Emiraty Arabskie,270
+Male,MLE,Malediwy,Kraków,KRK,Polska,1135
+Chania,CHQ,Grecja,Katowice,KTW,Polska,155
+Katowice,KTW,Polska,Zakynthos,ZTH,Grecja,165
+Warszawa-Chopina,WAW,Polska,Samos,SMI,Grecja,165
+Podgorica,TGD,Czarnogóra,Rzeszów,RZE,Polska,250
+Poznań,POZ,Polska,Marsa Alam,RMF,Egipt,275
+Kraków,KRK,Polska,Rodos,RHO,Grecja,155
+Katowice,KTW,Polska,Enfidha,NBE,Tunezja,155
+Warszawa-Chopina,WAW,Polska,Fuerteventura,FUE,Wyspy Kanaryjskie,330
+Hurghada,HRG,Egipt,Gdańsk,GDN,Polska,270
+Kraków,KRK,Polska,Dubrownik,DBV,Chorwacja,115
+Cancun,CUN,Meksyk,Warszawa-Chopina,WAW,Polska,1285
+Warszawa-Chopina,WAW,Polska,Rodos,RHO,Grecja,170
+Denpasar,DPS,Indonezja - Bali,Warszawa-Chopina,WAW,Polska,985
+Gdańsk,GDN,Polska,Podgorica,TGD,Czarnogóra,415
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,670
+Wrocław,WRO,Polska,Zakynthos,ZTH,Grecja,145
+Warszawa-Chopina,WAW,Polska,Faro,FAO,Portugalia,290
+Rodos,RHO,Grecja,Wrocław,WRO,Polska,165
+Warszawa-Chopina,WAW,Polska,Samos,SMI,Grecja,160
+Rzeszów,RZE,Polska,Podgorica,TGD,Czarnogóra,625
+Warszawa-Chopina,WAW,Polska,Enfidha,NBE,Tunezja,185
+Kraków,KRK,Polska,Cancun,CUN,Meksyk,1050
+Katowice,KTW,Polska,Minorka,MAH,Hiszpania,155
+Kraków,KRK,Polska,Phuket,HKT,Tajlandia,1430
+Kraków,KRK,Polska,Dubrownik,DBV,Czarnogóra,115
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,1110
+Denpasar,DPS,Indonezja - Bali,Warszawa-Chopina,WAW,Polska,1600
+Marsa Alam,RMF,Egipt,Katowice,KTW,Polska,270
+Poznań,POZ,Polska,Hurghada,HRG,Egipt,265
+Zakynthos,ZTH,Grecja,Warszawa-Chopina,WAW,Polska,150
+Warszawa-Chopina,WAW,Polska,Mahe,SEZ,Seszele,750
+Warszawa-Chopina,WAW,Polska,Mauritius,MRU,Mauritius,880
+Zanzibar,ZNZ,Zanzibar,Warszawa-Chopina,WAW,Polska,625
+Katowice,KTW,Polska,Milas-Bodrum,BJV,Turcja,160
+Warszawa-Chopina,WAW,Polska,Punta Cana,PUJ,Dominikana,985
+Warszawa-Chopina,WAW,Polska,Fuerteventura,FUE,Wyspy Kanaryjskie,320
+Warszawa-Chopina,WAW,Polska,Mombasa,MBA,Kenia,605
+Wrocław,WRO,Polska,Hurghada,HRG,Egipt,255
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,705
+Warszawa-Chopina,WAW,Polska,Larnaca,LCA,Cypr,200
+Mahe,SEZ,Seszele,Warszawa-Chopina,WAW,Polska,770
+Milas-Bodrum,BJV,Turcja,Katowice,KTW,Polska,160
+Zakynthos,ZTH,Grecja,Katowice,KTW,Polska,140
+Warszawa-Chopina,WAW,Polska,Araxos,GPA,Grecja,150
+Poznań,POZ,Polska,Chania,CHQ,Grecja,180
+Split,SPU,Chorwacja,Warszawa-Chopina,WAW,Polska,340
+Katowice,KTW,Polska,Milas-Bodrum,BJV,Turcja,155
+Curaçao,CUR,Curaçao,Gdańsk,GDN,Polska,1020
+Larnaca,LCA,Cypr,Warszawa-Chopina,WAW,Polska,200
+Warszawa-Chopina,WAW,Polska,Korfu,CFU,Grecja,140
+Gran Canaria,LPA,Wyspy Kanaryjskie,Katowice,KTW,Polska,325
+Milas-Bodrum,BJV,Turcja,Katowice,KTW,Polska,155
+Marsa Alam,RMF,Egipt,Poznań,POZ,Polska,275
+Warszawa-Chopina,WAW,Polska,Sharm El Sheikh,SSH,Egipt,310
+Warszawa-Chopina,WAW,Polska,Antalya,AYT,Turcja,180
+Gdańsk,GDN,Polska,Podgorica,TGD,Czarnogóra,220
+Katowice,KTW,Polska,Tirana,TIA,Albania,100
+Marsa Alam,RMF,Egipt,Warszawa-Chopina,WAW,Polska,260
+Podgorica,TGD,Czarnogóra,Warszawa-Chopina,WAW,Polska,120
+Katowice,KTW,Polska,Antalya,AYT,Turcja,165
+Warszawa-Chopina,WAW,Polska,Korfu,CFU,Grecja,135
+Warszawa-Chopina,WAW,Polska,Larnaca,LCA,Cypr,190
+Kraków,KRK,Polska,Saloniki,SKG,Grecja,290
+Warszawa-Chopina,WAW,Polska,Antalya,AYT,Turcja,175
+Warszawa-Chopina,WAW,Polska,Montego Bay,MBJ,Jamajka,1260
+Milas-Bodrum,BJV,Turcja,Warszawa-Chopina,WAW,Polska,170
+Punta Cana,PUJ,Dominikana,Warszawa-Chopina,WAW,Polska,645
+Phuket,HKT,Tajlandia,Poznań,POZ,Polska,1575
+Warszawa-Chopina,WAW,Polska,Denpasar,DPS,Indonezja - Bali,1600
+Pafos,PFO,Cypr,Warszawa-Chopina,WAW,Polska,190
+Gdańsk,GDN,Polska,Curaçao,CUR,Curaçao,1020
+Kraków,KRK,Polska,Phuket,HKT,Tajlandia,1630
+Havana,HAV,Kuba,Warszawa-Chopina,WAW,Polska,885
+Warszawa-Chopina,WAW,Polska,Kos,KGS,Grecja,175
+Larnaca,LCA,Cypr,Warszawa-Chopina,WAW,Polska,190
+Katowice,KTW,Polska,Burgas,BOJ,Bułgaria,115
+Katowice,KTW,Polska,Chania,CHQ,Grecja,155
+Kraków,KRK,Polska,Saloniki,SKG,Grecja,285
+Warszawa-Chopina,WAW,Polska,Gran Canaria,LPA,Wyspy Kanaryjskie,345
+Rodos,RHO,Grecja,Katowice,KTW,Polska,160
+Zakynthos,ZTH,Grecja,Wrocław,WRO,Polska,145
+Lanzarote,ACE,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,330
+Warna,VAR,Bułgaria,Warszawa-Chopina,WAW,Polska,120
+Warszawa-Chopina,WAW,Polska,Split,SPU,Chorwacja,340
+Warszawa-Chopina,WAW,Polska,Izmir,ADB,Turcja,160
+Gdańsk,GDN,Polska,Antalya,AYT,Turcja,200
+Faro,FAO,Portugalia,Warszawa-Chopina,WAW,Polska,260
+Katowice,KTW,Polska,Burgas,BOJ,Bułgaria,110
+Izmir,ADB,Turcja,Warszawa-Chopina,WAW,Polska,160
+Katowice,KTW,Polska,Hurghada,HRG,Egipt,250
+Tirana,TIA,Albania,Poznań,POZ,Polska,120
+Warszawa-Chopina,WAW,Polska,Sri Lanka,CMB,Sri Lanka,555
+Warszawa-Chopina,WAW,Polska,Faro,FAO,Portugalia,260
+Warszawa-Chopina,WAW,Polska,Havana,HAV,Kuba,885
+Warszawa-Chopina,WAW,Polska,Gran Canaria,LPA,Wyspy Kanaryjskie,340
+Milas-Bodrum,BJV,Turcja,Warszawa-Chopina,WAW,Polska,160
+Kraków,KRK,Polska,Phuket,HKT,Tajlandia,1355
+Gdańsk,GDN,Polska,Marsa Alam,RMF,Egipt,320
+Lanzarote,ACE,Wyspy Kanaryjskie,Katowice,KTW,Polska,315
+Warna,VAR,Bułgaria,Warszawa-Chopina,WAW,Polska,115
+Punta Cana,PUJ,Dominikana,Warszawa-Chopina,WAW,Polska,985
+Warszawa-Chopina,WAW,Polska,Dubai,DXB,Zjednoczone Emiraty Arabskie,350
+Sal / Amilcal Cabral,SID,Wyspy Zielonego Przylądka,Warszawa-Chopina,WAW,Polska,555
+Katowice,KTW,Polska,Hurghada,HRG,Egipt,245
+Warszawa-Chopina,WAW,Polska,Punta Cana,PUJ,Dominikana,645
+Warszawa-Chopina,WAW,Polska,Faro,FAO,Hiszpania,290
+Teneryfa,TFS,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,350
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,1120
+Poznań,POZ,Polska,Fuerteventura,FUE,Wyspy Kanaryjskie,310
+Kraków,KRK,Polska,Male,MLE,Malediwy,885
+Kraków,KRK,Polska,Antalya,AYT,Turcja,170
+Katowice,KTW,Polska,Gran Canaria,LPA,Wyspy Kanaryjskie,325
+Warszawa-Chopina,WAW,Polska,Heraklion,HER,Grecja,175
+Kraków,KRK,Polska,Mauritius,MRU,Mauritius,1025
+Warszawa-Chopina,WAW,Polska,Costa del Sol,AGP,Hiszpania,240
+Teneryfa,TFS,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,345
+Warszawa-Chopina,WAW,Polska,Sri Lanka,CMB,Sri Lanka,1210
+Sri Lanka,CMB,Sri Lanka,Warszawa-Chopina,WAW,Polska,555
+Punta Cana,PUJ,Dominikana,Katowice,KTW,Polska,680
+Warszawa-Chopina,WAW,Polska,Mauritius,MRU,Mauritius,1330
+Kraków,KRK,Polska,Antalya,AYT,Turcja,165
+Warszawa-Chopina,WAW,Polska,Funchal,FNC,Portugalia,315
+Katowice,KTW,Polska,Mombasa,MBA,Kenia,610
+Denpasar,DPS,Indonezja - Bali,Warszawa-Chopina,WAW,Polska,1295
+Podgorica,TGD,Czarnogóra,Gdańsk,GDN,Polska,220
+Katowice,KTW,Polska,Warna,VAR,Bułgaria,110
+Punta Cana,PUJ,Dominikana,Warszawa-Chopina,WAW,Polska,975
+Palma de Mallorca,PMI,Hiszpania,Katowice,KTW,Polska,170
+Male,MLE,Malediwy,Kraków,KRK,Polska,1125
+Mauritius,MRU,Mauritius,Warszawa-Chopina,WAW,Polska,895
+Phuket,HKT,Tajlandia,Kraków,KRK,Polska,1430
+Denpasar,DPS,Indonezja - Bali,Wrocław,WRO,Polska,1400
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,1110
+Mauritius,MRU,Mauritius,Kraków,KRK,Polska,1025
+Warszawa-Chopina,WAW,Polska,Sal / Amilcal Cabral,SID,Wyspy Zielonego Przylądka,495
+Sal / Amilcal Cabral,SID,Wyspy Zielonego Przylądka,Warszawa-Chopina,WAW,Polska,495
+Heraklion,HER,Grecja,Warszawa-Chopina,WAW,Polska,175
+Warszawa-Chopina,WAW,Polska,Cancun,CUN,Meksyk,1285
+Katowice,KTW,Polska,Zanzibar,ZNZ,Zanzibar,565
+Fuerteventura,FUE,Wyspy Kanaryjskie,Poznań,POZ,Polska,310
+Katowice,KTW,Polska,Fuerteventura,FUE,Wyspy Kanaryjskie,315
+Poznań,POZ,Polska,Phuket,HKT,Tajlandia,1875
+Heraklion,HER,Grecja,Katowice,KTW,Polska,160
+Sri Lanka,CMB,Sri Lanka,Warszawa-Chopina,WAW,Polska,1210
+Cancun,CUN,Meksyk,Poznań,POZ,Polska,835
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,705
+Split,SPU,Chorwacja,Warszawa-Chopina,WAW,Polska,120
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,835
+Warszawa-Chopina,WAW,Polska,Sri Lanka,CMB,Sri Lanka,1065
+Dubai,DXB,Zjednoczone Emiraty Arabskie,Warszawa-Chopina,WAW,Polska,360
+Kraków,KRK,Polska,Male,MLE,Malediwy,1135
+Dubrownik,DBV,Czarnogóra,Kraków,KRK,Polska,115
+Denpasar,DPS,Indonezja - Bali,Warszawa-Chopina,WAW,Polska,1105
+Chania,CHQ,Grecja,Poznań,POZ,Polska,180
+Varadero,VRA,Kuba,Katowice,KTW,Polska,845
+Warszawa-Chopina,WAW,Polska,Teneryfa,TFS,Wyspy Kanaryjskie,350
+Katowice,KTW,Polska,Izmir,ADB,Turcja,145
+Burgas,BOJ,Bułgaria,Wrocław,WRO,Polska,125
+Warszawa-Chopina,WAW,Polska,Male,MLE,Malediwy,835
+Split,SPU,Chorwacja,Warszawa-Chopina,WAW,Polska,250
+Warszawa-Chopina,WAW,Polska,Podgorica,TGD,Czarnogóra,120
+Dubrownik,DBV,Chorwacja,Kraków,KRK,Polska,115
+Minorka,MAH,Hiszpania,Poznań,POZ,Polska,155
+Poznań,POZ,Polska,Larnaca,LCA,Cypr,215
+Faro,FAO,Hiszpania,Warszawa-Chopina,WAW,Polska,290
+Dubrownik,DBV,Chorwacja,Warszawa-Chopina,WAW,Polska,120
+Katowice,KTW,Polska,Araxos,GPA,Grecja,135
+Dubrownik,DBV,Chorwacja,Katowice,KTW,Polska,760
+Curaçao,CUR,Curaçao,Gdańsk,GDN,Polska,930
+Montego Bay,MBJ,Jamajka,Warszawa-Chopina,WAW,Polska,1260
+Mombasa,MBA,Kenia,Katowice,KTW,Polska,610
+Warszawa-Chopina,WAW,Polska,Punta Cana,PUJ,Dominikana,975
+Poznań,POZ,Polska,Tirana,TIA,Albania,120
+Warszawa-Chopina,WAW,Polska,Denpasar,DPS,Indonezja - Bali,985
+Wrocław,WRO,Polska,Denpasar,DPS,Indonezja - Bali,1400
+Mombasa,MBA,Kenia,Warszawa-Chopina,WAW,Polska,620
+Heraklion,HER,Grecja,Poznań,POZ,Polska,180
+Minorka,MAH,Hiszpania,Katowice,KTW,Polska,155
+Kraków,KRK,Polska,Sri Lanka,CMB,Sri Lanka,750
+Araxos,GPA,Grecja,Katowice,KTW,Polska,135
+Male,MLE,Malediwy,Kraków,KRK,Polska,1110
+Katowice,KTW,Polska,Zakynthos,ZTH,Grecja,140
+Mauritius,MRU,Mauritius,Warszawa-Chopina,WAW,Polska,880
+Podgorica,TGD,Czarnogóra,Rzeszów,RZE,Polska,625
+Poznań,POZ,Polska,Heraklion,HER,Grecja,180
+Warszawa-Chopina,WAW,Polska,Tirana,TIA,Albania,120
+Larnaca,LCA,Cypr,Poznań,POZ,Polska,215
+Katowice,KTW,Polska,Faro,FAO,Portugalia,290
+Fuerteventura,FUE,Wyspy Kanaryjskie,Warszawa-Chopina,WAW,Polska,330
+Saloniki,SKG,Grecja,Kraków,KRK,Polska,290
+Mauritius,MRU,Mauritius,Gdańsk,GDN,Polska,1270
+Warszawa-Chopina,WAW,Polska,Marsa Alam,RMF,Egipt,260
+Wrocław,WRO,Polska,Rodos,RHO,Grecja,165
+Dubai,DXB,Zjednoczone Emiraty Arabskie,Warszawa-Chopina,WAW,Polska,350
+Kraków,KRK,Polska,Male,MLE,Malediwy,1125
+Larnaca,LCA,Cypr,Katowice,KTW,Polska,200
+Wrocław,WRO,Polska,Heraklion,HER,Grecja,165
+Katowice,KTW,Polska,Marsa Alam,RMF,Egipt,280
+Phuket,HKT,Tajlandia,Kraków,KRK,Polska,1630
+Faro,FAO,Portugalia,Katowice,KTW,Polska,290
+Kraków,KRK,Polska,Phuket,HKT,Tajlandia,1940
+Gdańsk,GDN,Polska,Curaçao,CUR,Curaçao,930
+Warszawa-Chopina,WAW,Polska,Ibiza,IBZ,Hiszpania,200
+Teneryfa,TFS,Wyspy Kanaryjskie,Katowice,KTW,Polska,335
+Palma de Mallorca,PMI,Hiszpania,Warszawa-Chopina,WAW,Polska,200
+Dalaman,DLM,Turcja,Katowice,KTW,Polska,165
+Saloniki,SKG,Grecja,Kraków,KRK,Polska,285
+Gdańsk,GDN,Polska,Podgorica,TGD,Czarnogóra,255
+Montego Bay,MBJ,Jamajka,Warszawa-Chopina,WAW,Polska,1070
+Burgas,BOJ,Bułgaria,Katowice,KTW,Polska,115
+Warszawa-Chopina,WAW,Polska,Warna,VAR,Bułgaria,120
+Podgorica,TGD,Czarnogóra,Gdańsk,GDN,Polska,415
+Antalya,AYT,Turcja,Gdańsk,GDN,Polska,200
+Warszawa-Chopina,WAW,Polska,Minorka,MAH,Hiszpania,185
+Warszawa-Chopina,WAW,Polska,Split,SPU,Chorwacja,120
+Kos,KGS,Grecja,Katowice,KTW,Polska,160
+Mahe,SEZ,Seszele,Warszawa-Chopina,WAW,Polska,750
+Antalya,AYT,Turcja,Katowice,KTW,Polska,165
+Warszawa-Chopina,WAW,Polska,Denpasar,DPS,Indonezja - Bali,1105
+Katowice,KTW,Polska,Larnaca,LCA,Cypr,200
+Teneryfa,TFS,Wyspy Kanaryjskie,Katowice,KTW,Polska,330
+Warszawa-Chopina,WAW,Polska,Split,SPU,Chorwacja,250
+Cancun,CUN,Meksyk,Warszawa-Chopina,WAW,Polska,720
+Gdańsk,GDN,Polska,Hurghada,HRG,Egipt,270
+Katowice,KTW,Polska,Pafos,PFO,Cypr,185
+Burgas,BOJ,Bułgaria,Katowice,KTW,Polska,110
+Warszawa-Chopina,WAW,Polska,Warna,VAR,Bułgaria,115
+Pafos,PFO,Cypr,Katowice,KTW,Polska,185
+Poznań,POZ,Polska,Minorka,MAH,Hiszpania,155
+Warszawa-Chopina,WAW,Polska,Sal / Amilcal Cabral,SID,Wyspy Zielonego Przylądka,555
+Phuket,HKT,Tajlandia,Kraków,KRK,Polska,1355
+Mombasa,MBA,Kenia,Warszawa-Chopina,WAW,Polska,605
+Phuket,HKT,Tajlandia,Poznań,POZ,Polska,1875
+Marsa Alam,RMF,Egipt,Gdańsk,GDN,Polska,320
+Warszawa-Chopina,WAW,Polska,Zanzibar,ZNZ,Zanzibar,625
+Gdańsk,GDN,Polska,Dubrownik,DBV,Chorwacja,345
+Kos,KGS,Grecja,Katowice,KTW,Polska,155
+Antalya,AYT,Turcja,Wrocław,WRO,Polska,175
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,945
+Tirana,TIA,Albania,Katowice,KTW,Polska,100
+Montego Bay,MBJ,Jamajka,Katowice,KTW,Polska,1155
+Costa del Sol,AGP,Hiszpania,Warszawa-Chopina,WAW,Polska,240
+Palma de Mallorca,PMI,Hiszpania,Warszawa-Chopina,WAW,Polska,190
+Korfu,CFU,Grecja,Warszawa-Chopina,WAW,Polska,140
+Warszawa-Chopina,WAW,Polska,Palma de Mallorca,PMI,Hiszpania,200
+Kos,KGS,Grecja,Warszawa-Chopina,WAW,Polska,175
+Chania,CHQ,Grecja,Warszawa-Chopina,WAW,Polska,175
+Korfu,CFU,Grecja,Warszawa-Chopina,WAW,Polska,135
+Warszawa-Chopina,WAW,Polska,Chania,CHQ,Grecja,175
+Warszawa-Chopina,WAW,Polska,Sri Lanka,CMB,Sri Lanka,855
+Katowice,KTW,Polska,Heraklion,HER,Grecja,160
+Djerba,DJE,Tunezja,Warszawa-Chopina,WAW,Polska,185
+Ibiza,IBZ,Hiszpania,Warszawa-Chopina,WAW,Polska,200
+Lublin,LUZ,Polska,Antalya,AYT,Turcja,165
+Poznań,POZ,Polska,Phuket,HKT,Tajlandia,1575
+Male,MLE,Malediwy,Warszawa-Chopina,WAW,Polska,670
+Gran Canaria,LPA,Wyspy Kanaryjskie,Katowice,KTW,Polska,295
+Punta Cana,PUJ,Dominikana,Warszawa-Chopina,WAW,Polska,1020
+Warszawa-Chopina,WAW,Polska,Milas-Bodrum,BJV,Turcja,170
+Faro,FAO,Portugalia,Warszawa-Chopina,WAW,Polska,290
+Enfidha,NBE,Tunezja,Katowice,KTW,Polska,155
+Katowice,KTW,Polska,Teneryfa,TFS,Wyspy Kanaryjskie,335
+Dubrownik,DBV,Chorwacja,Gdańsk,GDN,Polska,345
+Katowice,KTW,Polska,Kos,KGS,Grecja,160
+Warszawa-Chopina,WAW,Polska,Palma de Mallorca,PMI,Hiszpania,190
+Warszawa-Chopina,WAW,Polska,Zakynthos,ZTH,Grecja,150
+Burgas,BOJ,Bułgaria,Warszawa-Chopina,WAW,Polska,130
+Katowice,KTW,Polska,Montego Bay,MBJ,Jamajka,1155
+Katowice,KTW,Polska,Lanzarote,ACE,Wyspy Kanaryjskie,315
+Katowice,KTW,Polska,Palma de Mallorca,PMI,Hiszpania,170
+Samos,SMI,Grecja,Warszawa-Chopina,WAW,Polska,165
+Rodos,RHO,Grecja,Kraków,KRK,Polska,155
+Dubai,DXB,Zjednoczone Emiraty Arabskie,Poznań,POZ,Polska,270
+Katowice,KTW,Polska,Teneryfa,TFS,Wyspy Kanaryjskie,330
+Warszawa-Chopina,WAW,Polska,Dubrownik,DBV,Chorwacja,120
+Katowice,KTW,Polska,Kos,KGS,Grecja,155
+Sharm El Sheikh,SSH,Egipt,Warszawa-Chopina,WAW,Polska,310
+Tirana,TIA,Albania,Warszawa-Chopina,WAW,Polska,120
+Warszawa-Chopina,WAW,Polska,Sri Lanka,CMB,Sri Lanka,845
+Antalya,AYT,Turcja,Lublin,LUZ,Polska,165
+Warszawa-Chopina,WAW,Polska,Hurghada,HRG,Egipt,260
+Sri Lanka,CMB,Sri Lanka,Warszawa-Chopina,WAW,Polska,855
+Zanzibar,ZNZ,Zanzibar,Katowice,KTW,Polska,565

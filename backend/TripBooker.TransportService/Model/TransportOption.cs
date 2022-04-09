@@ -10,12 +10,25 @@ internal class TransportOption
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string DeparturePlace { get; set; } = null!;
+    [Required]
+    public string DepartureAirportCode { get; set; } = null!;
 
-    public string Destination { get; set; } = null!;
+    public string DepartureAirportName { get; set; } = null!;
+
+    public string DepartureAirportCountry { get; set; } = null!;
+
+    [Required]
+    public string DestinationAirportCode { get; set; } = null!;
+
+    public string DestinationAirportName { get; set; } = null!;
+    
+    public string DestinationAirportCountry { get; set; } = null!;
 
     [Required]
     public TransportType Type { get; set; }
 
-    public string Carrier { get; set; } = null!;
+    /// <summary>
+    /// Transport duration in minutes
+    /// </summary>
+    public int Duration { get; set; }
 }

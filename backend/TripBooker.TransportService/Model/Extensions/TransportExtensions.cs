@@ -11,13 +11,13 @@ internal static class TransportExtensions
         string departure;
         if (transport.IsReturn)
         {
-            departure = transportOption.Destination;
-            destination = transportOption.DeparturePlace;
+            departure = transportOption.DestinationAirportCode;
+            destination = transportOption.DepartureAirportCode;
         }
         else
         {
-            departure = transportOption.DeparturePlace;
-            destination = transportOption.Destination;
+            departure = transportOption.DepartureAirportCode;
+            destination = transportOption.DestinationAirportCode;
         }
 
         return new NewTransportEventData(transport.DepartureDate, departure, destination, transport.TransportOptionId,
