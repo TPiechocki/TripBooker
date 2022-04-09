@@ -1,5 +1,6 @@
 using TripBooker.TravelAgencyService.Infrastructure;
 using TripBooker.TravelAgencyService.Repositories;
+using TripBooker.TravelAgencyService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services
     .AddInfrastructure(builder.Configuration)
-    .AddRepositories();
+    .AddRepositories()
+    .AddServices();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();

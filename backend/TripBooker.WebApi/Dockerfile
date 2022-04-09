@@ -2,6 +2,7 @@
 WORKDIR /src
 
 # Copy needed projects
+COPY TripBooker.Common TripBooker.Common
 COPY TripBooker.WebApi TripBooker.WebApi
 
 # Build project

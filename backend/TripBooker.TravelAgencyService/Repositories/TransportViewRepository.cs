@@ -8,6 +8,8 @@ namespace TripBooker.TravelAgencyService.Repositories;
 internal interface ITransportViewRepository
 {
     Task AddOrUpdateAsync(TransportModel transport, CancellationToken cancellationToken);
+
+    IQueryable<TransportModel> QueryAll();
 }
 
 internal class TransportViewRepository : ITransportViewRepository
@@ -45,5 +47,10 @@ internal class TransportViewRepository : ITransportViewRepository
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
+    }
+
+    public IQueryable<TransportModel> QueryAll()
+    {
+        return _dbContext.TransportView.Select(x => x);
     }
 }

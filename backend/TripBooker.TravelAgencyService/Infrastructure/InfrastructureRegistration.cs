@@ -1,6 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using TripBooker.Common.TravelAgency;
 using TripBooker.TravelAgencyService.EventConsumers.Public;
+using TripBooker.TravelAgencyService.EventConsumers.Public.Query;
+using TripBooker.TravelAgencyService.Services;
 
 namespace TripBooker.TravelAgencyService.Infrastructure;
 
@@ -25,20 +28,18 @@ internal static class ServicesRegistration
         var host = configuration.GetSection("RabbitMq")["Host"];
 
         return services.AddMassTransit(x =>
-                {
-                    // public
-                    x.AddConsumer<TransportViewContractConsumer>();
-                    
+            {
+                // public
+                x.AddConsumer<TransportViewContractConsumer>();
 
-                    x.UsingRabbitMq((context, cfg) =>
-                        {
-                            cfg.Host(host);
-                            cfg.ConfigureEndpoints(context);
-                            cfg.UseRawJsonSerializer();
-                        }
-                    );
-                }
-            )
-            .AddMassTransitHostedService(true);
+                x.AddConsumer<DestinationsQueryConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                    {
+                        cfg.Host(host);
+                        cfg.ConfigureEndpoints(context);
+                    }
+                );
+            });
     }
 }

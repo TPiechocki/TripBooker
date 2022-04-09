@@ -64,12 +64,10 @@ internal static class ServicesRegistration
                         {
                             cfg.Host(host);
                             cfg.ConfigureEndpoints(context);
-                            cfg.UseRawJsonSerializer();
                         }
                     );
                 }
-            )
-            .AddMassTransitHostedService(true);
+            );
     }
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)

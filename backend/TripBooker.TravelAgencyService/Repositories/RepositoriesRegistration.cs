@@ -1,6 +1,6 @@
 ﻿namespace TripBooker.TravelAgencyService.Repositories;
 
-internal static class RepositoriesRegistration
+internal static class ServicesRegistration
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {

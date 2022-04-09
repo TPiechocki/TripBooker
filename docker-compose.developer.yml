@@ -1,6 +1,23 @@
 version: "3.4"
 
 services:
+    webapi:
+        container_name: webapi
+        build:
+            context: backend
+            dockerfile: TripBooker.WebApi/Dockerfile
+        depends_on:
+            - "rabbitmq"
+            - "travel-agency-service"
+        ports:
+            - 8081:80
+        environment:
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+
     transport-service:
         container_name: transport-service
         build:
