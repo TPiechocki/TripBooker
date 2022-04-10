@@ -40,6 +40,10 @@ internal static class ServicesRegistration
                         cfg.ConfigureEndpoints(context);
                     }
                 );
-            });
+            })
+            .Configure<MassTransitHostOptions>(x =>
+            {
+                x.WaitUntilStarted = true;
+            }); ;
     }
 }
