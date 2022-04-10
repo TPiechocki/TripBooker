@@ -17,7 +17,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
         ConfigureEventCorrelationIds();
 
         Initially(SetSubmitOrderHandler());
-        During(AwaitingTransportConfirmation, SetAcceptOrderHandler());
+        During(AwaitingTransportConfirmation, SetAcceptTransportHandler(), SetRejectTransportHandler());
     }
 
     private void ConfigureEventCorrelationIds()
@@ -26,6 +26,8 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             x.CorrelateById(c => c.Message.Order.OrderId));
 
         Event(() => AcceptTransport, x =>
+            x.CorrelateById(c => c.Message.CorrelationId));
+        Event(() => RejectTransport, x =>
             x.CorrelateById(c => c.Message.CorrelationId));
     }
 
@@ -39,12 +41,17 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 Order = x.Message.Order
             }));
 
-    private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptOrderHandler() =>
+    private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
         When(AcceptTransport)
             .TransitionTo(TransportAccepted)    // TODO: save reservation id
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
             .Finalize();
-            
+
+    private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
+        When(RejectTransport)
+            .Then(x => _logger.LogInformation($"Transport reservation rejected (OrderId={x.Message.CorrelationId})."))
+            .Finalize();
+
 
 
     private static void UpdateSagaState(OrderState state, OrderCommand data)
@@ -52,12 +59,17 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
         state.Order = data.Order;
     }
 
+    // SUBMIT - new order
+    public Event<SubmitOrder> SubmitOrder { get; private set; } = null!;
 
+
+    // TRANSPORT RESERVATION
     public SagaState AwaitingTransportConfirmation { get; private set; } = null!;
-
-    public SagaState TransportAccepted { get; private set; } = null!;
 
     public Event<TransportReservationAccepted> AcceptTransport { get; private set; } = null!;
 
-    public Event<SubmitOrder> SubmitOrder { get; private set; } = null!;
+    public Event<TransportReservationRejected> RejectTransport { get; private set; } = null!;
+
+    public SagaState TransportAccepted { get; private set; } = null!;
+
 }
