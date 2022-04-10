@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TripBooker.Common.TravelAgency;
 using TripBooker.TravelAgencyService.EventConsumers.Public;
 using TripBooker.TravelAgencyService.EventConsumers.Public.Query;
+using TripBooker.TravelAgencyService.Order.State;
 using TripBooker.TravelAgencyService.Services;
 
 namespace TripBooker.TravelAgencyService.Infrastructure;
@@ -29,10 +30,17 @@ internal static class ServicesRegistration
 
         return services.AddMassTransit(x =>
             {
-                // public
+                // PUBLIC
+
+                // view updates
                 x.AddConsumer<TransportViewContractConsumer>();
 
+                // queries
                 x.AddConsumer<DestinationsQueryConsumer>();
+
+                // sagas
+                x.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                    .InMemoryRepository();      // TODO: persist saga in database
 
                 x.UsingRabbitMq((context, cfg) =>
                     {

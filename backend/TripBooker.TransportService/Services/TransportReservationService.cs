@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Transactions;
+using Newtonsoft.Json;
 using TripBooker.Common;
+using TripBooker.Common.Order.Transport;
 using TripBooker.Common.Transport;
-using TripBooker.Common.Transport.Contract.Command;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Reservation;
@@ -14,7 +15,7 @@ namespace TripBooker.TransportService.Services;
 
 internal interface ITransportReservationService
 {
-    Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken);
+    Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken);
 
     Task Cancel(Guid reservationId, CancellationToken cancellationToken);
 }
@@ -32,10 +33,13 @@ internal class TransportReservationService : ITransportReservationService
         _reservationEventRepository = reservationEventRepository;
     }
 
-    public async Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken)
+    public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
     {
+        var transportId = reservation.Order.TransportId;
+        var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats;
+
         // add reservation
-        var data = new NewReservationEventData(reservation.TransportId, reservation.Places);
+        var data = new NewReservationEventData(transportId, numberOfPlaces);
         var reservationStreamId = await _reservationEventRepository.AddNewAsync(data, cancellationToken);
 
         var tryTransaction = true;
@@ -45,10 +49,17 @@ internal class TransportReservationService : ITransportReservationService
             tryTransaction = false;
 
             var transportEvents =
-                await _transportRepository.GetTransportEventsAsync(reservation.TransportId, cancellationToken);
+                await _transportRepository.GetTransportEventsAsync(transportId, cancellationToken);
+            if (transportEvents.Count == 0)
+            {
+                throw new ArgumentException(
+                    $"Received reservation for transport which does not exist {JsonConvert.SerializeObject(reservation)}.",
+                    nameof(reservation));
+            }
+
             var transportItem = TransportBuilder.Build(transportEvents);
 
-            if (transportItem.AvailablePlaces < reservation.Places)
+            if (transportItem.AvailablePlaces < numberOfPlaces)
             {
                 // if there is not enough free places
                 await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
@@ -120,18 +131,18 @@ internal class TransportReservationService : ITransportReservationService
         }
     }
 
-    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation,
+    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewTransportReservation reservation,
         TransportModel transportItem,
         CancellationToken cancellationToken)
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var transportEvent = new TransportPlaceUpdateEvent(
-            transportItem.AvailablePlaces - reservation.Places,
-            -reservation.Places,
+            transportItem.AvailablePlaces - reservation.Order.NumberOfOccupiedSeats,
+            -reservation.Order.NumberOfOccupiedSeats,
             reservationStreamId);
 
-        await _transportRepository.AddAsync(transportEvent, reservation.TransportId, transportItem.Version,
+        await _transportRepository.AddAsync(transportEvent, reservation.Order.TransportId, transportItem.Version,
             cancellationToken);
 
         await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
