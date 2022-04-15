@@ -11,5 +11,6 @@ public class TransportViewContract
     public string DestinationAirportCode { get; set; } = null!;
     public string DestinationAirportName { get; set; } = null!;
     public Guid Id { get; set; }
+    public int TicketPrice { get; set; }
     public TransportType Type { get; set; }
 }

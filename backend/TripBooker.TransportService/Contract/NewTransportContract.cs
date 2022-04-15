@@ -2,10 +2,11 @@
 
 public class NewTransportContract
 {
-    public NewTransportContract(int transportOptionId, DateTime departureDate, int places)
+    public NewTransportContract(int transportOptionId, DateTime departureDate, int places, int ticketPrice)
     {
         DepartureDate = departureDate;
         Places = places;
+        TicketPrice = ticketPrice;
         TransportOptionId = transportOptionId;
     }
 
@@ -13,6 +14,7 @@ public class NewTransportContract
 
     public int Places { get; }
 
-    public int TransportOptionId { get; }
+    public int TicketPrice { get; }
 
+    public int TransportOptionId { get; }
 }

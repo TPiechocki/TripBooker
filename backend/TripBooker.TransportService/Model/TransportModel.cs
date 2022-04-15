@@ -9,4 +9,6 @@ internal class TransportModel : EventModel
     public int TransportOptionId { get; set; }
     
     public int AvailablePlaces { get; set; }
+
+    public int TicketPrice { get; set; }
 }

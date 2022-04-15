@@ -15,6 +15,7 @@ internal static class TransportViewContractMapper
             DepartureDate = transport.DepartureDate,
             DestinationAirportCode = option.DestinationAirportCode,
             DestinationAirportName = option.DestinationAirportName,
+            TicketPrice = transport.TicketPrice,
             Type = option.Type
         };
     }
