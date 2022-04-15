@@ -145,7 +145,10 @@ internal class TransportReservationService : ITransportReservationService
         await _transportRepository.AddAsync(transportEvent, reservation.Order.TransportId, transportItem.Version,
             cancellationToken);
 
-        await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
+        var price = reservation.Places * transportItem.TicketPrice;
+
+        await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1,
+            new ReservationAcceptedEventData(price), cancellationToken);
 
         transaction.Complete();
     }
