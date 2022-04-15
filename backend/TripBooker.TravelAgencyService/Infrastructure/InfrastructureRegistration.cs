@@ -1,8 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using TripBooker.Common;
 using TripBooker.Common.TravelAgency;
 using TripBooker.TravelAgencyService.EventConsumers.Public;
 using TripBooker.TravelAgencyService.EventConsumers.Public.Query;
+using TripBooker.TravelAgencyService.Order.State;
 using TripBooker.TravelAgencyService.Services;
 
 namespace TripBooker.TravelAgencyService.Infrastructure;
@@ -29,10 +31,22 @@ internal static class ServicesRegistration
 
         return services.AddMassTransit(x =>
             {
-                // public
+                // PUBLIC
+
+                // view updates
                 x.AddConsumer<TransportViewContractConsumer>();
 
+                // queries
                 x.AddConsumer<DestinationsQueryConsumer>();
+
+                // sagas
+                x.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                    .MongoDbRepository(c =>
+                    {
+                        c.Connection = configuration.GetConnectionString("MongoDb");
+                        c.DatabaseName = GlobalConstants.MongoDbName;
+                        c.CollectionName = "OrderSaga";
+                    });
 
                 x.UsingRabbitMq((context, cfg) =>
                     {

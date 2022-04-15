@@ -46,9 +46,8 @@ static void CreateDbIfNotExists(IHost host)
     {
         var transportContext = services.GetRequiredService<TransportDbContext>();
         var transportService = services.GetRequiredService<ITransportService>();
-        var reservationService = services.GetRequiredService<ITransportReservationService>();
 
-        SqlDbInitializer.Initialize(transportContext, transportService, reservationService);
+        SqlDbInitializer.Initialize(transportContext, transportService);
     }
     catch (Exception ex)
     {
