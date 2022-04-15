@@ -27,4 +27,6 @@ public class OrderData
     public Guid OrderId { get; set; }
 
     public Guid TransportId { get; set; }
+
+    public int TransportPrice { get; set; }
 }

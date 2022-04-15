@@ -52,6 +52,7 @@ internal class TransportReservationService : ITransportReservationService
                 await _transportRepository.GetTransportEventsAsync(transportId, cancellationToken);
             if (transportEvents.Count == 0)
             {
+                await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
                 throw new ArgumentException(
                     $"Received reservation for transport which does not exist {JsonConvert.SerializeObject(reservation)}.",
                     nameof(reservation));
@@ -81,6 +82,7 @@ internal class TransportReservationService : ITransportReservationService
                 }
                 else
                 {
+                    await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
                     throw;
                 }
             }
@@ -145,7 +147,7 @@ internal class TransportReservationService : ITransportReservationService
         await _transportRepository.AddAsync(transportEvent, reservation.Order.TransportId, transportItem.Version,
             cancellationToken);
 
-        var price = reservation.Places * transportItem.TicketPrice;
+        var price = reservation.Order.NumberOfOccupiedSeats * transportItem.TicketPrice;
 
         await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1,
             new ReservationAcceptedEventData(price), cancellationToken);
