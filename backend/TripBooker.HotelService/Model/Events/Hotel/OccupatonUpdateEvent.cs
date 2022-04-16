@@ -2,7 +2,7 @@
 
 internal class OccupatonUpdateEvent
 {
-    public Guid ReservationEventId { get; }
+    public Guid ReservationEventId { get; set; }
 
     public int RoomsStudio { get; set; }
 
