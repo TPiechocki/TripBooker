@@ -26,8 +26,6 @@ internal class HotelService : IHotelService
         {
             var newHotelDayEvent = HotelExtensions.MapToNewHotelDayEventData(day, hotel);
             await _eventRepository.AddNewAsync(newHotelDayEvent, cancellationToken);
-
-            //TODO: Create event to update views
         }
     }
 }

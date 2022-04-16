@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TripBooker.HotelService.Infrastructure;
+using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Hotel;
 
 namespace TripBooker.HotelService.Repositories;
@@ -13,7 +14,7 @@ internal interface IHotelEventRepository
     Task AddAsync(OccupatonUpdateEvent occupationUpdateEvent, Guid streamId, int previousVersion,
         CancellationToken cancellationToken);
 
-    Task<ICollection<HotelEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken);
+    Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken);
 
     Task<ICollection<HotelEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken);
 }
@@ -64,10 +65,11 @@ internal class HotelEventRepository : IHotelEventRepository
             throw new DbUpdateException(message);
         }
 
-        //await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
+        // TODO: Make special case of event for particular hotel day
+        await _bus.Publish(new OccupationViewUpdateEvent(), cancellationToken);
     }
 
-    public async Task<ICollection<HotelEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken)
+    public async Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken)
     {
         return await _dbContext.HotelEvent
             .Where(x => x.StreamId == streamId)

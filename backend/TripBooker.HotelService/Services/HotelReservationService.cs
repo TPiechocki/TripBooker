@@ -47,7 +47,7 @@ internal class HotelReservationService : IHotelReservationService
             bool checkSuccesfull = true;
             foreach(var hotelday in reservation.HotelDays)
             {
-                var hotelEvents = await _hotelRepository.GetTransportEventsAsync(hotelday, cancellationToken);
+                var hotelEvents = await _hotelRepository.GetHotelEventsAsync(hotelday, cancellationToken);
                 var occupation = HotelOccupationBuilder.Build(hotelEvents);
 
                 // Check if enough rooms awailable
@@ -95,6 +95,8 @@ internal class HotelReservationService : IHotelReservationService
         while (!transactionSuccesfull);
 
     }
+
+    // TODO: Cancellation
 
     private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation, 
         List<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)

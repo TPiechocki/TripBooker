@@ -16,7 +16,7 @@ internal class HotelDbContext : DbContext
     public DbSet<HotelEvent> HotelEvent { get; set; } = null!;
 
     // VIEWS
-    public DbSet<HotelOccupationModel> HotelOccupationModels { get; set; } = null!;
+    public DbSet<HotelOccupationModel> HotelOccupationView { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

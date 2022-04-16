@@ -4,18 +4,17 @@ using TripBooker.HotelService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddInfrastructure(builder.Configuration)
     .AddRepositories()
     .AddServices();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -30,8 +29,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
@@ -44,6 +41,8 @@ static void CreateDbIfNotExists(IHost host)
     try
     {
         var hotelContext = services.GetRequiredService<HotelDbContext>();
+        var hotelService = services.GetRequiredService<IHotelService>();
+        var reservationService = services.GetRequiredService<IHotelReservationService>();
 
         SqlDbInitializer.Initialize(hotelContext);
     }

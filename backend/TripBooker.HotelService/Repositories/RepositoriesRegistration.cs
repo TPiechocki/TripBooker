@@ -7,9 +7,10 @@ internal static class RepositoriesRegistration
         return services
             .AddScoped<IHotelOptionRepository, HotelOptionRepository>()
             .AddScoped<IRoomOptionRepository, RoomOptionRepository>()
-            .AddScoped<IHotelOccupationModelRepository, HotelOccupationModelRepository>()
+            .AddScoped<IHotelOccupationViewRepository, HotelOccupationViewRepository>()
             .AddScoped<IReservationEventRepository, ReservationEventRepository>()
-            .AddScoped<IHotelEventRepository, HotelEventRepository>();
+            .AddScoped<IHotelEventRepository, HotelEventRepository>()
+            .AddScoped<IEventTimestampRepository, EventTimestampRepository>();
     }
     
 }
