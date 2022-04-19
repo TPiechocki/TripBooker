@@ -12,7 +12,9 @@ internal interface IHotelEventRepository
     Task AddNewAsync(NewHotelDayEventData hotelEvent, CancellationToken cancellationToken);
 
     Task AddAsync(OccupatonUpdateEvent occupationUpdateEvent, Guid streamId, int previousVersion,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken, bool updateView = true);
+
+    Task AddToManyAsync(OccupatonUpdateEvent occupationUpdateEvent, IEnumerable<Guid> ids, IEnumerable<int> versions, CancellationToken cancellationToken);
 
     Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken);
 
@@ -51,7 +53,7 @@ internal class HotelEventRepository : IHotelEventRepository
         }
     }
 
-    public async Task AddAsync(OccupatonUpdateEvent occupationUpdateEvent, Guid streamId, int previousVersion, CancellationToken cancellationToken)
+    public async Task AddAsync(OccupatonUpdateEvent occupationUpdateEvent, Guid streamId, int previousVersion, CancellationToken cancellationToken, bool updateView = true)
     {
         await _dbContext.HotelEvent.AddAsync(new HotelEvent(
                 streamId, previousVersion + 1, nameof(OccupatonUpdateEvent), occupationUpdateEvent),
@@ -60,13 +62,12 @@ internal class HotelEventRepository : IHotelEventRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add a transport place update event: {JsonConvert.SerializeObject(occupationUpdateEvent)}";
+            var message = $"Could not add a occupation update event: {JsonConvert.SerializeObject(occupationUpdateEvent)}";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
 
-        // TODO: Make special case of event for particular hotel day
-        await _bus.Publish(new OccupationViewUpdateEvent(), cancellationToken);
+        if(updateView) await _bus.Publish(new OccupationViewUpdateEvent(), cancellationToken);
     }
 
     public async Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken)
@@ -82,5 +83,13 @@ internal class HotelEventRepository : IHotelEventRepository
         return await _dbContext.HotelEvent
             .Where(x => x.Timestamp >= timestamp)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task AddToManyAsync(OccupatonUpdateEvent occupationUpdateEvent, IEnumerable<Guid> ids, IEnumerable<int> versions, CancellationToken cancellationToken)
+    {
+        foreach(var occupation in ids.Zip(versions, Tuple.Create))
+            await AddAsync(occupationUpdateEvent, occupation.Item1, occupation.Item2, cancellationToken, false);
+
+        await _bus.Publish(new OccupationViewUpdateEvent(), cancellationToken);
     }
 }

@@ -103,22 +103,17 @@ internal class HotelReservationService : IHotelReservationService
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        foreach(var occupation in hotelOccupations)
+        var updateEvent = new OccupatonUpdateEvent
         {
-            var updateEvent = new OccupatonUpdateEvent
-            {
-                ReservationEventId = reservationStreamId,
-                RoomsApartment = reservation.RoomsApartment,
-                RoomsMedium = reservation.RoomsMedium,
-                RoomsLarge = reservation.RoomsLarge,
-                RoomsSmall = reservation.RoomsSmall,
-                RoomsStudio = reservation.RoomsStudio
-            };
+            ReservationEventId = reservationStreamId,
+            RoomsApartment = reservation.RoomsApartment,
+            RoomsMedium = reservation.RoomsMedium,
+            RoomsLarge = reservation.RoomsLarge,
+            RoomsSmall = reservation.RoomsSmall,
+            RoomsStudio = reservation.RoomsStudio
+        };
 
-            await _hotelRepository.AddAsync(updateEvent, occupation.Id, occupation.Version, cancellationToken);
-
-        }
-
+        await _hotelRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), hotelOccupations.Select(x => x.Version), cancellationToken) ;
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
 
         transaction.Complete();
