@@ -1,16 +1,16 @@
 ﻿using MassTransit;
 using TripBooker.Common;
-using TripBooker.Common.Transport.Contract.Command;
-using TripBooker.Common.Transport.Contract.Response;
-using TripBooker.TransportService.Services;
+using TripBooker.Common.Hotel.Contract.Command;
+using TripBooker.Common.Hotel.Contract.Response;
+using TripBooker.HotelService.Services;
 
-namespace TripBooker.TransportService.EventConsumers.Public;
+namespace TripBooker.HotelService.EventConsumers.Public;
 
 internal class NewReservationEventConsumer : IConsumer<NewReservationContract>
 {
-    private readonly ITransportReservationService _reservationService;
+    private readonly IHotelReservationService _reservationService;
 
-    public NewReservationEventConsumer(ITransportReservationService reservationService)
+    public NewReservationEventConsumer(IHotelReservationService reservationService)
     {
         _reservationService = reservationService;
     }

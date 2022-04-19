@@ -23,8 +23,4 @@
     <ProjectReference Include="..\TripBooker.Common\TripBooker.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EventConsumers\Public\" />
-  </ItemGroup>
-
 </Project>

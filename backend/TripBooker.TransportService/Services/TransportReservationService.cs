@@ -2,7 +2,6 @@
 using Npgsql;
 using System.Transactions;
 using TripBooker.Common;
-using TripBooker.Common.Transport;
 using TripBooker.Common.Transport.Contract.Command;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using TripBooker.Common.Transport;
 using TripBooker.Common.Transport.Contract.Command;
-using TripBooker.TransportService.Contract;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Services;
 
