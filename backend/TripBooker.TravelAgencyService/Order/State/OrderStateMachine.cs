@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using AutoMapper;
+using MassTransit;
 using TripBooker.Common.Order;
 using TripBooker.Common.Order.Transport;
 using SagaState = MassTransit.State;
@@ -8,10 +9,12 @@ namespace TripBooker.TravelAgencyService.Order.State;
 internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
     private readonly ILogger<OrderStateMachine> _logger;
+    private readonly IMapper _mapper;
 
-    public OrderStateMachine(ILogger<OrderStateMachine> logger)
+    public OrderStateMachine(ILogger<OrderStateMachine> logger, IMapper mapper)
     {
         _logger = logger;
+        _mapper = mapper;
 
         InstanceState(x => x.State);
         ConfigureEventCorrelationIds();
@@ -44,11 +47,13 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
         When(AcceptTransport)
             .TransitionTo(TransportAccepted)    // TODO: save reservation id
+            .Then(x => x.Saga.Order = _mapper.Map(x.Message, x.Saga.Order))
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
             .Finalize();
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
         When(RejectTransport)
+            // TODO: save reservation id
             .Then(x => _logger.LogInformation($"Transport reservation rejected (OrderId={x.Message.CorrelationId})."))
             .Finalize();
 

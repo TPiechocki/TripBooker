@@ -28,7 +28,7 @@ internal class NewReservationEventConsumer : IConsumer<NewTransportReservation>
 
             if (result.Status == ReservationStatus.Accepted)
             {
-                await context.Publish(new TransportReservationAccepted(context.Message.Order.OrderId), context.CancellationToken);
+                await context.Publish(new TransportReservationAccepted(context.Message.Order.OrderId, result.Price), context.CancellationToken);
                 await _bus.Publish(new TransportViewUpdateEvent(), context.CancellationToken);
             }
             else

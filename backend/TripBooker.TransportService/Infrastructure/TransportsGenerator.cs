@@ -23,7 +23,8 @@ namespace TripBooker.TransportService.Infrastructure
                     new NewTransportContract(
                         option.Id,
                         x,
-                        random.Next(50, 150)));
+                        random.Next(50, 150),
+                        50 + option.Duration / 2));
 
                 transports.AddRange(newTransports);
             }
