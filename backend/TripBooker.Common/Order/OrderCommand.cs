@@ -10,6 +10,12 @@ public class OrderCommand
 
 public class OrderData
 {
+    /// <summary>
+    /// Should be set before finalize to describe reason of the unsuccessful reservation.
+    /// Null means successful action for the defined state of the saga.
+    /// </summary>
+    public string? FailureMessage { get; set; }
+
     public int NumberOfAdults { get; set; }
 
     public int NumberOfChildrenUpTo18 { get; set; }
@@ -26,7 +32,10 @@ public class OrderData
 
     public Guid OrderId { get; set; }
 
+    // TODO: analogical three fields for return transport
     public Guid TransportId { get; set; }
 
     public int TransportPrice { get; set; }
+
+    public Guid? TransportReservationId { get; set; }
 }

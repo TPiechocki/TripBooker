@@ -11,6 +11,9 @@ internal class TransportMappings : Profile
     {
         CreateMap<TransportViewContract, TransportModel>();
         CreateMap<TransportReservationAccepted, OrderData>()
-            .ForMember(dest => dest.TransportPrice, opt => opt.MapFrom(src => src.Price));
+            .ForMember(dest => dest.TransportPrice, opt => opt.MapFrom(src => src.Price))
+            .ForMember(dest => dest.TransportReservationId, opt => opt.MapFrom(src => src.ReservationId));
+        CreateMap<TransportReservationRejected, OrderData>()
+            .ForMember(dest => dest.TransportReservationId, opt => opt.MapFrom(src => src.ReservationId));
     }
 }

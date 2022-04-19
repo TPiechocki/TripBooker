@@ -46,18 +46,20 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
         When(AcceptTransport)
-            .TransitionTo(TransportAccepted)    // TODO: save reservation id
+            .TransitionTo(TransportAccepted)
             .Then(x => x.Saga.Order = _mapper.Map(x.Message, x.Saga.Order))
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
             .Finalize();
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
         When(RejectTransport)
-            // TODO: save reservation id
+            .Then(x =>
+            {
+                x.Saga.Order = _mapper.Map(x.Message, x.Saga.Order);
+                x.Saga.Order.FailureMessage = "Reservation was rejected.";
+            })
             .Then(x => _logger.LogInformation($"Transport reservation rejected (OrderId={x.Message.CorrelationId})."))
             .Finalize();
-
-
 
     private static void UpdateSagaState(OrderState state, OrderCommand data)
     {
