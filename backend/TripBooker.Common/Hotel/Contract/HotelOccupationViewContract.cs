@@ -5,10 +5,12 @@ namespace TripBooker.Common.Hotel.Contract;
 public class HotelOccupationViewContract
 {
     public Guid HotelId { get; set; }
+    public string HotelCode { get; set; } = null!;
     public string HotelName { get; set; } = null!;
     public string City { get; set; } = null!;
-    public string Address { get; set; } = null!;
+    public string AirportCode { get; set; } = null!;
     public int Rating { get; set; }
+    public bool AllInclusive { get; set; }
     public DateTime Date { get; set; }
     public int RoomsStudio { get; set; }
     public int RoomsSmall { get; set; }

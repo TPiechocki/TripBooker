@@ -23,7 +23,7 @@ internal class HotelDbContext : DbContext
         modelBuilder.Entity<RoomOption>()
             .HasOne(r => r.Hotel)
             .WithMany(h => h.Rooms)
-            .HasForeignKey(r => r.HotelId)
+            .HasForeignKey(r => r.HotelCode)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
 

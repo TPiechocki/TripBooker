@@ -9,10 +9,12 @@ internal static class HotelOccupationViewContractMapper
         return new HotelOccupationViewContract
         {
             HotelId = occupation.HotelId,
+            HotelCode = hotel.Code,
             HotelName = hotel.Name,
             City = hotel.City,
-            Address = hotel.Address,
+            AirportCode = hotel.AirportCode,
             Rating = hotel.Rating,
+            AllInclusive = hotel.AllInclusive,
             Date = occupation.Date,
             RoomsStudio = occupation.RoomsStudio,
             RoomsSmall = occupation.RoomsSmall,

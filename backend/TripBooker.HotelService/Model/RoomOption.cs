@@ -15,7 +15,7 @@ internal class RoomOption
     public double PriceModifier { get; set; }
 
     [Required]
-    public Guid HotelId { get; set; }
+    public string HotelCode { get; set; } = null!;
 
-    public HotelOption Hotel { get; set; }
+    public HotelOption Hotel { get; set; } = null!;
 }

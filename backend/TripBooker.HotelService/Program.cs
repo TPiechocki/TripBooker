@@ -44,7 +44,7 @@ static void CreateDbIfNotExists(IHost host)
         var hotelService = services.GetRequiredService<IHotelService>();
         var reservationService = services.GetRequiredService<IHotelReservationService>();
 
-        SqlDbInitializer.Initialize(hotelContext);
+        SqlDbInitializer.Initialize(hotelContext, hotelService);
     }
     catch (Exception ex)
     {
