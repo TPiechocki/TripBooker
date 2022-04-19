@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TripBooker.HotelService.Infrastructure;
 using TripBooker.HotelService.Model.Events;
+using TripBooker.HotelService.Model.Events.Reservation;
 
 namespace TripBooker.HotelService.Repositories;
 
@@ -11,6 +12,8 @@ internal interface IReservationEventRepository
     Task<Guid> AddNewAsync(NewReservationEventData reservationEvent, CancellationToken cancellationToken);
 
     Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
+
+    Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
     Task AddRejectedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
@@ -60,7 +63,22 @@ internal class ReservationEventRepository : IReservationEventRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add an accepted reservation event: streamId={streamId}";
+            var message = $"Could not add an accept reservation event: streamId={streamId}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
+    }
+
+    public async Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
+    {
+        await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
+                streamId, previousVersion + 1, nameof(ReservationCancelledEventData), new ReservationCancelledEventData()),
+            cancellationToken);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add an cancel reservation event: streamId={streamId}";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
@@ -75,7 +93,7 @@ internal class ReservationEventRepository : IReservationEventRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add a rejected reservation event: streamId={streamId}";
+            var message = $"Could not add a reject reservation event: streamId={streamId}";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }

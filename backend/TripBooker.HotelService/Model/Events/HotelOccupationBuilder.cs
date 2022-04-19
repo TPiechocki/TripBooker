@@ -49,10 +49,10 @@ internal static class HotelOccupationBuilder
 
         item.Version = @event.Version;
 
-        item.RoomsStudio -= data.RoomsStudio;
-        item.RoomsSmall -= data.RoomsSmall;
-        item.RoomsMedium -= data.RoomsMedium;
-        item.RoomsLarge -= data.RoomsLarge;
-        item.RoomsApartment -= data.RoomsApartment;
+        item.RoomsStudio += data.RoomsStudio;
+        item.RoomsSmall += data.RoomsSmall;
+        item.RoomsMedium += data.RoomsMedium;
+        item.RoomsLarge += data.RoomsLarge;
+        item.RoomsApartment += data.RoomsApartment;
     }
 }

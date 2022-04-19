@@ -1,5 +1,4 @@
 ﻿using TripBooker.Common;
-using TripBooker.Common.Transport;
 
 namespace TripBooker.TransportService.Model;
 

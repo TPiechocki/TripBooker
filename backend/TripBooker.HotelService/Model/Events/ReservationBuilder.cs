@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TripBooker.Common;
-using TripBooker.TransportService.Model.Events.Reservation;
 
-namespace TripBooker.TransportService.Model.Events;
+namespace TripBooker.HotelService.Model.Events;
 
 internal static class ReservationBuilder
 {
@@ -39,8 +38,12 @@ internal static class ReservationBuilder
         item.Version = @event.Version;
 
         item.Status = ReservationStatus.New;
-        item.TransportId = data.TransportId;
-        item.Places = data.Places;
+        item.HotelDays = data.HotelDays;
+        item.RoomsStudio = data.RoomsStudio;
+        item.RoomsSmall = data.RoomsSmall;
+        item.RoomsMedium = data.RoomsMedium;
+        item.RoomsLarge = data.RoomsLarge;
+        item.RoomsApartment = data.RoomsApartment;
     }
 
     private static void ApplyAccepted(this ReservationModel item, BaseEvent @event)
