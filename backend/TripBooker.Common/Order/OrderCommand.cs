@@ -16,6 +16,8 @@ public class OrderData
     /// </summary>
     public string? FailureMessage { get; set; }
 
+    public int Price => TransportPrice + ReturnTransportPrice;
+
     public int NumberOfAdults { get; set; }
 
     public int NumberOfChildrenUpTo18 { get; set; }
@@ -38,4 +40,10 @@ public class OrderData
     public int TransportPrice { get; set; }
 
     public Guid? TransportReservationId { get; set; }
+
+    public Guid ReturnTransportId { get; set; }
+
+    public int ReturnTransportPrice { get; set; }
+
+    public Guid? ReturnTransportReservationId { get; set; }
 }

@@ -38,11 +38,11 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
         const string timestampKey = TransportViewUpdateEventConstants.TimestampKey;
 
         // query current timestamp
-        var eventTimestamp = await _timestampRepository.QueryOne(timestampKey, cancellationToken);
-        var oldTimestamp = eventTimestamp?.Timestamp ?? DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
-        var newTimestamp = DateTime.UtcNow;
+        var eventTimestamp =  await _timestampRepository.QueryOne(timestampKey, cancellationToken);
+        var oldTimestamp = eventTimestamp?.Timestamp ?? DateTime.MinValue;
+        oldTimestamp = DateTime.SpecifyKind(oldTimestamp, DateTimeKind.Utc);
 
-        await ConsumeEventsSince(oldTimestamp, cancellationToken);
+        var newTimestamp = await ConsumeEventsSince(oldTimestamp, cancellationToken);
 
         // save new timestamp after successful consume
         if (eventTimestamp == null)
@@ -56,7 +56,7 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
         }
     }
 
-    private async Task ConsumeEventsSince(DateTime oldTimestamp, CancellationToken cancellationToken)
+    private async Task<DateTime> ConsumeEventsSince(DateTime oldTimestamp, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Started consuming events since {oldTimestamp}.");
 
@@ -84,5 +84,8 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +
                                $"Updated rows (count={transportIdsToUpdate.Count}): {JsonConvert.SerializeObject(transportIdsToUpdate)}");
+        return newEvents.Count == 0
+            ? oldTimestamp
+            : DateTime.SpecifyKind(newEvents.Select(x => x.Timestamp).Max(), DateTimeKind.Utc);
     }
 }
