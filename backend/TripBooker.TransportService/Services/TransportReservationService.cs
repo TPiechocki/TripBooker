@@ -35,7 +35,9 @@ internal class TransportReservationService : ITransportReservationService
 
     public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
     {
-        var transportId = reservation.Order.TransportId;
+        var transportId = reservation.IsReturn
+            ? reservation.Order.ReturnTransportId
+            : reservation.Order.TransportId;
         var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats;
 
         // add reservation
@@ -69,8 +71,8 @@ internal class TransportReservationService : ITransportReservationService
 
             try
             {
-                await ValidateNewReservationTransaction(reservationStreamId, reservation, transportItem,
-                    cancellationToken);
+                await ValidateNewReservationTransaction(reservationStreamId, transportId, numberOfPlaces, 
+                    transportItem, cancellationToken);
             }
             catch (DbUpdateException e)
             {
@@ -96,6 +98,7 @@ internal class TransportReservationService : ITransportReservationService
 
     public async Task Cancel(Guid reservationId, CancellationToken cancellationToken) 
     {
+        
         var reservationEvents =
             await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
         var reservation = ReservationBuilder.Build(reservationEvents);
@@ -133,21 +136,21 @@ internal class TransportReservationService : ITransportReservationService
         }
     }
 
-    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewTransportReservation reservation,
-        TransportModel transportItem,
+    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, Guid transportId,
+        int numberOfPlaces, TransportModel transportItem,
         CancellationToken cancellationToken)
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var transportEvent = new TransportPlaceUpdateEvent(
-            transportItem.AvailablePlaces - reservation.Order.NumberOfOccupiedSeats,
-            -reservation.Order.NumberOfOccupiedSeats,
+            transportItem.AvailablePlaces - numberOfPlaces,
+            -numberOfPlaces,
             reservationStreamId);
 
-        await _transportRepository.AddAsync(transportEvent, reservation.Order.TransportId, transportItem.Version,
+        await _transportRepository.AddAsync(transportEvent, transportId, transportItem.Version,
             cancellationToken);
 
-        var price = reservation.Order.NumberOfOccupiedSeats * transportItem.TicketPrice;
+        var price = numberOfPlaces * transportItem.TicketPrice;
 
         await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1,
             new ReservationAcceptedEventData(price), cancellationToken);
