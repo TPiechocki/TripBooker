@@ -17,6 +17,8 @@ internal interface IHotelOccupationViewRepository
     Task<ICollection<HotelOccupationModel>> GetByHotelIdAsync(Guid hotelId, CancellationToken cancellationToken);
 
     Task AddOrUpdateAsync(HotelOccupationModel occupationModel, CancellationToken cancellationToken);
+
+    Task AddManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken);
 }
 
 internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
@@ -68,5 +70,10 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
             await AddAsync(occupationModel, cancellationToken);
         }
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AddManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken)
+    {
+        await _dbContext.AddRangeAsync(models, cancellationToken);
     }
 }
