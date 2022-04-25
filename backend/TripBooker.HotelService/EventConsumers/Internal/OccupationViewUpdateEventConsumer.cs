@@ -1,5 +1,7 @@
 ﻿using MassTransit;
 using Newtonsoft.Json;
+using TripBooker.Common.Hotel.Contract;
+using TripBooker.HotelService.Infrastructure;
 using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Mappings;
@@ -63,7 +65,11 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
 
         // read all events after old timestamp
         var newEvents = await _hotelRepository.GetEventsSinceAsync(oldTimestamp, cancellationToken);
-        var hotelDayIdsToUpdate = newEvents.Select(x => x.StreamId).Distinct().ToList();
+        var newViewsEvents = newEvents.Where(x => x.Version == 1).ToDictionary(x => x.StreamId);
+        var hotelDayIdsToUpdate = newEvents.Select(x => x.StreamId).Distinct().Except(newViewsEvents.Keys).ToList();
+        
+        // get data of all hotels for easy access
+        var hotels = await _hotelOptionRepository.QuerryAllAsync(cancellationToken);
 
         // update view and publish events
         foreach (var hotelDayId in hotelDayIdsToUpdate)
@@ -73,7 +79,7 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
 
             await _viewRepository.AddOrUpdateAsync(occupationModel, cancellationToken);
 
-            var hotelOption = await _hotelOptionRepository.GetByIdAsync(occupationModel.HotelId, cancellationToken);
+            HotelOption hotelOption = hotels.Where(h => h.Id == occupationModel.HotelId).First();
             if (hotelOption == null)
             {
                 throw new InvalidOperationException("Cannot map occupation without defined Hotel option." +
@@ -81,6 +87,36 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
             }
 
             await _bus.Publish(HotelOccupationViewContractMapper.MapFrom(occupationModel, hotelOption), cancellationToken);
+        }
+
+        // create new views and publish events
+        var newViews = new List<HotelOccupationModel>();
+        var newContracts = new List<HotelOccupationViewContract>();
+        foreach (var newHotelDay in newViewsEvents.Values)
+        {
+            var occupationModel = HotelOccupationBuilder.Build(new List<HotelEvent>() { newHotelDay });
+            newViews.Add(occupationModel);
+
+            HotelOption hotelOption = hotels.Where(h => h.Id == occupationModel.HotelId).First();
+            if (hotelOption == null)
+            {
+                throw new InvalidOperationException("Cannot map occupation without defined Hotel option." +
+                                                    $"(missingOptionId={occupationModel.HotelId}");
+            }
+
+            newContracts.Add(HotelOccupationViewContractMapper.MapFrom(occupationModel, hotelOption));
+        }
+        if (newViews.Any()) await _viewRepository.AddManyAsync(newViews, cancellationToken);
+        if (newContracts.Any())
+        {
+            var chunks = newContracts.Chunk(1000);
+
+            // add in chunks so data is partially available earlier
+            foreach (var chunk in chunks)
+            {
+                await _bus.PublishBatch(chunk, cancellationToken);
+            }
+            
         }
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +

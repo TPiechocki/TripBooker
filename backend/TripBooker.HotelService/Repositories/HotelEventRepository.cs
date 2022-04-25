@@ -20,6 +20,8 @@ internal interface IHotelEventRepository
 
     Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken);
 
+    Task<ICollection<HotelEvent>> QueryAll(CancellationToken cancellationToken);
+
     Task<ICollection<HotelEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken);
 }
 
@@ -106,6 +108,11 @@ internal class HotelEventRepository : IHotelEventRepository
         return await _dbContext.HotelEvent
             .Where(x => x.Timestamp >= timestamp)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ICollection<HotelEvent>> QueryAll(CancellationToken cancellationToken)
+    {
+        return await _dbContext.HotelEvent.Select(x => x).ToListAsync(cancellationToken);
     }
 
     public async Task AddToManyAsync(OccupatonUpdateEvent occupationUpdateEvent, IEnumerable<Guid> ids, IEnumerable<int> versions, CancellationToken cancellationToken)

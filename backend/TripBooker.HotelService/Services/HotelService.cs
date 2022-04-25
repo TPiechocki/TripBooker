@@ -6,8 +6,9 @@ namespace TripBooker.HotelService.Services;
 
 internal interface IHotelService
 {
-    Task AddNewHotelDay(DateTime day, CancellationToken cancellationToken);
+    Task AddNewHotelDay(DateTime day, CancellationToken cancellationToken, int days = 1);
 }
+
 internal class HotelService : IHotelService
 {
     private readonly IHotelEventRepository _eventRepository;
@@ -19,14 +20,19 @@ internal class HotelService : IHotelService
         _hotelOptionRepository = hotelOptionRepository;
     }
 
-    public async Task AddNewHotelDay(DateTime day, CancellationToken cancellationToken)
+    public async Task AddNewHotelDay(DateTime day, CancellationToken cancellationToken, int days = 1)
     {
         var hotels = await _hotelOptionRepository.QuerryAllAsync(cancellationToken);
         var events = new List<NewHotelDayEventData>();
 
-        foreach (var hotel in hotels)
+        for (int i = 0; i < days; i++)
         {
-            events.Add(HotelExtensions.MapToNewHotelDayEventData(day, hotel));
+            foreach (var hotel in hotels)
+            {
+                events.Add(HotelExtensions.MapToNewHotelDayEventData(day, hotel));
+            }
+
+            day = day.AddDays(1);
         }
 
         await _eventRepository.AddNewRangeAsync(events, cancellationToken);

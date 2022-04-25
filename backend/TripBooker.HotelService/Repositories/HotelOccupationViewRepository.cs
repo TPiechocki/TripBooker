@@ -74,6 +74,13 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
 
     public async Task AddManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken)
     {
-        await _dbContext.AddRangeAsync(models, cancellationToken);
+        await _dbContext.HotelOccupationView.AddRangeAsync(models, cancellationToken);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add range of HotelOccupationView";
+            throw new DbUpdateException(message);
+        }
     }
 }

@@ -22,14 +22,9 @@ internal static class SqlDbInitializer
         hotelContext.SaveChanges();
 
         // Hotel Occupation
-        if (!hotelContext.HotelOccupationView.Any())
+        if (!hotelContext.HotelEvent.Any() && !hotelContext.HotelOccupationView.Any())
         {
-            DateTime day = DateTime.UtcNow;
-            for (int i = 0; i < 30; i++)
-            {
-                hotelService.AddNewHotelDay(day, default).GetAwaiter().GetResult();
-                day = day.AddDays(1);
-            }
+            hotelService.AddNewHotelDay(DateTime.UtcNow, default, 30).GetAwaiter().GetResult();
         }
             
     }
