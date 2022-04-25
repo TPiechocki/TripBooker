@@ -22,7 +22,7 @@ internal class HotelReservationService : IHotelReservationService
     private readonly IReservationEventRepository _reservationRepository;
     private readonly IHotelEventRepository _hotelRepository;
 
-    public HotelReservationService(ReservationEventRepository reservationRepository, HotelEventRepository hotelRepository)
+    public HotelReservationService(IReservationEventRepository reservationRepository, IHotelEventRepository hotelRepository)
     {
         _reservationRepository = reservationRepository;
         _hotelRepository = hotelRepository;

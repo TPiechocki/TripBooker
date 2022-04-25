@@ -14,6 +14,8 @@ internal interface IHotelEventRepository
     Task AddAsync(OccupatonUpdateEvent occupationUpdateEvent, Guid streamId, int previousVersion,
         CancellationToken cancellationToken, bool updateView = true);
 
+    Task AddNewRangeAsync(IEnumerable<NewHotelDayEventData> hotelEventDatas, CancellationToken cancellationToken);
+
     Task AddToManyAsync(OccupatonUpdateEvent occupationUpdateEvent, IEnumerable<Guid> ids, IEnumerable<int> versions, CancellationToken cancellationToken);
 
     Task<ICollection<HotelEvent>> GetHotelEventsAsync(Guid streamId, CancellationToken cancellationToken);
@@ -47,7 +49,28 @@ internal class HotelEventRepository : IHotelEventRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add a new Transport: {JsonConvert.SerializeObject(hotelEvent)}";
+            var message = $"Could not add a new HotelDay: {JsonConvert.SerializeObject(hotelEvent)}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
+    }
+
+    public async Task AddNewRangeAsync(IEnumerable<NewHotelDayEventData> hotelEventDatas, CancellationToken cancellationToken)
+    {
+        var hotelEvents = new List<HotelEvent>();
+
+        foreach(var hotelEvent in hotelEventDatas)
+        {
+            var guid = Guid.NewGuid();
+            hotelEvents.Add(new HotelEvent(guid, 1, nameof(NewHotelDayEventData), hotelEvent));
+        }
+
+        _dbContext.HotelEvent.AddRange(hotelEvents);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add range of HotelDays";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }

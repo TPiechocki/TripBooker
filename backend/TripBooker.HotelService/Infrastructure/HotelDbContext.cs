@@ -20,15 +20,23 @@ internal class HotelDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<RoomOption>()
             .HasOne(r => r.Hotel)
             .WithMany(h => h.Rooms)
-            .HasForeignKey(r => r.HotelCode)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
 
         modelBuilder.Entity<HotelOccupationModel>()
             .HasKey(c => new { c.HotelId, c.Date });
+
+        modelBuilder.Entity<HotelEvent>()
+            .Property(x => x.Timestamp)
+            .HasDefaultValueSql("now() at time zone 'utc'");
+        modelBuilder.Entity<ReservationEvent>()
+            .Property(x => x.Timestamp)
+            .HasDefaultValueSql("now() at time zone 'utc'");
     }
 
     public HotelDbContext(DbContextOptions options) : base(options)

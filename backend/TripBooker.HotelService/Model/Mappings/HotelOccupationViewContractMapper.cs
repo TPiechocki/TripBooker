@@ -11,7 +11,7 @@ internal static class HotelOccupationViewContractMapper
             HotelId = occupation.HotelId,
             HotelCode = hotel.Code,
             HotelName = hotel.Name,
-            City = hotel.City,
+            Country = hotel.Country,
             AirportCode = hotel.AirportCode,
             Rating = hotel.Rating,
             AllInclusive = hotel.AllInclusive,

@@ -24,10 +24,10 @@ internal static class SqlDbInitializer
         // Hotel Occupation
         if (!hotelContext.HotelOccupationView.Any())
         {
-            DateTime day = DateTime.Now;
+            DateTime day = DateTime.UtcNow;
             for (int i = 0; i < 30; i++)
             {
-                hotelService.AddNewHotelDay(day, default);
+                hotelService.AddNewHotelDay(day, default).GetAwaiter().GetResult();
                 day = day.AddDays(1);
             }
         }
@@ -60,17 +60,17 @@ internal static class SqlDbInitializer
         List<RoomOption> rooms = new List<RoomOption>();
 
         int hotelSize = random.Next(1, 5);
+        int rating = hotel.Rating == 0 ? 3 : (int)hotel.Rating;
 
         hotel.AllInclusive = hotel.Rating > 3 ? true : random.NextDouble() < (hotel.Rating + 2) / 10;
         hotel.PriceModifier = 1.2 - random.NextDouble() + hotel.Rating / 10;
 
         // Studio
-        for (int i = 0; i < random.Next((hotelSize - 1) * 2, 10 / hotel.Rating * hotelSize); i++)
+        for (int i = 0; i < random.Next((hotelSize - 1) * 2, 10 / rating * hotelSize); i++)
         {
             rooms.Add(new RoomOption
             {
                 Hotel = hotel,
-                HotelCode = hotel.Code,
                 RoomType = RoomType.Studio,
                 PriceModifier = 0.5
             });
@@ -82,7 +82,6 @@ internal static class SqlDbInitializer
             rooms.Add(new RoomOption
             {
                 Hotel = hotel,
-                HotelCode = hotel.Code,
                 RoomType = RoomType.Small,
                 PriceModifier = 1.80
             });
@@ -94,7 +93,6 @@ internal static class SqlDbInitializer
             rooms.Add(new RoomOption
             {
                 Hotel = hotel,
-                HotelCode = hotel.Code,
                 RoomType = RoomType.Medium,
                 PriceModifier = 2.0
             });
@@ -106,19 +104,17 @@ internal static class SqlDbInitializer
             rooms.Add(new RoomOption
             {
                 Hotel = hotel,
-                HotelCode = hotel.Code,
                 RoomType = RoomType.Large,
                 PriceModifier = 3.0
             });
         }
 
         // Apartment
-        for (int i = 0; i < random.Next((hotelSize - 1) * Math.Max(hotel.Rating - 3, 0), hotelSize * Math.Max(hotel.Rating - 2, 0) ); i++)
+        for (int i = 0; i < random.Next((hotelSize - 1) * Math.Max(rating - 3, 0), hotelSize * Math.Max(rating - 2, 0) ); i++)
         {
             rooms.Add(new RoomOption
             {
                 Hotel = hotel,
-                HotelCode = hotel.Code,
                 RoomType = RoomType.Apartment,
                 PriceModifier = 5.0
             });

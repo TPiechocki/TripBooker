@@ -17,12 +17,12 @@ internal class HotelOption
 
     public string Description { get; set; } = null!;
 
-    public string City { get; set; } = null!;
+    public string Country { get; set; } = null!;
 
     [Required]
     public string AirportCode { get; set; } = null!;
 
-    public int Rating { get; set; }
+    public float Rating { get; set; }
 
     public double PriceModifier { get; set; }
 

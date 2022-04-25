@@ -18,7 +18,7 @@ internal class EventTimestampRepository : IEventTimestampRepository
 
     public EventTimestampRepository(IMongoDatabase mongoDatabase)
     {
-        _timestamps = mongoDatabase.GetCollection<EventTimestamp>("transport_event_timestamps");
+        _timestamps = mongoDatabase.GetCollection<EventTimestamp>("hotel_event_timestamps");
 
         _timestamps.Indexes.CreateOne(
             new CreateIndexModel<EventTimestamp>(Builders<EventTimestamp>.IndexKeys.Ascending(x => x.Id)));

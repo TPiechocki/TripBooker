@@ -7,9 +7,9 @@ public class HotelOccupationViewContract
     public Guid HotelId { get; set; }
     public string HotelCode { get; set; } = null!;
     public string HotelName { get; set; } = null!;
-    public string City { get; set; } = null!;
+    public string Country { get; set; } = null!;
     public string AirportCode { get; set; } = null!;
-    public int Rating { get; set; }
+    public float Rating { get; set; }
     public bool AllInclusive { get; set; }
     public DateTime Date { get; set; }
     public int RoomsStudio { get; set; }
