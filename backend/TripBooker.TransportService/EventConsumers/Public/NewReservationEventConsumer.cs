@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using TripBooker.Common.Order.Transport;
-using TripBooker.Common.Transport;
+using TripBooker.Common;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Services;
 

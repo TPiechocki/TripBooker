@@ -4,7 +4,6 @@ using System.Transactions;
 using Newtonsoft.Json;
 using TripBooker.Common;
 using TripBooker.Common.Order.Transport;
-using TripBooker.Common.Transport;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Reservation;
