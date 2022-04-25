@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Transactions;
+using Newtonsoft.Json;
 using TripBooker.Common;
-using TripBooker.Common.Transport.Contract.Command;
+using TripBooker.Common.Order.Transport;
+using TripBooker.Common.Transport;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Events.Reservation;
@@ -13,7 +15,7 @@ namespace TripBooker.TransportService.Services;
 
 internal interface ITransportReservationService
 {
-    Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken);
+    Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken);
 
     Task Cancel(Guid reservationId, CancellationToken cancellationToken);
 }
@@ -31,10 +33,15 @@ internal class TransportReservationService : ITransportReservationService
         _reservationEventRepository = reservationEventRepository;
     }
 
-    public async Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken)
+    public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
     {
+        var transportId = reservation.IsReturn
+            ? reservation.Order.ReturnTransportId
+            : reservation.Order.TransportId;
+        var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats;
+
         // add reservation
-        var data = new NewReservationEventData(reservation.TransportId, reservation.Places);
+        var data = new NewReservationEventData(transportId, numberOfPlaces);
         var reservationStreamId = await _reservationEventRepository.AddNewAsync(data, cancellationToken);
 
         var tryTransaction = true;
@@ -44,10 +51,18 @@ internal class TransportReservationService : ITransportReservationService
             tryTransaction = false;
 
             var transportEvents =
-                await _transportRepository.GetTransportEventsAsync(reservation.TransportId, cancellationToken);
+                await _transportRepository.GetTransportEventsAsync(transportId, cancellationToken);
+            if (transportEvents.Count == 0)
+            {
+                await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
+                throw new ArgumentException(
+                    $"Received reservation for transport which does not exist {JsonConvert.SerializeObject(reservation)}.",
+                    nameof(reservation));
+            }
+
             var transportItem = TransportBuilder.Build(transportEvents);
 
-            if (transportItem.AvailablePlaces < reservation.Places)
+            if (transportItem.AvailablePlaces < numberOfPlaces)
             {
                 // if there is not enough free places
                 await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
@@ -56,8 +71,8 @@ internal class TransportReservationService : ITransportReservationService
 
             try
             {
-                await ValidateNewReservationTransaction(reservationStreamId, reservation, transportItem,
-                    cancellationToken);
+                await ValidateNewReservationTransaction(reservationStreamId, transportId, numberOfPlaces, 
+                    transportItem, cancellationToken);
             }
             catch (DbUpdateException e)
             {
@@ -69,6 +84,7 @@ internal class TransportReservationService : ITransportReservationService
                 }
                 else
                 {
+                    await _reservationEventRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
                     throw;
                 }
             }
@@ -82,6 +98,7 @@ internal class TransportReservationService : ITransportReservationService
 
     public async Task Cancel(Guid reservationId, CancellationToken cancellationToken) 
     {
+        
         var reservationEvents =
             await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
         var reservation = ReservationBuilder.Build(reservationEvents);
@@ -119,21 +136,24 @@ internal class TransportReservationService : ITransportReservationService
         }
     }
 
-    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation,
-        TransportModel transportItem,
+    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, Guid transportId,
+        int numberOfPlaces, TransportModel transportItem,
         CancellationToken cancellationToken)
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var transportEvent = new TransportPlaceUpdateEvent(
-            transportItem.AvailablePlaces - reservation.Places,
-            -reservation.Places,
+            transportItem.AvailablePlaces - numberOfPlaces,
+            -numberOfPlaces,
             reservationStreamId);
 
-        await _transportRepository.AddAsync(transportEvent, reservation.TransportId, transportItem.Version,
+        await _transportRepository.AddAsync(transportEvent, transportId, transportItem.Version,
             cancellationToken);
 
-        await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
+        var price = numberOfPlaces * transportItem.TicketPrice;
+
+        await _reservationEventRepository.AddAcceptedAsync(reservationStreamId, 1,
+            new ReservationAcceptedEventData(price), cancellationToken);
 
         transaction.Complete();
     }

@@ -36,6 +36,7 @@ internal static class TransportBuilder
 
         item.AvailablePlaces = data.AvailablePlaces;
         item.DepartureDate = data.DepartureDate;
+        item.TicketPrice = data.TicketPrice;
         item.TransportOptionId = data.TransportOptionId;
     }
 

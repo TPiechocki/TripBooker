@@ -30,7 +30,11 @@ namespace TripBooker.WebApi.Infrastructure
                             }
                         );
                     }
-                );
+                )
+                .Configure<MassTransitHostOptions>(x =>
+                {
+                    x.WaitUntilStarted = true;
+                });
         }
     }
 }

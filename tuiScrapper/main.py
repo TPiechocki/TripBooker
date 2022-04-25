@@ -116,7 +116,9 @@ for code in dest_codes:
 
             hotel_name = info["hotelName"]
             hotel_code = info["hotelCode"]
-            hotels.add((country, hotel_name, hotel_code, foreign_airport_code, foreign_airport_name))
+            hotel_rating = info["tripAdvisorRating"] if "tripAdvisorRating" in info else "No rating"
+            hotel_features = ", ".join(info["features"])
+            hotels.add((country, hotel_name, hotel_code, foreign_airport_code, hotel_rating, hotel_features))
 
         if page == resp["pagination"]["pagesCount"]:
             break
@@ -127,7 +129,7 @@ cw.writerow(["origin_airport_name","origin_airport_code","origin_airport_country
 cw.writerows(list(connections))
 
 cw_hotels = csv.writer(open("hotels.csv", 'w', newline='', encoding="utf-8"))
-cw_hotels.writerow(["country","hotel_name","hotel_code","airport_code","airport_name"])
+cw_hotels.writerow(["country","hotel_name","hotel_code","airport_code","hotel_rating","hotel_features"])
 cw_hotels.writerows(list(hotels))
 
 print(connections)

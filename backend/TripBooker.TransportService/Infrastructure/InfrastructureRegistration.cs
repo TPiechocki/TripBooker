@@ -87,7 +87,7 @@ internal static class ServicesRegistration
                     .ForJob(jobKey)
                     .WithIdentity(jobKey + "-trigger")
                     .WithSimpleSchedule(x => x
-                        .WithIntervalInSeconds(15)
+                        .WithIntervalInSeconds(600)
                         .RepeatForever()));
             })
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

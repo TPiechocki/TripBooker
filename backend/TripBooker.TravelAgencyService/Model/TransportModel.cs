@@ -20,5 +20,7 @@ internal class TransportModel
     [Key]
     public Guid Id { get; set; }
 
+    public int TicketPrice { get; set; }
+
     public TransportType Type { get; set; }
 }

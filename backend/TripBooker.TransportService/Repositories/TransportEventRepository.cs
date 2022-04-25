@@ -87,7 +87,7 @@ internal class TransportEventRepository : ITransportEventRepository
     public async Task<ICollection<TransportEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken)
     {
         return await _dbContext.TransportEvent
-            .Where(x => x.Timestamp >= timestamp)
+            .Where(x => x.Timestamp > timestamp)
             .ToListAsync(cancellationToken);
     }
 }

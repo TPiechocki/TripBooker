@@ -7,6 +7,7 @@ internal static class TransportExtensions
 {
     public static NewTransportEventData MapToNewTransportEventData(this NewTransportContract transport)
     {
-        return new NewTransportEventData(transport.TransportOptionId, transport.DepartureDate, transport.Places);
+        return new NewTransportEventData(transport.TransportOptionId, transport.DepartureDate, transport.Places,
+            transport.TicketPrice);
     }
 }

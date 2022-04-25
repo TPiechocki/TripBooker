@@ -9,7 +9,7 @@ internal interface IReservationEventRepository
 {
     Task<Guid> AddNewAsync(NewReservationEventData reservationEvent, CancellationToken cancellationToken);
 
-    Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
+    Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data, CancellationToken cancellationToken);
 
     Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
@@ -54,10 +54,11 @@ internal class ReservationEventRepository : IReservationEventRepository
     public async Task AddAcceptedAsync(
         Guid streamId,
         int previousVersion,
+        ReservationAcceptedEventData data,
         CancellationToken cancellationToken)
     {
         await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
-                streamId, previousVersion + 1, nameof(ReservationAcceptedEventData), new ReservationAcceptedEventData()),
+                streamId, previousVersion + 1, nameof(ReservationAcceptedEventData), data),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);

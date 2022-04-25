@@ -8,5 +8,7 @@ internal class ReservationModel : EventModel
 
     public int Places { get; set; }
 
+    public int Price { get; set; }
+
     public ReservationStatus Status { get; set; }
 }
