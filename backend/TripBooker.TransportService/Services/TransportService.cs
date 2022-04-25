@@ -6,7 +6,7 @@ namespace TripBooker.TransportService.Services;
 
 internal interface ITransportService
 {
-    Task<Guid> AddNewTransport(NewTransportContract transport, CancellationToken cancellationToken);
+    Task AddManyNewTransports(IEnumerable<NewTransportContract> transports, CancellationToken cancellationToken);
 }
 
 internal class TransportService : ITransportService
@@ -22,20 +22,27 @@ internal class TransportService : ITransportService
         _eventRepository = eventRepository;
     }
 
-    public async Task<Guid> AddNewTransport(NewTransportContract transport, CancellationToken cancellationToken)
+    public async Task AddManyNewTransports(IEnumerable<NewTransportContract> transports, CancellationToken cancellationToken)
     {
-        var transportOption = await _optionRepository.GetById(transport.TransportOptionId);
-        if (transportOption == null)
+        var transportOptionsIds = transports.Select(x => x.TransportOptionId).Distinct().ToList();
+
+        var transportOptions = await _optionRepository.GetByIds(
+            transportOptionsIds, cancellationToken);
+        if (transportOptionsIds.Count > transportOptions.Count())
         {
-            throw new ArgumentException($"Option id for transport does not exist (optionId={transport.TransportOptionId}",
-                nameof(transport));
+            throw new ArgumentException("Option id for any of the new transports does not exist",
+                nameof(transports));
         }
 
-        var newTransportEvent = transport.MapToNewTransportEventData();
+        var newTransportEvents = transports.Select(x => x.MapToNewTransportEventData());
 
-        var guid = await _eventRepository.AddNewAsync(
-            newTransportEvent, cancellationToken);
+        var chunks = newTransportEvents.Chunk(500);
 
-        return guid;
+        // add in chunks so data is partially available earlier
+        foreach (var chunk in chunks)
+        {
+            await _eventRepository.AddManyNewAsync(
+                chunk, cancellationToken);
+        }
     }
 }

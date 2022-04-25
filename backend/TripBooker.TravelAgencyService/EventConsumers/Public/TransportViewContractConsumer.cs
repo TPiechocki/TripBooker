@@ -6,19 +6,20 @@ using TripBooker.TravelAgencyService.Repositories;
 
 namespace TripBooker.TravelAgencyService.EventConsumers.Public;
 
-internal class TransportViewContractConsumer : IConsumer<TransportViewContract>
+internal class ManyTransportsViewContractConsumer : IConsumer<ManyTransportsViewContract>
 {
     private readonly ITransportViewRepository _repository;
     private readonly IMapper _mapper;
 
-    public TransportViewContractConsumer(ITransportViewRepository repository, IMapper mapper)
+    public ManyTransportsViewContractConsumer(ITransportViewRepository repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
     }
 
-    public async Task Consume(ConsumeContext<TransportViewContract> context)
+    public async Task Consume(ConsumeContext<ManyTransportsViewContract> context)
     {
-        await _repository.AddOrUpdateAsync(_mapper.Map<TransportModel>(context.Message), context.CancellationToken);
+        var transports = _mapper.Map<IEnumerable<TransportModel>>(context.Message.Transports);
+        await _repository.AddOrUpdateManyAsync(transports, context.CancellationToken);
     }
 }
