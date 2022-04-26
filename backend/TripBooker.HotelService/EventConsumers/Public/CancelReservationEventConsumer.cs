@@ -1,10 +1,10 @@
 ﻿using MassTransit;
-using TripBooker.Common.Hotel.Contract.Command;
+using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Services;
 
 namespace TripBooker.HotelService.EventConsumers.Public;
 
-internal class CancelReservationEventConsumer : IConsumer<CancelReservationContract>
+internal class CancelReservationEventConsumer : IConsumer<CancelHotelReservation>
 {
     private readonly IHotelReservationService _reservationService;
 
@@ -13,7 +13,7 @@ internal class CancelReservationEventConsumer : IConsumer<CancelReservationContr
         _reservationService = reservationService;
     }
 
-    public async Task Consume(ConsumeContext<CancelReservationContract> context)
+    public async Task Consume(ConsumeContext<CancelHotelReservation> context)
     {
         await _reservationService.Cancel(context.Message.ReservationId, context.CancellationToken);
     }

@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using TripBooker.Common.Hotel;
 
-namespace TripBooker.Common.Hotel.Contract.Command;
+namespace TripBooker.Common.Order.Hotel;
 
-public class NewReservationContract : ContractBase
+public class NewHotelReservation : OrderCommand
 {
-    public NewReservationContract(Guid correlationId,
-                                  IEnumerable<Guid> hotelDays,
-                                  int roomsStudio,
-                                  int roomsSmall,
-                                  int roomsMedium,
-                                  int roomsLarge,
-                                  int roomsApartment) : base(correlationId)
+    public NewHotelReservation(
+        IEnumerable<Guid> hotelDays,
+        int roomsStudio,
+        int roomsSmall,
+        int roomsMedium,
+        int roomsLarge,
+        int roomsApartment)
     {
         HotelDays = hotelDays;
         RoomsStudio = roomsStudio;
@@ -32,4 +33,6 @@ public class NewReservationContract : ContractBase
     public int RoomsLarge { get; set; }
 
     public int RoomsApartment { get; set; }
+
+    public MealOption MealOption { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using TripBooker.Common;
+using TripBooker.Common.Hotel;
 
 namespace TripBooker.HotelService.Model;
 
@@ -15,6 +16,10 @@ internal class ReservationModel : EventModel
     public int RoomsLarge { get; set; }
 
     public int RoomsApartment { get; set; }
+
+    public MealOption MealOption { get; set; }
+
+    public double Price { get; set; }
 
     public ReservationStatus Status { get; set; }
 }

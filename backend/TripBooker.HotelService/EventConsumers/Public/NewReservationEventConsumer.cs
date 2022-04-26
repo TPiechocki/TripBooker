@@ -1,13 +1,12 @@
 ﻿using MassTransit;
 using TripBooker.Common;
-using TripBooker.Common.Hotel.Contract.Command;
-using TripBooker.Common.Hotel.Contract.Response;
+using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Services;
 
 namespace TripBooker.HotelService.EventConsumers.Public;
 
-internal class NewReservationEventConsumer : IConsumer<NewReservationContract>
+internal class NewReservationEventConsumer : IConsumer<NewHotelReservation>
 {
     private readonly IHotelReservationService _reservationService;
     private readonly IBus _bus;
@@ -20,25 +19,28 @@ internal class NewReservationEventConsumer : IConsumer<NewReservationContract>
         _bus = bus;
     }
 
-    public async Task Consume(ConsumeContext<NewReservationContract> context)
+    public async Task Consume(ConsumeContext<NewHotelReservation> context)
     {
         try
         {
-            var result = await _reservationService.AddNewReservation(context.Message, context.CancellationToken);
+            var result = 
+                await _reservationService.AddNewReservation(context.Message, context.CancellationToken);
 
             if (result.Status == ReservationStatus.Accepted)
             {
-                await context.Publish(new ReservationAcceptedContract(context.Message.CorrelationId, result.Id), context.CancellationToken);
+                await context.Publish(
+                    new HotelReservationAccepted(context.Message.Order.OrderId, result.Price, result.Id), 
+                    context.CancellationToken);
                 await _bus.Publish(new OccupationViewUpdateEvent(), context.CancellationToken);
             }
             else
             {
-                await context.Publish(new ReservationRejectedContract(context.Message.CorrelationId, result.Id), context.CancellationToken);
+                await context.Publish(new HotelReservationRejected(context.Message.Order.OrderId, result.Id), context.CancellationToken);
             }
         }
         catch
         {
-            await context.Publish(new ReservationRejectedContract(context.Message.CorrelationId, null), context.CancellationToken);
+            await context.Publish(new HotelReservationRejected(context.Message.Order.OrderId, null), context.CancellationToken);
         }
     }
 }

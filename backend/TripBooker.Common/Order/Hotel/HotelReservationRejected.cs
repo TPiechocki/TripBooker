@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace TripBooker.Common.Hotel.Contract.Response;
+namespace TripBooker.Common.Order.Hotel;
 
-public class ReservationRejectedContract : ContractBase
+public class HotelReservationRejected : ContractBase
 {
-    public ReservationRejectedContract(
+    public HotelReservationRejected(
         Guid correlationId,
         Guid? reservationId)
         : base(correlationId)

@@ -2,7 +2,7 @@
 using Npgsql;
 using System.Transactions;
 using TripBooker.Common;
-using TripBooker.Common.Hotel.Contract.Command;
+using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Hotel;
@@ -12,7 +12,7 @@ namespace TripBooker.HotelService.Services;
 
 internal interface IHotelReservationService
 {
-    Task<ReservationModel> AddNewReservation(NewReservationContract newReservationContract, CancellationToken cancellationToken);
+    Task<ReservationModel> AddNewReservation(NewHotelReservation newReservationContract, CancellationToken cancellationToken);
 
     Task Cancel(Guid reservationId, CancellationToken cancellationToken);
 }
@@ -28,7 +28,7 @@ internal class HotelReservationService : IHotelReservationService
         _hotelRepository = hotelRepository;
     }
 
-    public async Task<ReservationModel> AddNewReservation(NewReservationContract reservation, CancellationToken cancellationToken)
+    public async Task<ReservationModel> AddNewReservation(NewHotelReservation reservation, CancellationToken cancellationToken)
     {
         var data = new NewReservationEventData(reservation.HotelDays,
                                                reservation.RoomsStudio,
@@ -147,7 +147,7 @@ internal class HotelReservationService : IHotelReservationService
         while (!transactionSuccesfull);
     }
 
-    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewReservationContract reservation, 
+    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewHotelReservation reservation, 
         List<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
