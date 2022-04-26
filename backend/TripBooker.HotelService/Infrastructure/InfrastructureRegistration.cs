@@ -6,6 +6,7 @@ using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
 using TripBooker.HotelService.EventConsumers.Internal;
+using TripBooker.HotelService.EventConsumers.Public;
 
 namespace TripBooker.HotelService.Infrastructure;
 
@@ -47,8 +48,8 @@ internal static class InfrastructureRegistration
         return services.AddMassTransit(x =>
         {
             // public
-            //x.AddConsumer<NewReservationEventConsumer>();
-            //x.AddConsumer<CancelReservationEventConsumer>();
+            x.AddConsumer<NewReservationEventConsumer>();
+            x.AddConsumer<CancelReservationEventConsumer>();
 
             // internal
             x.AddConsumer<OccupationViewUpdateEventConsumer>(opt =>
