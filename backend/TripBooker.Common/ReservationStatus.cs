@@ -1,4 +1,4 @@
-﻿namespace TripBooker.Common.Transport;
+﻿namespace TripBooker.Common;
 
 public enum ReservationStatus
 {

@@ -16,7 +16,7 @@ public class OrderData
     /// </summary>
     public string? FailureMessage { get; set; }
 
-    public int Price => TransportPrice + ReturnTransportPrice;
+    public double Price => TransportPrice + ReturnTransportPrice + HotelPrice;
 
     public int NumberOfAdults { get; set; }
 
@@ -37,13 +37,22 @@ public class OrderData
     // TODO: analogical three fields for return transport
     public Guid TransportId { get; set; }
 
-    public int TransportPrice { get; set; }
+    public double TransportPrice { get; set; }
 
     public Guid? TransportReservationId { get; set; }
 
     public Guid ReturnTransportId { get; set; }
 
-    public int ReturnTransportPrice { get; set; }
+    public double ReturnTransportPrice { get; set; }
 
     public Guid? ReturnTransportReservationId { get; set; }
+
+    // HOTEL
+
+    public Guid HotelId { get; set; }
+
+    public Guid HotelReservationId { get; set; }
+
+    public double HotelPrice { get; set; }
+
 }

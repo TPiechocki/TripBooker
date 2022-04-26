@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace TripBooker.Common.Order.Transport;
+namespace TripBooker.Common.Order.Hotel;
 
-public class TransportReservationAccepted : ContractBase
+public class HotelReservationAccepted : ContractBase
 {
-    public TransportReservationAccepted(
+    public HotelReservationAccepted(
         Guid correlationId,
-        double price, 
+        double price,
         Guid reservationId)
         : base(correlationId)
     {

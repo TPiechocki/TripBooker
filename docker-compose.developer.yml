@@ -37,6 +37,26 @@ services:
             RabbitMq__Host: "rabbitmq"
         networks:
             - network
+            
+    hotel-service:
+        container_name: hotel-service
+        build:
+            context: backend
+            dockerfile: TripBooker.HotelService/Dockerfile
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+            - "mongodb"
+            - "travel-agency-service"           # remove if travel agency will query the data on startup
+        ports:
+            - 8084:80
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Hotels;Username=admin;Password=password"
+            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
 
     travel-agency-service:
         container_name: travel-agency-service
