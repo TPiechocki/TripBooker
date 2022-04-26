@@ -9,10 +9,10 @@ namespace TripBooker.TransportService.Repositories;
 
 internal interface ITransportEventRepository
 {
-    Task<Guid> AddNewAsync(NewTransportEventData transportEvent, CancellationToken cancellationToken);
-
     Task AddAsync(TransportPlaceUpdateEvent placeUpdateEvent, Guid streamId, int previousVersion,
         CancellationToken cancellationToken);
+
+    Task AddManyNewAsync(IEnumerable<NewTransportEventData> transportEvents, CancellationToken cancellationToken);
 
     Task<ICollection<TransportEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken);
 
@@ -35,24 +35,24 @@ internal class TransportEventRepository : ITransportEventRepository
         _bus = bus;
     }
 
-    public async Task<Guid> AddNewAsync(
-        NewTransportEventData transportEvent,
+    public async Task AddManyNewAsync(
+        IEnumerable<NewTransportEventData> transportEvents,
         CancellationToken cancellationToken)
     {
         var guid = Guid.NewGuid();
-        await _dbContext.TransportEvent.AddAsync(new TransportEvent(
-            guid, 1, nameof(NewTransportEventData), transportEvent), 
+        await _dbContext.TransportEvent.AddRangeAsync(transportEvents.Select(x =>
+                new TransportEvent(Guid.NewGuid(), 1, nameof(NewTransportEventData), x)),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add a new Transport: {JsonConvert.SerializeObject(transportEvent)}";
+            const string message = "Could not add new Transports.";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
 
-        return guid;
+        await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
     }
 
     public async Task AddAsync(

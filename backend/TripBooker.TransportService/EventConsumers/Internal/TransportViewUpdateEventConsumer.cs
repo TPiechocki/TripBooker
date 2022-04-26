@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Newtonsoft.Json;
+using TripBooker.Common.Transport.Contract;
 using TripBooker.TransportService.Model.Events;
 using TripBooker.TransportService.Model.Mappings;
 using TripBooker.TransportService.Repositories;
@@ -65,6 +66,7 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
         var transportIdsToUpdate = newEvents.Select(x => x.StreamId).Distinct().ToList();
 
         // update view and publish events
+        var updates = new List<TransportViewContract>();
         foreach (var transportId in transportIdsToUpdate)
         {
             var transportModel = TransportBuilder.Build(
@@ -79,8 +81,9 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
                                                     $"(missingOptionId={transportModel.TransportOptionId}");
             }
 
-            await _bus.Publish(TransportViewContractMapper.MapFrom(transportModel, transportOption), cancellationToken);
+            updates.Add(TransportViewContractMapper.MapFrom(transportModel, transportOption));
         }
+        await _bus.Publish(new ManyTransportsViewContract(updates), cancellationToken);
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +
                                $"Updated rows (count={transportIdsToUpdate.Count}): {JsonConvert.SerializeObject(transportIdsToUpdate)}");

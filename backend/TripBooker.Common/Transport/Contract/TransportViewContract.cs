@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TripBooker.Common.Transport.Contract;
 
@@ -13,4 +14,14 @@ public class TransportViewContract
     public Guid Id { get; set; }
     public int TicketPrice { get; set; }
     public TransportType Type { get; set; }
+}
+
+public class ManyTransportsViewContract
+{
+    public ManyTransportsViewContract(IEnumerable<TransportViewContract> transports)
+    {
+        Transports = transports;
+    }
+
+    public IEnumerable<TransportViewContract> Transports { get; }
 }

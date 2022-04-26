@@ -29,10 +29,7 @@ internal static class SqlDbInitializer
             var transports = TransportsGenerator.GenerateTransports(
                 transportContext.TransportOption.Select(x => x).ToList());
 
-            foreach (var transport in transports)
-            {
-                transportService.AddNewTransport(transport, default).GetAwaiter().GetResult();
-            }
+            transportService.AddManyNewTransports(transports, default).GetAwaiter().GetResult();
         }
         transportContext.SaveChanges();
     }

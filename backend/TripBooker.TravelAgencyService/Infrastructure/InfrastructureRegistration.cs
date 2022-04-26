@@ -34,7 +34,7 @@ internal static class ServicesRegistration
                 // PUBLIC
 
                 // view updates
-                x.AddConsumer<TransportViewContractConsumer>();
+                x.AddConsumer<ManyTransportsViewContractConsumer>();
 
                 // queries
                 x.AddConsumer<DestinationsQueryConsumer>();
