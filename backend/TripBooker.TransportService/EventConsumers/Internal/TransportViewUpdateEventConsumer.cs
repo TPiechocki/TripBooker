@@ -44,7 +44,7 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
         oldTimestamp = DateTime.SpecifyKind(oldTimestamp, DateTimeKind.Utc);
 
         var newTimestamp = await ConsumeEventsSince(oldTimestamp, cancellationToken);
-
+        
         // save new timestamp after successful consume
         if (eventTimestamp == null)
         {
@@ -83,7 +83,7 @@ internal class TransportViewUpdateEventConsumer : IConsumer<TransportViewUpdateE
 
             updates.Add(TransportViewContractMapper.MapFrom(transportModel, transportOption));
         }
-        await _bus.Publish(new ManyTransportsViewContract(updates), cancellationToken);
+        await _bus.PublishBatch(updates, cancellationToken);
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +
                                $"Updated rows (count={transportIdsToUpdate.Count}): {JsonConvert.SerializeObject(transportIdsToUpdate)}");

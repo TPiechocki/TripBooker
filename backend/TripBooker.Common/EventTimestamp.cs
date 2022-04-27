@@ -12,5 +12,6 @@ public class EventTimestamp
 
     public string Id { get; set; } = null!;
 
+    [BsonDateTimeOptions(Representation = BsonType.Document)]
     public DateTime Timestamp { get; set; }
 }

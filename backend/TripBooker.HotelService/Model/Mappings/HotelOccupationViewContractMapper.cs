@@ -15,7 +15,7 @@ internal static class HotelOccupationViewContractMapper
             Country = hotel.Country,
             AirportCode = hotel.AirportCode,
             Rating = hotel.Rating,
-            BreakfestPrice = hotel.GetPriceFor(MealOption.ContinentalBreakfeast),
+            BreakfastPrice = hotel.GetPriceFor(MealOption.ContinentalBreakfeast),
             AllInclusive = hotel.AllInclusive,
             AllInclusivePrice = hotel.GetPriceFor(MealOption.AllInclusive),
             Date = occupation.Date,

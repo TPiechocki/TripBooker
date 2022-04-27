@@ -1,11 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.Common;
-using TripBooker.Common.TravelAgency;
 using TripBooker.TravelAgencyService.EventConsumers.Public;
 using TripBooker.TravelAgencyService.EventConsumers.Public.Query;
 using TripBooker.TravelAgencyService.Order.State;
-using TripBooker.TravelAgencyService.Services;
 
 namespace TripBooker.TravelAgencyService.Infrastructure;
 
@@ -34,7 +32,22 @@ internal static class ServicesRegistration
                 // PUBLIC
 
                 // view updates
-                x.AddConsumer<ManyTransportsViewContractConsumer>();
+                x.AddConsumer<TransportViewContractConsumer>(cfg =>
+                {
+                    cfg.Options<BatchOptions>(opt =>
+                    {
+                        opt.ConcurrencyLimit = 2;
+                        opt.MessageLimit = 500;
+                    });
+                });
+                x.AddConsumer<HotelOccupationViewContractConsumer>(cfg =>
+                {
+                    cfg.Options<BatchOptions>(opt =>
+                    {
+                        opt.ConcurrencyLimit = 4;
+                        opt.MessageLimit = 1000;
+                    });
+                });
 
                 // queries
                 x.AddConsumer<DestinationsQueryConsumer>();

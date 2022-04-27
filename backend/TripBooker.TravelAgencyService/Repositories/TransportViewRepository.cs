@@ -46,6 +46,9 @@ internal class TransportViewRepository : ITransportViewRepository
 
     public async Task AddOrUpdateManyAsync(IEnumerable<TransportModel> transports, CancellationToken cancellationToken)
     {
+        if (!transports.Any())
+            return;
+
         foreach (var transport in transports)
         {
             if (await _dbContext.TransportView.AnyAsync(x => x.Id == transport.Id, cancellationToken))
@@ -61,7 +64,7 @@ internal class TransportViewRepository : ITransportViewRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add or update many transport view updates.";
+            const string message = $"Could not add or update many transport view updates.";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }

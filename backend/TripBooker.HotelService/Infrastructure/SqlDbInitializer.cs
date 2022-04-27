@@ -44,24 +44,24 @@ internal static class SqlDbInitializer
             .DistinctBy(x => x.Code)
             .ToList();
 
-        hotelOptions.ForEach(hotel => GenerateRoomsAndDetails(hotel));
+        hotelOptions.ForEach(GenerateRoomsAndDetails);
 
         dbSet.AddRange(hotelOptions);
     }
 
     private static void GenerateRoomsAndDetails(HotelOption hotel)
     {
-        Random random = new Random();
-        List<RoomOption> rooms = new List<RoomOption>();
+        var random = new Random();
+        var rooms = new List<RoomOption>();
 
-        int hotelSize = random.Next(1, 5);
-        int rating = hotel.Rating == 0 ? 3 : (int)hotel.Rating;
+        var hotelSize = random.Next(1, 5);
+        var rating = hotel.Rating == 0 ? 3 : (int)hotel.Rating;
 
-        hotel.AllInclusive = hotel.Rating > 3 ? true : random.NextDouble() < (hotel.Rating + 2) / 10;
+        hotel.AllInclusive = hotel.Rating > 3 || random.NextDouble() < (hotel.Rating + 2) / 10;
         hotel.PriceModifier = 1.2 - random.NextDouble() + hotel.Rating / 10;
 
         // Studio
-        for (int i = 0; i < random.Next((hotelSize - 1) * 2, 10 / rating * hotelSize); i++)
+        for (var i = 0; i < random.Next((hotelSize - 1) * 2, 10 / rating * hotelSize); i++)
         {
             rooms.Add(new RoomOption
             {
@@ -72,7 +72,7 @@ internal static class SqlDbInitializer
         }
 
         // Small
-        for (int i = 0; i < random.Next(1, hotelSize * 10 - 5 ); i++)
+        for (var i = 0; i < random.Next(1, hotelSize * 10 - 5 ); i++)
         {
             rooms.Add(new RoomOption
             {
@@ -83,7 +83,7 @@ internal static class SqlDbInitializer
         }
 
         // Medium
-        for (int i = 0; i < random.Next((hotelSize - 1) * 2, hotelSize * 8 - 4); i++)
+        for (var i = 0; i < random.Next((hotelSize - 1) * 2, hotelSize * 8 - 4); i++)
         {
             rooms.Add(new RoomOption
             {
@@ -94,7 +94,7 @@ internal static class SqlDbInitializer
         }
 
         // Large
-        for (int i = 0; i < random.Next((hotelSize - 1) * 2, hotelSize * 5 - 3 ); i++)
+        for (var i = 0; i < random.Next((hotelSize - 1) * 2, hotelSize * 5 - 3 ); i++)
         {
             rooms.Add(new RoomOption
             {
@@ -105,7 +105,7 @@ internal static class SqlDbInitializer
         }
 
         // Apartment
-        for (int i = 0; i < random.Next((hotelSize - 1) * Math.Max(rating - 3, 0), hotelSize * Math.Max(rating - 2, 0) ); i++)
+        for (var i = 0; i < random.Next((hotelSize - 1) * Math.Max(rating - 3, 0), hotelSize * Math.Max(rating - 2, 0) ); i++)
         {
             rooms.Add(new RoomOption
             {
