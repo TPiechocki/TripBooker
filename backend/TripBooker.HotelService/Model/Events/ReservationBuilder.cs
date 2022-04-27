@@ -44,6 +44,8 @@ internal static class ReservationBuilder
         item.RoomsMedium = data.RoomsMedium;
         item.RoomsLarge = data.RoomsLarge;
         item.RoomsApartment = data.RoomsApartment;
+        item.MealOption = data.MealOption;
+        item.Price = data.Price;
     }
 
     private static void ApplyAccepted(this ReservationModel item, BaseEvent @event)

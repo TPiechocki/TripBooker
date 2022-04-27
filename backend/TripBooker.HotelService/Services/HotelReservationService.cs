@@ -2,6 +2,7 @@
 using Npgsql;
 using System.Transactions;
 using TripBooker.Common;
+using TripBooker.Common.Hotel;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
@@ -20,11 +21,13 @@ internal interface IHotelReservationService
 internal class HotelReservationService : IHotelReservationService
 {
     private readonly IReservationEventRepository _reservationRepository;
-    private readonly IHotelEventRepository _hotelRepository;
+    private readonly IHotelEventRepository _eventRepository;
+    private readonly IHotelOptionRepository _hotelRepository;
 
-    public HotelReservationService(IReservationEventRepository reservationRepository, IHotelEventRepository hotelRepository)
+    public HotelReservationService(IReservationEventRepository reservationRepository, IHotelEventRepository eventRepository, IHotelOptionRepository hotelRepository)
     {
         _reservationRepository = reservationRepository;
+        _eventRepository = eventRepository;
         _hotelRepository = hotelRepository;
     }
 
@@ -35,7 +38,9 @@ internal class HotelReservationService : IHotelReservationService
                                                reservation.RoomsSmall,
                                                reservation.RoomsMedium,
                                                reservation.RoomsLarge,
-                                               reservation.RoomsApartment);
+                                               reservation.RoomsApartment,
+                                               reservation.MealOption,
+                                               reservation.Order.HotelPrice);
         var reservationStreamId = await _reservationRepository.AddNewAsync(data, cancellationToken);
 
         bool transactionSuccesfull;
@@ -45,11 +50,20 @@ internal class HotelReservationService : IHotelReservationService
 
             var hotelOccupations = new List<HotelOccupationModel>();
 
+            // Check hotel
+            var hotel = await _hotelRepository.GetByIdAsync(reservation.Order.HotelId, cancellationToken);
+            if (hotel == null || (hotel.AllInclusive == false && reservation.MealOption == MealOption.AllInclusive))
+            {
+                // There is no such hotel or the hotel cannot provide required service
+                await _reservationRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
+                break;
+            }
+
             // Check for all days
             bool checkSuccesfull = true;
             foreach(var hotelday in reservation.HotelDays)
             {
-                var hotelEvents = await _hotelRepository.GetHotelEventsAsync(hotelday, cancellationToken);
+                var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelday, cancellationToken);
                 var occupation = HotelOccupationBuilder.Build(hotelEvents);
 
                 // Check if enough rooms awailable
@@ -119,7 +133,7 @@ internal class HotelReservationService : IHotelReservationService
 
             foreach (var hotelday in reservation.HotelDays)
             {
-                var hotelEvents = await _hotelRepository.GetHotelEventsAsync(hotelday, cancellationToken);
+                var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelday, cancellationToken);
                 var occupation = HotelOccupationBuilder.Build(hotelEvents);
 
                 hotelOccupations.Add(occupation);
@@ -162,7 +176,7 @@ internal class HotelReservationService : IHotelReservationService
             RoomsStudio = -reservation.RoomsStudio
         };
 
-        await _hotelRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
+        await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
@@ -185,7 +199,7 @@ internal class HotelReservationService : IHotelReservationService
             RoomsStudio = reservation.RoomsStudio
         };
 
-        await _hotelRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id),
+        await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id),
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
         await _reservationRepository.AddCancelledAsync(reservation.Id, reservation.Version, cancellationToken);
