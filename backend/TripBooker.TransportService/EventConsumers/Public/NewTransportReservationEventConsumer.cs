@@ -6,12 +6,12 @@ using TripBooker.TransportService.Services;
 
 namespace TripBooker.TransportService.EventConsumers.Public;
 
-internal class NewReservationEventConsumer : IConsumer<NewTransportReservation>
+internal class NewTransportReservationEventConsumer : IConsumer<NewTransportReservation>
 {
     private readonly ITransportReservationService _reservationService;
     private readonly IBus _bus;
 
-    public NewReservationEventConsumer(
+    public NewTransportReservationEventConsumer(
         ITransportReservationService reservationService, 
         IBus bus)
     {

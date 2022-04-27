@@ -50,7 +50,7 @@ internal static class ServicesRegistration
         return services.AddMassTransit(x =>
                 {
                     // public
-                    x.AddConsumer<NewReservationEventConsumer>();
+                    x.AddConsumer<NewTransportReservationEventConsumer>();
                     x.AddConsumer<CancelReservationEventConsumer>();
 
                     // internal
