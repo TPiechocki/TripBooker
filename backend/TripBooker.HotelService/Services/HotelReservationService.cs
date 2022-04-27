@@ -39,8 +39,7 @@ internal class HotelReservationService : IHotelReservationService
                                                reservation.RoomsMedium,
                                                reservation.RoomsLarge,
                                                reservation.RoomsApartment,
-                                               reservation.MealOption,
-                                               reservation.Order.HotelPrice);
+                                               reservation.MealOption);
         var reservationStreamId = await _reservationRepository.AddNewAsync(data, cancellationToken);
 
         bool transactionSuccesfull;
@@ -90,7 +89,7 @@ internal class HotelReservationService : IHotelReservationService
             // Check succesfull can reserve
             try
             {
-                await ValidateNewReservationTransaction(reservationStreamId, reservation, hotelOccupations,
+                await ValidateNewReservationTransaction(reservationStreamId, reservation, hotel, hotelOccupations,
                     cancellationToken);
             }
             catch (DbUpdateException e)
@@ -161,8 +160,11 @@ internal class HotelReservationService : IHotelReservationService
         while (!transactionSuccesfull);
     }
 
-    private async Task ValidateNewReservationTransaction(Guid reservationStreamId, NewHotelReservation reservation, 
-        List<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)
+    private async Task ValidateNewReservationTransaction(Guid reservationStreamId,
+                                                         NewHotelReservation reservation,
+                                                         HotelOption hotel,
+                                                         List<HotelOccupationModel> hotelOccupations,
+                                                         CancellationToken cancellationToken)
     {
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -179,7 +181,15 @@ internal class HotelReservationService : IHotelReservationService
         await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
-        await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, cancellationToken);
+        // Calculate price
+        var price = reservation.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
+                    + reservation.RoomsSmall * hotel.GetPriceFor(RoomType.Small)
+                    + reservation.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
+                    + reservation.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
+                    + reservation.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
+                    + reservation.Order.NumberOfOccupiedSeats * hotel.GetPriceFor(reservation.MealOption);
+
+        await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 
         transaction.Complete();
     }

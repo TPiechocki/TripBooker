@@ -15,35 +15,20 @@ internal static class HotelOccupationViewContractMapper
             Country = hotel.Country,
             AirportCode = hotel.AirportCode,
             Rating = hotel.Rating,
-            BreakfestPrice = hotel.PriceModifier * HotelConstants.BaseBreakfeastPrice,
+            BreakfestPrice = hotel.GetPriceFor(MealOption.ContinentalBreakfeast),
             AllInclusive = hotel.AllInclusive,
-            AllInclusivePrice = hotel.PriceModifier * HotelConstants.BaseAllInclusivePrice,
+            AllInclusivePrice = hotel.GetPriceFor(MealOption.AllInclusive),
             Date = occupation.Date,
             RoomsStudio = occupation.RoomsStudio,
-            StudioPrice = hotel.PriceModifier 
-                          * hotel.Rooms.Where(r => r.RoomType == RoomType.Studio)
-                                       .FirstOrDefault(new RoomOption { PriceModifier = 1.0}).PriceModifier 
-                          * HotelConstants.BaseRoomPrice,
+            StudioPrice = hotel.GetPriceFor(RoomType.Studio),
             RoomsSmall = occupation.RoomsSmall,
-            SmallPrice = hotel.PriceModifier
-                         * hotel.Rooms.Where(r => r.RoomType == RoomType.Small)
-                                      .FirstOrDefault(new RoomOption { PriceModifier = 1.0 }).PriceModifier
-                         * HotelConstants.BaseRoomPrice,
+            SmallPrice = hotel.GetPriceFor(RoomType.Small),
             RoomsMedium = occupation.RoomsMedium,
-            MediumPrice = hotel.PriceModifier
-                          * hotel.Rooms.Where(r => r.RoomType == RoomType.Medium)
-                                       .FirstOrDefault(new RoomOption { PriceModifier = 1.0 }).PriceModifier
-                          * HotelConstants.BaseRoomPrice,
+            MediumPrice = hotel.GetPriceFor(RoomType.Medium),
             RoomsLarge = occupation.RoomsLarge,
-            LargePrice = hotel.PriceModifier
-                         * hotel.Rooms.Where(r => r.RoomType == RoomType.Large)
-                                      .FirstOrDefault(new RoomOption { PriceModifier = 1.0 }).PriceModifier
-                         * HotelConstants.BaseRoomPrice,
+            LargePrice = hotel.GetPriceFor(RoomType.Large),
             RoomsApartment = occupation.RoomsApartment,
-            ApartmentPrice = hotel.PriceModifier
-                             * hotel.Rooms.Where(r => r.RoomType == RoomType.Apartment)
-                                          .FirstOrDefault(new RoomOption { PriceModifier = 1.0 }).PriceModifier
-                             * HotelConstants.BaseRoomPrice
+            ApartmentPrice = hotel.GetPriceFor(RoomType.Apartment),
         };
     }
 }

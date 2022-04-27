@@ -11,8 +11,7 @@ public class NewReservationEventData
         int medium,
         int large,
         int apartment,
-        MealOption mealOption,
-        double price)
+        MealOption mealOption)
     {
         HotelDays = hotelDays;
         RoomsStudio = studio;
@@ -21,7 +20,6 @@ public class NewReservationEventData
         RoomsLarge = large;
         RoomsApartment = apartment;
         MealOption = mealOption;
-        Price = price;
     }
 
     public IEnumerable<Guid> HotelDays { get; set; }
@@ -37,6 +35,4 @@ public class NewReservationEventData
     public int RoomsApartment { get; set; }
 
     public MealOption MealOption { get; set; }
-
-    public double Price { get; set; }
 }
