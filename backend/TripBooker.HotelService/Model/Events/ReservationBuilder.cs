@@ -44,13 +44,17 @@ internal static class ReservationBuilder
         item.RoomsMedium = data.RoomsMedium;
         item.RoomsLarge = data.RoomsLarge;
         item.RoomsApartment = data.RoomsApartment;
+        item.MealOption = data.MealOption;
     }
 
     private static void ApplyAccepted(this ReservationModel item, BaseEvent @event)
     {
+        var data = JsonConvert.DeserializeObject<ReservationAcceptedEventData>(@event.Data)!;
+
         item.Version = @event.Version;
 
         item.Status = ReservationStatus.Accepted;
+        item.Price = data.Price;
     }
 
     private static void ApplyRejected(this ReservationModel item, BaseEvent @event)

@@ -4,7 +4,14 @@ namespace TripBooker.HotelService.Model.Events;
 
 public class NewReservationEventData
 {
-    public NewReservationEventData(IEnumerable<Guid> hotelDays, int studio, int small, int medium, int large, int apartment)
+    public NewReservationEventData(
+        IEnumerable<Guid> hotelDays,
+        int studio,
+        int small,
+        int medium,
+        int large,
+        int apartment,
+        MealOption mealOption)
     {
         HotelDays = hotelDays;
         RoomsStudio = studio;
@@ -12,6 +19,7 @@ public class NewReservationEventData
         RoomsMedium = medium;
         RoomsLarge = large;
         RoomsApartment = apartment;
+        MealOption = mealOption;
     }
 
     public IEnumerable<Guid> HotelDays { get; set; }
@@ -25,4 +33,6 @@ public class NewReservationEventData
     public int RoomsLarge { get; set; }
 
     public int RoomsApartment { get; set; }
+
+    public MealOption MealOption { get; set; }
 }

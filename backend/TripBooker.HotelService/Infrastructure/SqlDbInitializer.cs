@@ -78,7 +78,7 @@ internal static class SqlDbInitializer
             {
                 Hotel = hotel,
                 RoomType = RoomType.Small,
-                PriceModifier = 1.80
+                PriceModifier = 1.0
             });
         }
 
