@@ -1,6 +1,6 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using TripBooker.Common.TravelAgency.Folder.Query;
+using TripBooker.Common.TravelAgency.Contract.Query;
 
 namespace TripBooker.WebApi.Controllers
 {
