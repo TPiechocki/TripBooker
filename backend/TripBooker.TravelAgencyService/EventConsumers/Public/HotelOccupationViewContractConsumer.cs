@@ -20,7 +20,11 @@ internal class HotelOccupationViewContractConsumer : IConsumer<Batch<HotelOccupa
     public async Task Consume(ConsumeContext<Batch<HotelOccupationViewContract>> context)
     {
         var data = _mapper.Map<IEnumerable<HotelOccupationModel>>(
-                context.Message.Select(x => x.Message));
-        await _repository.AddOrUpdateManyAsync(data, context.CancellationToken);
+            context.Message.Select(x => x.Message));
+
+        var distinctData = data.GroupBy(x =>
+            new { x.HotelId, x.Date }).Select(x => x.Last());
+
+        await _repository.AddOrUpdateManyAsync(distinctData, context.CancellationToken);
     }
 }

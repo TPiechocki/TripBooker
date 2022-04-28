@@ -36,7 +36,7 @@ internal static class ServicesRegistration
                 {
                     cfg.Options<BatchOptions>(opt =>
                     {
-                        opt.ConcurrencyLimit = 2;
+                        opt.ConcurrencyLimit = 1;
                         opt.MessageLimit = 500;
                     });
                 });
@@ -44,7 +44,7 @@ internal static class ServicesRegistration
                 {
                     cfg.Options<BatchOptions>(opt =>
                     {
-                        opt.ConcurrencyLimit = 4;
+                        opt.ConcurrencyLimit = 1;
                         opt.MessageLimit = 1000;
                     });
                 });

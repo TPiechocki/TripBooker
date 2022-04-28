@@ -56,6 +56,9 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
                     x.HotelId == hotelOccupation.HotelId && x.Date == hotelOccupation.Date, cancellationToken))
             {
                 _dbContext.HotelOccupationView.Update(hotelOccupation);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                _dbContext.Entry(hotelOccupation).State = EntityState.Detached;
             }
             else
             {
@@ -63,13 +66,7 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
             }
         }
 
-        var status = await _dbContext.SaveChangesAsync(cancellationToken);
-        if (status == 0)
-        {
-            const string message = $"Could not add or update many hotelOccupation view updates.";
-            _logger.LogError(message);
-            throw new DbUpdateException(message);
-        }
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async Task AddAsync(HotelOccupationModel hotelOccupation, CancellationToken cancellationToken)
