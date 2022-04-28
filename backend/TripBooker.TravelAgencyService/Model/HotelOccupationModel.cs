@@ -22,4 +22,8 @@ internal class HotelOccupationModel
     public int RoomsStudio { get; set; }
     public double SmallPrice { get; set; }
     public double StudioPrice { get; set; }
+
+    // TODO: different number of places per free room
+    public int MaxNumberOfPeople =>
+        RoomsApartment + RoomsLarge + RoomsMedium + RoomsSmall + RoomsStudio;
 }

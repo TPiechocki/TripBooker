@@ -3,6 +3,7 @@ using Npgsql;
 using System.Transactions;
 using Newtonsoft.Json;
 using TripBooker.Common;
+using TripBooker.Common.Extensions;
 using TripBooker.Common.Order.Transport;
 using TripBooker.TransportService.Model;
 using TripBooker.TransportService.Model.Events;
@@ -37,7 +38,7 @@ internal class TransportReservationService : ITransportReservationService
         var transportId = reservation.IsReturn
             ? reservation.Order.ReturnTransportId
             : reservation.Order.TransportId;
-        var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats;
+        var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats();
 
         // add reservation
         var data = new NewReservationEventData(transportId, numberOfPlaces);

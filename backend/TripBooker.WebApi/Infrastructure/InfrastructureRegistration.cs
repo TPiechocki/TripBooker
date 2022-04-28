@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using TripBooker.Common.TravelAgency.Contract.Query;
 
 namespace TripBooker.WebApi.Infrastructure
@@ -19,9 +19,6 @@ namespace TripBooker.WebApi.Infrastructure
                 .AddMassTransit(x =>
                     {
                         // public
-
-                        // request client needs defined endpoint to work properly
-                        x.AddRequestClient<DestinationsQueryContract>();
 
                         x.UsingRabbitMq((context, cfg) =>
                             {

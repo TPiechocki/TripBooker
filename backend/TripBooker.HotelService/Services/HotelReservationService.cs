@@ -2,6 +2,7 @@
 using Npgsql;
 using System.Transactions;
 using TripBooker.Common;
+using TripBooker.Common.Extensions;
 using TripBooker.Common.Hotel;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model;
@@ -187,7 +188,7 @@ internal class HotelReservationService : IHotelReservationService
                     + reservation.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
                     + reservation.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
                     + reservation.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
-                    + reservation.Order.NumberOfOccupiedSeats * hotel.GetPriceFor(reservation.MealOption);
+                    + reservation.Order.NumberOfHotelPlaces() * hotel.GetPriceFor(reservation.MealOption);
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 
