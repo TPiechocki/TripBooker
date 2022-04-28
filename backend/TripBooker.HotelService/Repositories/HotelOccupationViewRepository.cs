@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TripBooker.HotelService.Infrastructure;
 using TripBooker.HotelService.Model;
 
@@ -19,6 +19,8 @@ internal interface IHotelOccupationViewRepository
     Task AddOrUpdateAsync(HotelOccupationModel occupationModel, CancellationToken cancellationToken);
 
     Task AddManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken);
+
+    Task AddOrUpdateManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken);
 }
 
 internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
@@ -37,7 +39,7 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
 
     public async Task<HotelOccupationModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _dbContext.HotelOccupationView.FindAsync(cancellationToken, id);
+        return await _dbContext.HotelOccupationView.FindAsync(new object?[] { id }, cancellationToken);
     }
 
     public async Task<IEnumerable<HotelOccupationModel>> QueryAllAsync(CancellationToken cancellationToken)
@@ -61,7 +63,8 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
 
     public async Task AddOrUpdateAsync(HotelOccupationModel occupationModel, CancellationToken cancellationToken)
     {
-        if (await _dbContext.HotelOccupationView.AnyAsync(x => x.Id == occupationModel.Id, cancellationToken))
+        if (await _dbContext.HotelOccupationView.AnyAsync(x =>
+                x.HotelId == occupationModel.HotelId && x.Date == occupationModel.Date, cancellationToken))
         {
             _dbContext.HotelOccupationView.Update(occupationModel);
         }
@@ -71,7 +74,7 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
         }
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
-
+    
     public async Task AddManyAsync(IEnumerable<HotelOccupationModel> models, CancellationToken cancellationToken)
     {
         await _dbContext.HotelOccupationView.AddRangeAsync(models, cancellationToken);
@@ -79,7 +82,31 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
         if (status == 0)
         {
-            var message = $"Could not add range of HotelOccupationView";
+            const string message = "Could not add range of HotelOccupationView";
+            throw new DbUpdateException(message);
+        }
+    }
+
+    public async Task AddOrUpdateManyAsync(IEnumerable<HotelOccupationModel> models,
+        CancellationToken cancellationToken)
+    {
+        foreach (var model in models)
+        {
+            if (await _dbContext.HotelOccupationView.AnyAsync(x =>
+                        x.HotelId == model.HotelId && x.Date == model.Date, cancellationToken))
+            {
+                _dbContext.HotelOccupationView.Update(model);
+            }
+            else
+            {
+                await AddAsync(model, cancellationToken);
+            }
+        }
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            const string message = "Could not add or update many transport view updates.";
             throw new DbUpdateException(message);
         }
     }

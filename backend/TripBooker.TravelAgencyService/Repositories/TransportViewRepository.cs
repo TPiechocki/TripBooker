@@ -46,11 +46,19 @@ internal class TransportViewRepository : ITransportViewRepository
 
     public async Task AddOrUpdateManyAsync(IEnumerable<TransportModel> transports, CancellationToken cancellationToken)
     {
+        if (!transports.Any())
+            return;
+
+        _dbContext.TransportView.UpdateRange(transports);
+
         foreach (var transport in transports)
         {
             if (await _dbContext.TransportView.AnyAsync(x => x.Id == transport.Id, cancellationToken))
             {
                 _dbContext.TransportView.Update(transport);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                _dbContext.Entry(transport).State = EntityState.Detached;
             }
             else
             {
@@ -58,13 +66,7 @@ internal class TransportViewRepository : ITransportViewRepository
             }
         }
 
-        var status = await _dbContext.SaveChangesAsync(cancellationToken);
-        if (status == 0)
-        {
-            var message = $"Could not add or update many transport view updates.";
-            _logger.LogError(message);
-            throw new DbUpdateException(message);
-        }
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private async Task AddAsync(TransportModel transport, CancellationToken cancellationToken)

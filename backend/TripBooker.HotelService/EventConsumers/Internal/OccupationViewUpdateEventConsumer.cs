@@ -79,7 +79,7 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
 
             await _viewRepository.AddOrUpdateAsync(occupationModel, cancellationToken);
 
-            HotelOption hotelOption = hotels.Where(h => h.Id == occupationModel.HotelId).First();
+            var hotelOption = hotels.First(h => h.Id == occupationModel.HotelId);
             if (hotelOption == null)
             {
                 throw new InvalidOperationException("Cannot map occupation without defined Hotel option." +
@@ -90,33 +90,11 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
         }
 
         // create new views and publish events
-        var newViews = new List<HotelOccupationModel>();
-        var newContracts = new List<HotelOccupationViewContract>();
-        foreach (var newHotelDay in newViewsEvents.Values)
+        var newDataChunks = newViewsEvents.Values.Chunk(1000);
+
+        foreach (var chunk in newDataChunks)
         {
-            var occupationModel = HotelOccupationBuilder.Build(new List<HotelEvent>() { newHotelDay });
-            newViews.Add(occupationModel);
-
-            HotelOption hotelOption = hotels.Where(h => h.Id == occupationModel.HotelId).First();
-            if (hotelOption == null)
-            {
-                throw new InvalidOperationException("Cannot map occupation without defined Hotel option." +
-                                                    $"(missingOptionId={occupationModel.HotelId}");
-            }
-
-            newContracts.Add(HotelOccupationViewContractMapper.MapFrom(occupationModel, hotelOption));
-        }
-        if (newViews.Any()) await _viewRepository.AddManyAsync(newViews, cancellationToken);
-        if (newContracts.Any())
-        {
-            var chunks = newContracts.Chunk(1000);
-
-            // add in chunks so data is partially available earlier
-            foreach (var chunk in chunks)
-            {
-                await _bus.PublishBatch(chunk, cancellationToken);
-            }
-            
+            await CreateNewData(chunk, hotels, cancellationToken);
         }
 
         _logger.LogInformation($"Finished consuming events since {oldTimestamp}. " +
@@ -127,4 +105,29 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
             : DateTime.SpecifyKind(newEvents.Select(x => x.Timestamp).Max(), DateTimeKind.Utc);
     }
 
+    private async Task CreateNewData(IEnumerable<HotelEvent> newViewsEvents, ICollection<HotelOption> hotels, CancellationToken cancellationToken)
+    {
+        var newViews = new List<HotelOccupationModel>();
+        var newContracts = new List<HotelOccupationViewContract>();
+        foreach (var newHotelDay in newViewsEvents)
+        {
+            var occupationModel = HotelOccupationBuilder.Build(new List<HotelEvent>() {newHotelDay});
+            newViews.Add(occupationModel);
+
+            var hotelOption = hotels.First(h => h.Id == occupationModel.HotelId);
+            if (hotelOption == null)
+            {
+                throw new InvalidOperationException("Cannot map occupation without defined Hotel option." +
+                                                    $"(missingOptionId={occupationModel.HotelId}");
+            }
+
+            newContracts.Add(HotelOccupationViewContractMapper.MapFrom(occupationModel, hotelOption));
+        }
+
+        if (newViews.Any()) await _viewRepository.AddOrUpdateManyAsync(newViews, cancellationToken);
+        if (newContracts.Any())
+        {
+            await _bus.PublishBatch(newContracts, cancellationToken);
+        }
+    }
 }

@@ -106,7 +106,7 @@ internal class HotelEventRepository : IHotelEventRepository
     public async Task<ICollection<HotelEvent>> GetEventsSinceAsync(DateTime timestamp, CancellationToken cancellationToken)
     {
         return await _dbContext.HotelEvent
-            .Where(x => x.Timestamp >= timestamp)
+            .Where(x => x.Timestamp > timestamp)
             .ToListAsync(cancellationToken);
     }
 

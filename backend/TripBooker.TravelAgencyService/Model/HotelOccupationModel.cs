@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace TripBooker.TravelAgencyService.Model;
 
-namespace TripBooker.Common.Hotel.Contract;
-
-public class HotelOccupationViewContract
+internal class HotelOccupationModel
 {
     public string AirportCode { get; set; } = null!;
     public bool AllInclusive { get; set; }

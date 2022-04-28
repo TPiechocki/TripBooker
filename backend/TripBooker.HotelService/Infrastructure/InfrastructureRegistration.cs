@@ -48,7 +48,7 @@ internal static class InfrastructureRegistration
         return services.AddMassTransit(x =>
         {
             // public
-            x.AddConsumer<NewReservationEventConsumer>();
+            x.AddConsumer<NewHotelReservationEventConsumer>();
             x.AddConsumer<CancelReservationEventConsumer>();
 
             // internal

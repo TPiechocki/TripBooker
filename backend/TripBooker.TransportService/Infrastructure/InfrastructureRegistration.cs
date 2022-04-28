@@ -50,7 +50,7 @@ internal static class ServicesRegistration
         return services.AddMassTransit(x =>
                 {
                     // public
-                    x.AddConsumer<NewReservationEventConsumer>();
+                    x.AddConsumer<NewTransportReservationEventConsumer>();
                     x.AddConsumer<CancelReservationEventConsumer>();
 
                     // internal
@@ -87,7 +87,7 @@ internal static class ServicesRegistration
                     .ForJob(jobKey)
                     .WithIdentity(jobKey + "-trigger")
                     .WithSimpleSchedule(x => x
-                        .WithIntervalInSeconds(600)
+                        .WithIntervalInSeconds(15)
                         .RepeatForever()));
             })
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

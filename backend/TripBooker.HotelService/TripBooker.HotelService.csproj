@@ -24,4 +24,10 @@
     <ProjectReference Include="..\TripBooker.Common\TripBooker.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="hotels.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

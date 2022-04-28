@@ -6,6 +6,6 @@ internal static class SqlDbInitializer
     {
         dbContext.Database.EnsureCreated();
 
-        // TODO: create initial database state by querying services for views
+        // TODO optional: create initial database state by querying services for views
     }
 }
