@@ -24,7 +24,8 @@ internal static class SqlDbInitializer
         // Hotel Occupation
         if (!hotelContext.HotelEvent.Any() && !hotelContext.HotelOccupationView.Any())
         {
-            hotelService.AddNewHotelDay(DateTime.UtcNow, default, 30).GetAwaiter().GetResult();
+            hotelService.AddNewHotelDay(DateTime.SpecifyKind(new DateTime(2022, 07, 01), DateTimeKind.Utc), default, 30)
+                .GetAwaiter().GetResult();
         }
             
     }

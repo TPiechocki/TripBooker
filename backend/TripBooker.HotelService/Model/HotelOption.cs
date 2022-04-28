@@ -33,23 +33,23 @@ internal class HotelOption
 
     public double GetPriceFor(RoomType roomType)
     {
-        return HotelConstants.BaseRoomPrice
+        var price = HotelConstants.BaseRoomPrice
                * PriceModifier
                * Rooms.Where(r => r.RoomType == roomType)
                       .FirstOrDefault(new RoomOption { PriceModifier = 0.0 }).PriceModifier;
+
+        return Math.Round(price, 2);
     }
 
     public double GetPriceFor(MealOption mealOption)
     {
-        switch (mealOption)
+        var price = mealOption switch
         {
-            case MealOption.AllInclusive:
-                return HotelConstants.BaseAllInclusivePrice * PriceModifier;
-            case MealOption.ContinentalBreakfeast:
-                return HotelConstants.BaseBreakfeastPrice * PriceModifier;
-            case MealOption.NoMeals:
-            default:
-                return 0;
-        }
+            MealOption.AllInclusive => HotelConstants.BaseAllInclusivePrice * PriceModifier,
+            MealOption.ContinentalBreakfeast => HotelConstants.BaseBreakfeastPrice * PriceModifier,
+            _ => 0
+        };
+
+        return Math.Round(price, 2);
     }
 }

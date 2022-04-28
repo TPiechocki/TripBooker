@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using TripBooker.WebApi.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,11 @@ builder.Services
 
 
 builder.Services.AddControllers()
-    .AddNewtonsoftJson();
+    .AddNewtonsoftJson(x =>
+    {
+        x.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

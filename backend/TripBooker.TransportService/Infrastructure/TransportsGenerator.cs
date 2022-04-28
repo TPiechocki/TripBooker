@@ -10,8 +10,8 @@ namespace TripBooker.TransportService.Infrastructure
         {
             var random = new Random();
             var saturdays = DateTimeHelpers.GetDaysBetween(
-                    DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 06, 01), DateTimeKind.Utc),
-                    DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 08, 31), DateTimeKind.Utc))
+                    DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 07, 01), DateTimeKind.Utc),
+                    DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 07, 31), DateTimeKind.Utc))
                 .Where(x => x.DayOfWeek == DayOfWeek.Saturday)
                 .ToList();
 

@@ -1,5 +1,5 @@
 using MassTransit;
-using TripBooker.Common.TravelAgency.Folder.Query;
+using TripBooker.Common.TravelAgency.Contract.Query;
 using TripBooker.TravelAgencyService.Services;
 
 namespace TripBooker.TravelAgencyService.EventConsumers.Public.Query;
