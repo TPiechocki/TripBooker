@@ -88,7 +88,8 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Then(x => _logger.LogInformation($"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))
             .ThenAsync(x => x.Publish(new Payment
             {
-                Order = x.Saga.Order,
+                OrderId = x.Saga.Order.OrderId,
+                Price = x.Saga.Order.Price
             }));;
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectReturnTransportHandler() =>
@@ -115,7 +116,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Finalize();
 
     private EventActivityBinder<OrderState, PaymentRejected> SetRejectPaymentHandler() =>
-        When(RejectTransport)
+        When(RejectPayment)
             .Then(x =>
             {
                 x.Saga.Order.PaymentId = x.Message.PaymentId;

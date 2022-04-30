@@ -18,6 +18,8 @@ public class OrderData
 
     public int Price => TransportPrice + ReturnTransportPrice;
 
+    public Guid PaymentId { get; set; } = null!;
+
     public int NumberOfAdults { get; set; }
 
     public int NumberOfChildrenUpTo18 { get; set; }
