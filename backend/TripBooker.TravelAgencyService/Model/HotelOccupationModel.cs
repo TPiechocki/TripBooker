@@ -1,4 +1,6 @@
-﻿namespace TripBooker.TravelAgencyService.Model;
+﻿using TripBooker.Common.Hotel;
+
+namespace TripBooker.TravelAgencyService.Model;
 
 internal class HotelOccupationModel
 {
@@ -23,7 +25,10 @@ internal class HotelOccupationModel
     public double SmallPrice { get; set; }
     public double StudioPrice { get; set; }
 
-    // TODO: different number of places per free room
     public int MaxNumberOfPeople =>
-        RoomsApartment + RoomsLarge + RoomsMedium + RoomsSmall + RoomsStudio;
+        HotelConstants.GetMaxNumberOfPeople(RoomType.Apartment) * RoomsApartment 
+        + HotelConstants.GetMaxNumberOfPeople(RoomType.Large) * RoomsLarge 
+        + HotelConstants.GetMaxNumberOfPeople(RoomType.Medium) * RoomsMedium 
+        + HotelConstants.GetMaxNumberOfPeople(RoomType.Small) * RoomsSmall 
+        + HotelConstants.GetMaxNumberOfPeople(RoomType.Studio) * RoomsStudio;
 }

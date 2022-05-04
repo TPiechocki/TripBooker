@@ -90,7 +90,7 @@ internal static class SqlDbInitializer
             {
                 Hotel = hotel,
                 RoomType = RoomType.Medium,
-                PriceModifier = 2.0
+                PriceModifier = 1.8
             });
         }
 
@@ -101,7 +101,7 @@ internal static class SqlDbInitializer
             {
                 Hotel = hotel,
                 RoomType = RoomType.Large,
-                PriceModifier = 3.0
+                PriceModifier = 2.5
             });
         }
 

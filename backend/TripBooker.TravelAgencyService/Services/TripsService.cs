@@ -91,10 +91,22 @@ internal class TripsService : ITripsService
             .Where(x => x.AirportCode == query.AirportCode && allDates.Contains(x.Date))
             .ToListAsync(cancellationToken);
 
-        // possible optimization: keep number of people in DB and use it in DB part of the query
-        return hotels
-            .GroupBy(x => x.HotelId)
-            .Where(x => x.All(h => h.MaxNumberOfPeople >= query.NumberOfHotelPlaces()))
-            .Select(x => x.First());
+        // Set minimal values for rooms occupation
+        var availableHotels = new List<HotelOccupationModel>();
+        foreach (var group in hotels.GroupBy(x => x.HotelId))
+        {
+            var hotel = group.First();
+            foreach (var day in group.ToList())
+            {
+                hotel.RoomsLarge = Math.Min(hotel.RoomsLarge, day.RoomsLarge);
+                hotel.RoomsMedium = Math.Min(hotel.RoomsMedium, day.RoomsMedium);
+                hotel.RoomsSmall = Math.Min(hotel.RoomsSmall, day.RoomsSmall);
+                hotel.RoomsStudio = Math.Min(hotel.RoomsStudio, day.RoomsStudio);
+            }
+            if (hotel.MaxNumberOfPeople >= query.NumberOfHotelPlaces())
+                availableHotels.Add(hotel);
+        }
+
+        return availableHotels;
     }
 }
