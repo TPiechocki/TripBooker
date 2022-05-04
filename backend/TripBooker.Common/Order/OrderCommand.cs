@@ -18,8 +18,6 @@ public class OrderData
 
     public double Price => TransportPrice + ReturnTransportPrice + HotelPrice;
 
-    public Guid PaymentId { get; set; } = null!;
-
     public int NumberOfAdults { get; set; }
 
     public int NumberOfChildrenUpTo18 { get; set; }

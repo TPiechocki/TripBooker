@@ -6,15 +6,11 @@ public class PaymentAccepted : ContractBase
 {
     public PaymentAccepted(
         Guid correlationId,
-        int price,
-        Guid orderId)
+        int price)
         : base(correlationId)
     {
         Price = price;
-        OrderId = orderId;
     }
 
     public int Price { get; }
-
-    public Guid OrderId { get; }
 }
