@@ -1,6 +1,7 @@
 using AutoMapper;
 using MassTransit;
 using TripBooker.Common.Order;
+using TripBooker.Common.Order.Payment;
 using TripBooker.Common.Order.Transport;
 using SagaState = MassTransit.State;
 
@@ -22,6 +23,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
         Initially(SetSubmitOrderHandler());
         During(AwaitingTransportConfirmation, SetAcceptTransportHandler(), SetRejectTransportHandler());
         During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(), SetRejectReturnTransportHandler());
+        // TODO: hotel reservation
         During(AwaitingPaymentConfirmation, SetAcceptPaymentHandler(), SetRejectPaymentHandler());
     }
 
@@ -85,12 +87,13 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x.Saga.Order.ReturnTransportPrice = x.Message.Price;
                 x.Saga.Order.ReturnTransportReservationId = x.Message.ReservationId;
             })
-            .Then(x => _logger.LogInformation($"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x => x.Publish(new Payment
-            {
-                OrderId = x.Saga.Order.OrderId,
-                Price = x.Saga.Order.Price
-            }));;
+            .Then(x => _logger.LogInformation(
+                $"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))
+            .ThenAsync(x => x.Publish(new NewPayment
+                (
+                    x.Saga.CorrelationId, x.Saga.Order.Price
+                )
+            ));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectReturnTransportHandler() =>
         When(RejectTransport)
@@ -106,33 +109,44 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                     x.Saga.Order.TransportReservationId!.Value)))
             .Finalize();
 
-    private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptPaymentHandler() =>
+
+
+    private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
-            .Then(x =>
-            {
-                x.Saga.Order.PaymentId = x.Message.PaymentId;
-            })
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))
+            // TODO: confirm payment and update those statuses for transports and hotel
             .Finalize();
 
     private EventActivityBinder<OrderState, PaymentRejected> SetRejectPaymentHandler() =>
         When(RejectPayment)
             .Then(x =>
             {
-                x.Saga.Order.PaymentId = x.Message.PaymentId;
                 x.Saga.Order.FailureMessage = "Payment was rejected.";
             })
             .Then(x => _logger.LogInformation(
                 $"Payment rejected (OrderId={x.Message.CorrelationId})."))
+            // TODO optionally: cancel differently for rejected payment to get different status of reservation
             .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation(x.Saga.CorrelationId,
-                    x.Saga.Order.PaymentId!.Value)))
+                x.Publish(new CancelTransportReservation
+                (
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.TransportReservationId!.Value
+                )))
+            .ThenAsync(x =>
+                x.Publish(new CancelTransportReservation
+                (
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.ReturnTransportReservationId!.Value
+                )))
+            // TODO: cancel hotel
             .Finalize();
+
 
     private static void UpdateSagaState(OrderState state, OrderCommand data)
     {
         state.Order = data.Order;
     }
+
 
     // SUBMIT - new order
     public Event<SubmitOrder> SubmitOrder { get; private set; } = null!;
