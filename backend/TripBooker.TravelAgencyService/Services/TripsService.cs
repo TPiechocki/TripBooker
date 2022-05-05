@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TripBooker.Common.Extensions;
 using TripBooker.Common.Helpers;
+using TripBooker.Common.Hotel;
 using TripBooker.Common.TravelAgency.Contract.Query;
 using TripBooker.TravelAgencyService.Model;
 using TripBooker.TravelAgencyService.Repositories;
@@ -57,11 +58,11 @@ internal class TripsService : ITripsService
             return Enumerable.Empty<TripDescription>();
         }
 
-        // TODO: include minimal price for hotel in the offer
-        var minimalPrice = 
+        var minimalFlightPrice = 
             (flight?.TicketPrice ?? 0 + returnFlight?.TicketPrice ?? 0) * query.NumberOfOccupiedSeats();
 
-        return availableHotels.Select(x => new TripDescription(x.HotelCode, x.HotelName, minimalPrice)).ToList();
+        return availableHotels.Select(x => new TripDescription(
+            x.HotelCode, x.HotelName, minimalFlightPrice + x.GetMinPrice(query.NumberOfHotelPlaces(), query.NumberOfDays))).ToList();
     }
 
     private async Task<TransportModel?> GetReturnFlight(TripsQueryContract query, DateTime returnDate,
@@ -83,18 +84,31 @@ internal class TripsService : ITripsService
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    private async Task<IEnumerable<HotelOccupationModel>> GetAvailableHotels(TripsQueryContract query, IEnumerable<DateTime> allDates,
-        CancellationToken cancellationToken)
+    private async Task<IEnumerable<HotelOccupationModel>> GetAvailableHotels(
+        TripsQueryContract query, IEnumerable<DateTime> allDates, CancellationToken cancellationToken)
     {
         // find hotels
         var hotels = await _hotelRepository.QueryAll()
             .Where(x => x.AirportCode == query.AirportCode && allDates.Contains(x.Date))
             .ToListAsync(cancellationToken);
 
-        // possible optimization: keep number of people in DB and use it in DB part of the query
-        return hotels
-            .GroupBy(x => x.HotelId)
-            .Where(x => x.All(h => h.MaxNumberOfPeople >= query.NumberOfHotelPlaces()))
-            .Select(x => x.First());
+        // Set minimal values for rooms occupation
+        var availableHotels = new List<HotelOccupationModel>();
+        foreach (var group in hotels.GroupBy(x => x.HotelId))
+        {
+            var hotel = group.First();
+            foreach (var day in group.ToList())
+            {
+                hotel.RoomsLarge = Math.Min(hotel.RoomsLarge, day.RoomsLarge);
+                hotel.RoomsMedium = Math.Min(hotel.RoomsMedium, day.RoomsMedium);
+                hotel.RoomsSmall = Math.Min(hotel.RoomsSmall, day.RoomsSmall);
+                hotel.RoomsStudio = Math.Min(hotel.RoomsStudio, day.RoomsStudio);
+                hotel.RoomsApartment = Math.Min(hotel.RoomsApartment, day.RoomsApartment);
+            }
+            if (hotel.MaxNumberOfPeople >= query.NumberOfHotelPlaces())
+                availableHotels.Add(hotel);
+        }
+
+        return availableHotels;
     }
 }

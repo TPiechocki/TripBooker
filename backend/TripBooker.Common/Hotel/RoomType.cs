@@ -13,7 +13,7 @@ public enum RoomType
     Medium,
 
     /// <summary>
-    /// Room type that houses 5+ people
+    /// Room type that houses 5-8 people
     /// </summary>
     Large,
 
