@@ -8,7 +8,7 @@ public static class HotelConstants
 
     public const double BaseAllInclusivePrice = 100;
 
-    public static int GetMaxNumberOfPeople(RoomType roomType) => roomType switch
+    public static int GetMaxPeople(this RoomType roomType) => roomType switch
     {
         RoomType.Studio => 1,
         RoomType.Small => 2,

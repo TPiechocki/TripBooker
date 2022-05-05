@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TripBooker.Common.Extensions;
 using TripBooker.Common.Helpers;
+using TripBooker.Common.Hotel;
 using TripBooker.Common.TravelAgency.Contract.Query;
 using TripBooker.TravelAgencyService.Model;
 using TripBooker.TravelAgencyService.Repositories;
@@ -57,11 +58,11 @@ internal class TripsService : ITripsService
             return Enumerable.Empty<TripDescription>();
         }
 
-        // TODO: include minimal price for hotel in the offer
-        var minimalPrice = 
+        var minimalFlightPrice = 
             (flight?.TicketPrice ?? 0 + returnFlight?.TicketPrice ?? 0) * query.NumberOfOccupiedSeats();
 
-        return availableHotels.Select(x => new TripDescription(x.HotelCode, x.HotelName, minimalPrice)).ToList();
+        return availableHotels.Select(x => new TripDescription(
+            x.HotelCode, x.HotelName, minimalFlightPrice + x.GetMinHotelPrice(query.NumberOfHotelPlaces()))).ToList();
     }
 
     private async Task<TransportModel?> GetReturnFlight(TripsQueryContract query, DateTime returnDate,
@@ -83,8 +84,8 @@ internal class TripsService : ITripsService
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    private async Task<IEnumerable<HotelOccupationModel>> GetAvailableHotels(TripsQueryContract query, IEnumerable<DateTime> allDates,
-        CancellationToken cancellationToken)
+    private async Task<IEnumerable<HotelOccupationModel>> GetAvailableHotels(
+        TripsQueryContract query, IEnumerable<DateTime> allDates, CancellationToken cancellationToken)
     {
         // find hotels
         var hotels = await _hotelRepository.QueryAll()
@@ -102,6 +103,7 @@ internal class TripsService : ITripsService
                 hotel.RoomsMedium = Math.Min(hotel.RoomsMedium, day.RoomsMedium);
                 hotel.RoomsSmall = Math.Min(hotel.RoomsSmall, day.RoomsSmall);
                 hotel.RoomsStudio = Math.Min(hotel.RoomsStudio, day.RoomsStudio);
+                hotel.RoomsApartment = Math.Min(hotel.RoomsApartment, day.RoomsApartment);
             }
             if (hotel.MaxNumberOfPeople >= query.NumberOfHotelPlaces())
                 availableHotels.Add(hotel);

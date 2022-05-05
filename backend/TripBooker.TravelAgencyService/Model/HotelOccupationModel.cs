@@ -26,9 +26,41 @@ internal class HotelOccupationModel
     public double StudioPrice { get; set; }
 
     public int MaxNumberOfPeople =>
-        HotelConstants.GetMaxNumberOfPeople(RoomType.Apartment) * RoomsApartment 
-        + HotelConstants.GetMaxNumberOfPeople(RoomType.Large) * RoomsLarge 
-        + HotelConstants.GetMaxNumberOfPeople(RoomType.Medium) * RoomsMedium 
-        + HotelConstants.GetMaxNumberOfPeople(RoomType.Small) * RoomsSmall 
-        + HotelConstants.GetMaxNumberOfPeople(RoomType.Studio) * RoomsStudio;
+        RoomType.Apartment.GetMaxPeople() * RoomsApartment 
+        + RoomType.Large.GetMaxPeople() * RoomsLarge 
+        + RoomType.Medium.GetMaxPeople() * RoomsMedium 
+        + RoomType.Small.GetMaxPeople() * RoomsSmall 
+        + RoomType.Studio.GetMaxPeople() * RoomsStudio;
+
+    public double GetMinHotelPrice(int numberOfPeople)
+    {
+        var np = numberOfPeople;
+        var minPrice = 0.0;
+
+        var nLarge = Math.Min(np / RoomType.Large.GetMaxPeople(), RoomsLarge);
+        np -= nLarge * RoomType.Large.GetMaxPeople();
+        minPrice += nLarge * LargePrice;
+
+        var nMedium = Math.Min(np / RoomType.Medium.GetMaxPeople(), RoomsMedium);
+        np -= nMedium * RoomType.Medium.GetMaxPeople();
+        minPrice += nMedium * MediumPrice;
+
+        var nSmall = Math.Min(np / RoomType.Small.GetMaxPeople(), RoomsSmall);
+        np -= nSmall * RoomType.Small.GetMaxPeople();
+        minPrice += nSmall * SmallPrice;
+
+        var nStudio = Math.Min(np / RoomType.Studio.GetMaxPeople(), RoomsStudio);
+        np -= nStudio * RoomType.Studio.GetMaxPeople();
+        minPrice += nStudio * StudioPrice;
+
+        // If there is no other option put people in Apartments
+        if (np > 0)
+        {
+            var nApartment = Math.Min(np / RoomType.Apartment.GetMaxPeople(), RoomsApartment);
+            if (np % RoomType.Apartment.GetMaxPeople() > 0) nApartment++;
+            minPrice += nApartment * ApartmentPrice;
+        }
+
+        return minPrice;
+    }
 }
