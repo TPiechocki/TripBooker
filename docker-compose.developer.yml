@@ -65,12 +65,31 @@ services:
             dockerfile: TripBooker.TravelAgencyService/Dockerfile
         depends_on:
             - "postgres"
+            - "mongodb"
             - "rabbitmq"
         ports:
             - 8083:80
         environment:
             ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TravelAgency;Username=admin;Password=password"
             ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    payment-service:
+        container_name: payment-service
+        build:
+            context: backend
+            dockerfile: TripBooker.PaymentService/Dockerfile
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+        ports:
+            - 8085:80
+        environment:
+            # ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
+            # ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
