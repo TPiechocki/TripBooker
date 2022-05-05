@@ -28,6 +28,7 @@ jobs:
         id: docker_build_webapi
         uses: docker/build-push-action@v2
         with: 
-          context: "{{defaultContext}}:backend/TripBooker.WebApi"
+          context: "{{defaultContext}}:backend"
           push: true
           tags: tpiechocki/rsww_175641_webapi:latest
+          file: ./TripBooker.WebApi/Dockerfile
