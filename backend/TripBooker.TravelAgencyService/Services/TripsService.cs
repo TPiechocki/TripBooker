@@ -62,7 +62,7 @@ internal class TripsService : ITripsService
             (flight?.TicketPrice ?? 0 + returnFlight?.TicketPrice ?? 0) * query.NumberOfOccupiedSeats();
 
         return availableHotels.Select(x => new TripDescription(
-            x.HotelCode, x.HotelName, minimalFlightPrice + x.GetMinHotelPrice(query.NumberOfHotelPlaces()))).ToList();
+            x.HotelCode, x.HotelName, minimalFlightPrice + x.GetMinPrice(query.NumberOfHotelPlaces(), query.NumberOfDays))).ToList();
     }
 
     private async Task<TransportModel?> GetReturnFlight(TripsQueryContract query, DateTime returnDate,
