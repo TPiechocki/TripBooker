@@ -42,21 +42,21 @@ internal class HotelOccupationModel
         minPrice += nLarge * LargePrice;
         // Check if can fit remaining people in one more Large room
         if (nLarge < RoomsLarge && np > RoomType.Medium.GetMaxPeople())
-            return minPrice + LargePrice;
+            return (minPrice + LargePrice) * numberOfDays;
 
         var nMedium = Math.Min(np / RoomType.Medium.GetMaxPeople(), RoomsMedium);
         np -= nMedium * RoomType.Medium.GetMaxPeople();
         minPrice += nMedium * MediumPrice;
         // Check if can fit remaining people in one more Medium room
         if (nMedium < RoomsMedium && np > RoomType.Small.GetMaxPeople())
-            return minPrice + MediumPrice;
+            return (minPrice + MediumPrice) * numberOfDays;
 
         var nSmall = Math.Min(np / RoomType.Small.GetMaxPeople(), RoomsSmall);
         np -= nSmall * RoomType.Small.GetMaxPeople();
         minPrice += nSmall * SmallPrice;
         // Check if can fit remaining people in one more Small room
         if (nSmall < RoomsSmall && np > RoomType.Studio.GetMaxPeople())
-            return minPrice + SmallPrice;
+            return (minPrice + SmallPrice) * numberOfDays;
 
         var nStudio = Math.Min(np / RoomType.Studio.GetMaxPeople(), RoomsStudio);
         np -= nStudio * RoomType.Studio.GetMaxPeople();
