@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TripBooker.Common;
+using TripBooker.HotelService.Model.Events.Reservation;
 
 namespace TripBooker.HotelService.Model.Events;
 

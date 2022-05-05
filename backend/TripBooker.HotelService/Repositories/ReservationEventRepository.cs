@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TripBooker.HotelService.Infrastructure;
-using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Reservation;
 
 namespace TripBooker.HotelService.Repositories;

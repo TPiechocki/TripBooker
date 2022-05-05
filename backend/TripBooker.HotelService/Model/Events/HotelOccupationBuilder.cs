@@ -2,7 +2,7 @@
 using TripBooker.Common;
 using TripBooker.HotelService.Model.Events.Hotel;
 
-namespace TripBooker.HotelService.Model;
+namespace TripBooker.HotelService.Model.Events;
 
 internal static class HotelOccupationBuilder
 {

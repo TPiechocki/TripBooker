@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.HotelService", "
 		{93278898-5520-4CA0-B513-1FC00F5D3B15} = {93278898-5520-4CA0-B513-1FC00F5D3B15}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.PaymentService", "TripBooker.PaymentService\TripBooker.PaymentService.csproj", "{219561FF-B7EB-4DC6-8B4F-8368E310C14A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.PaymentService", "TripBooker.PaymentService\TripBooker.PaymentService.csproj", "{219561FF-B7EB-4DC6-8B4F-8368E310C14A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.TourOperator", "TripBooker.TourOperator\TripBooker.TourOperator.csproj", "{85FFD16E-7C92-414D-B3A0-8D21C3CA8617}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +56,10 @@ Global
 		{219561FF-B7EB-4DC6-8B4F-8368E310C14A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{219561FF-B7EB-4DC6-8B4F-8368E310C14A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{219561FF-B7EB-4DC6-8B4F-8368E310C14A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85FFD16E-7C92-414D-B3A0-8D21C3CA8617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85FFD16E-7C92-414D-B3A0-8D21C3CA8617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85FFD16E-7C92-414D-B3A0-8D21C3CA8617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85FFD16E-7C92-414D-B3A0-8D21C3CA8617}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

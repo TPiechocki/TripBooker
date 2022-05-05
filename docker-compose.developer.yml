@@ -95,6 +95,21 @@ services:
         networks:
             - network
 
+    tour-operator-service:
+        container_name: tour-operator-service
+        build:
+            context: backend
+            dockerfile: TripBooker.TourOperator/Dockerfile
+        depends_on:
+            - "rabbitmq"
+        ports:
+            - 8086:80
+        environment:
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
     rabbitmq:
         image: rabbitmq:3-management-alpine
         container_name: rabbitmq

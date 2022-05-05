@@ -8,6 +8,7 @@ using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Hotel;
+using TripBooker.HotelService.Model.Events.Reservation;
 using TripBooker.HotelService.Repositories;
 
 namespace TripBooker.HotelService.Services;

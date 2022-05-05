@@ -1,4 +1,4 @@
-﻿namespace TripBooker.HotelService.Model.Events;
+﻿namespace TripBooker.HotelService.Model.Events.Reservation;
 
 internal class ReservationAcceptedEventData
 {

@@ -1,6 +1,6 @@
 ﻿using TripBooker.Common.Hotel;
 
-namespace TripBooker.HotelService.Model.Events;
+namespace TripBooker.HotelService.Model.Events.Reservation;
 
 public class NewReservationEventData
 {
