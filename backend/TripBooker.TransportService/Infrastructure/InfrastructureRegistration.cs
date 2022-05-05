@@ -10,7 +10,7 @@ using TripBooker.TransportService.EventConsumers.Public;
 
 namespace TripBooker.TransportService.Infrastructure;
 
-internal static class ServicesRegistration
+internal static class InfrastructureRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -52,6 +52,7 @@ internal static class ServicesRegistration
                     // public
                     x.AddConsumer<NewTransportReservationEventConsumer>();
                     x.AddConsumer<CancelReservationEventConsumer>();
+                    x.AddConsumer<ConfirmReservationEventConsumer>();
 
                     // internal
                     x.AddConsumer<TransportViewUpdateEventConsumer>(opt =>

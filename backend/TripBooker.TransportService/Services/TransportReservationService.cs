@@ -18,19 +18,24 @@ internal interface ITransportReservationService
     Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken);
 
     Task Cancel(Guid reservationId, CancellationToken cancellationToken);
+
+    Task Confirm(Guid reservationId, CancellationToken cancellationToken);
 }
 
 internal class TransportReservationService : ITransportReservationService
 {
     private readonly ITransportEventRepository _transportRepository;
     private readonly IReservationEventRepository _reservationEventRepository;
+    private readonly ILogger<TransportReservationService> _logger;
 
     public TransportReservationService(
         ITransportEventRepository transportRepository,
-        IReservationEventRepository reservationEventRepository)
+        IReservationEventRepository reservationEventRepository, 
+        ILogger<TransportReservationService> logger)
     {
         _transportRepository = transportRepository;
         _reservationEventRepository = reservationEventRepository;
+        _logger = logger;
     }
 
     public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
@@ -98,18 +103,18 @@ internal class TransportReservationService : ITransportReservationService
 
     public async Task Cancel(Guid reservationId, CancellationToken cancellationToken) 
     {
-        
-        var reservationEvents =
-            await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
-        var reservation = ReservationBuilder.Build(reservationEvents);
-
-        if (reservation.Status != ReservationStatus.Accepted && reservation.Status != ReservationStatus.Confirmed)
-            return;
-
         var tryTransaction = true;
         while (tryTransaction)
         {
             tryTransaction = false;
+
+            var reservationEvents =
+                await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
+            var reservation = ReservationBuilder.Build(reservationEvents);
+
+            if (reservation.Status != ReservationStatus.Accepted && reservation.Status != ReservationStatus.Confirmed)
+                return;
+
 
             var transportEvents =
                 await _transportRepository.GetTransportEventsAsync(reservation.TransportId, cancellationToken);
@@ -123,6 +128,44 @@ internal class TransportReservationService : ITransportReservationService
             catch (DbUpdateException e)
             {
                 if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode })
+                {
+                    // repeat if there was version violation, so the db read and business logic
+                    // does not need to be inside transaction
+                    tryTransaction = true;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+    }
+
+    public async Task Confirm(Guid reservationId, CancellationToken cancellationToken)
+    {
+        var tryTransaction = true;
+        while (tryTransaction)
+        {
+            tryTransaction = false;
+
+            var reservationEvents =
+                await _reservationEventRepository.GetReservationEvents(reservationId, cancellationToken);
+            var reservation = ReservationBuilder.Build(reservationEvents);
+
+            if (reservation.Status == ReservationStatus.Rejected)
+                _logger.LogWarning($"Cannot confirm rejected reservation (ReservationId={reservation})");
+
+            if (reservation.Status != ReservationStatus.Accepted)
+                return;
+
+            try
+            {
+                await _reservationEventRepository.AddConfirmedAsync(reservation.Id, reservation.Version,
+                    cancellationToken);
+            }
+            catch (DbUpdateException e)
+            {
+                if (e.GetBaseException() is PostgresException { SqlState: GlobalConstants.PostgresUniqueViolationCode })
                 {
                     // repeat if there was version violation, so the db read and business logic
                     // does not need to be inside transaction
@@ -158,7 +201,8 @@ internal class TransportReservationService : ITransportReservationService
         transaction.Complete();
     }
 
-    private async Task ValidateCancelReservationTransaction(ReservationModel reservation,
+    private async Task ValidateCancelReservationTransaction(
+        ReservationModel reservation,
         TransportModel transportItem,
         CancellationToken cancellationToken)
     {

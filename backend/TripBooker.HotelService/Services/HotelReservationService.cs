@@ -17,6 +17,8 @@ internal interface IHotelReservationService
     Task<ReservationModel> AddNewReservation(NewHotelReservation newReservationContract, CancellationToken cancellationToken);
 
     Task Cancel(Guid reservationId, CancellationToken cancellationToken);
+
+    Task Confirm(Guid reservationId, CancellationToken cancellationToken);
 }
 
 internal class HotelReservationService : IHotelReservationService
@@ -24,12 +26,18 @@ internal class HotelReservationService : IHotelReservationService
     private readonly IReservationEventRepository _reservationRepository;
     private readonly IHotelEventRepository _eventRepository;
     private readonly IHotelOptionRepository _hotelRepository;
+    private readonly ILogger<HotelReservationService> _logger;
 
-    public HotelReservationService(IReservationEventRepository reservationRepository, IHotelEventRepository eventRepository, IHotelOptionRepository hotelRepository)
+    public HotelReservationService(
+        IReservationEventRepository reservationRepository, 
+        IHotelEventRepository eventRepository, 
+        IHotelOptionRepository hotelRepository, 
+        ILogger<HotelReservationService> logger)
     {
         _reservationRepository = reservationRepository;
         _eventRepository = eventRepository;
         _hotelRepository = hotelRepository;
+        _logger = logger;
     }
 
     public async Task<ReservationModel> AddNewReservation(NewHotelReservation reservation, CancellationToken cancellationToken)
@@ -159,6 +167,44 @@ internal class HotelReservationService : IHotelReservationService
 
         }
         while (!transactionSuccesfull);
+    }
+
+    public async Task Confirm(Guid reservationId, CancellationToken cancellationToken)
+    {
+        var tryTransaction = true;
+        while (tryTransaction)
+        {
+            tryTransaction = false;
+
+            var reservationEvents =
+                await _reservationRepository.GetReservationEvents(reservationId, cancellationToken);
+            var reservation = ReservationBuilder.Build(reservationEvents);
+
+            if (reservation.Status == ReservationStatus.Rejected)
+                _logger.LogWarning($"Cannot confirm rejected reservation (ReservationId={reservation})");
+
+            if (reservation.Status != ReservationStatus.Accepted)
+                return;
+
+            try
+            {
+                await _reservationRepository.AddConfirmedAsync(reservation.Id, reservation.Version,
+                    cancellationToken);
+            }
+            catch (DbUpdateException e)
+            {
+                if (e.GetBaseException() is PostgresException { SqlState: GlobalConstants.PostgresUniqueViolationCode })
+                {
+                    // repeat if there was version violation, so the db read and business logic
+                    // does not need to be inside transaction
+                    tryTransaction = true;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
     }
 
     private async Task ValidateNewReservationTransaction(Guid reservationStreamId,

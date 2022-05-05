@@ -46,30 +46,28 @@ internal static class InfrastructureRegistration
         var host = configuration.GetSection("RabbitMq")["Host"];
 
         return services.AddMassTransit(x =>
-        {
-            // public
-            x.AddConsumer<NewHotelReservationEventConsumer>();
-            x.AddConsumer<CancelReservationEventConsumer>();
+                {
+                    // public
+                    x.AddConsumer<NewHotelReservationEventConsumer>();
+                    x.AddConsumer<CancelReservationEventConsumer>();
+                    x.AddConsumer<ConfirmReservationEventConsumer>();
 
-            // internal
-            x.AddConsumer<OccupationViewUpdateEventConsumer>(opt =>
-            {
-                // do not reload the view concurrently
-                opt.UseConcurrentMessageLimit(1);
-            });
+                    // internal
+                    x.AddConsumer<OccupationViewUpdateEventConsumer>(opt =>
+                    {
+                        // do not reload the view concurrently
+                        opt.UseConcurrentMessageLimit(1);
+                    });
 
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(host);
-                cfg.ConfigureEndpoints(context);
-            }
-            );
-        }
+                    x.UsingRabbitMq((context, cfg) =>
+                        {
+                            cfg.Host(host);
+                            cfg.ConfigureEndpoints(context);
+                        }
+                    );
+                }
             )
-            .Configure<MassTransitHostOptions>(x =>
-            {
-                x.WaitUntilStarted = true;
-            });
+            .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; });
     }
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)

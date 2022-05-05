@@ -15,6 +15,8 @@ internal interface IReservationEventRepository
 
     Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
+    Task AddConfirmedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
+
     Task AddRejectedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
     Task<ICollection<ReservationEvent>> GetReservationEvents(Guid streamId, CancellationToken cancellationToken);
@@ -79,6 +81,21 @@ internal class ReservationEventRepository : IReservationEventRepository
         if (status == 0)
         {
             var message = $"Could not add an cancel reservation event: streamId={streamId}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
+    }
+
+    public async Task AddConfirmedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
+    {
+        await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
+                streamId, previousVersion + 1, nameof(ReservationConfirmedEventData), new ReservationConfirmedEventData()),
+            cancellationToken);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add a confirmed reservation event: streamId={streamId}";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }

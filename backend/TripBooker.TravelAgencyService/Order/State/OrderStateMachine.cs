@@ -114,7 +114,12 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
     private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))
-            // TODO: confirm payment and update those statuses for transports and hotel
+            .ThenAsync(x => x.Publish(new ConfirmTransportReservation(x.Saga.CorrelationId,
+                x.Saga.Order.TransportReservationId!.Value)))
+            .ThenAsync(x => x.Publish(new ConfirmTransportReservation(x.Saga.CorrelationId,
+                x.Saga.Order.ReturnTransportReservationId!.Value)))
+            // TODO: confirm payment and update those statuses for hotel
+            // TODO: send event to tour operator
             .Finalize();
 
     private EventActivityBinder<OrderState, PaymentRejected> SetRejectPaymentHandler() =>
