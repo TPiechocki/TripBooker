@@ -24,6 +24,51 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Build and push Hotels
+        id: docker_build_hotels
+        uses: docker/build-push-action@v2
+        with: 
+          context: "{{defaultContext}}:backend"
+          push: true
+          tags: tpiechocki/rsww_175641_hotel:latest
+          file: ./TripBooker.HotelService/Dockerfile
+      -
+        name: Build and push Payment
+        id: docker_build_payment
+        uses: docker/build-push-action@v2
+        with: 
+          context: "{{defaultContext}}:backend"
+          push: true
+          tags: tpiechocki/rsww_175641_payment:latest
+          file: ./TripBooker.PaymentService/Dockerfile
+      -
+        name: Build and push Tour Operator
+        id: docker_build_tour_operator
+        uses: docker/build-push-action@v2
+        with: 
+          context: "{{defaultContext}}:backend"
+          push: true
+          tags: tpiechocki/rsww_175641_tour_operator:latest
+          file: ./TripBooker.TourOperator/Dockerfile
+      -
+        name: Build and push Transport
+        id: docker_build_transport
+        uses: docker/build-push-action@v2
+        with: 
+          context: "{{defaultContext}}:backend"
+          push: true
+          tags: tpiechocki/rsww_175641_transport:latest
+          file: ./TripBooker.TransportService/Dockerfile
+      -
+        name: Build and push Travel Agency
+        id: docker_build_travel_agency
+        uses: docker/build-push-action@v2
+        with: 
+          context: "{{defaultContext}}:backend"
+          push: true
+          tags: tpiechocki/rsww_175641_travel_agency:latest
+          file: ./TripBooker.TravelAgencyService/Dockerfile
+      -
         name: Build and push WebApi
         id: docker_build_webapi
         uses: docker/build-push-action@v2
