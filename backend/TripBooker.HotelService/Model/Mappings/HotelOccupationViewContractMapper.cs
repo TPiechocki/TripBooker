@@ -9,6 +9,7 @@ internal static class HotelOccupationViewContractMapper
     {
         return new HotelOccupationViewContract
         {
+            Id = occupation.Id,
             HotelId = occupation.HotelId,
             HotelCode = hotel.Code,
             HotelName = hotel.Name,

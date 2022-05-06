@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TripBooker.Common.TravelAgency.Model;
 using TripBooker.TravelAgencyService.Infrastructure;
 using TripBooker.TravelAgencyService.Model;
 

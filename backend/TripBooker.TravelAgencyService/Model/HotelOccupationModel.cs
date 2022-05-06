@@ -4,6 +4,8 @@ namespace TripBooker.TravelAgencyService.Model;
 
 internal class HotelOccupationModel
 {
+    public Guid Id { get; set; }
+
     public string AirportCode { get; set; } = null!;
     public bool AllInclusive { get; set; }
     public double AllInclusivePrice { get; set; }

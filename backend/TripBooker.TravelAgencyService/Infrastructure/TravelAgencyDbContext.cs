@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TripBooker.Common.TravelAgency.Model;
 using TripBooker.TravelAgencyService.Model;
 
 namespace TripBooker.TravelAgencyService.Infrastructure;

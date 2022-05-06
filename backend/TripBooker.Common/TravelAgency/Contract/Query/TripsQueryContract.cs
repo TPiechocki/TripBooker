@@ -29,7 +29,7 @@ public class TripsQueryResult
 {
     public TripsQueryResult(IEnumerable<TripDescription> trips)
     {
-        this.Trips = trips;
+        Trips = trips;
     }
 
     public IEnumerable<TripDescription> Trips { get; }

@@ -52,6 +52,8 @@ internal static class ServicesRegistration
                 // queries
                 x.AddConsumer<DestinationsQueryConsumer>();
                 x.AddConsumer<TripsQueryConsumer>();
+                x.AddConsumer<TripOptionsQueryConsumer>();
+                x.AddConsumer<TripQueryConsumer>();
 
                 // sagas
                 x.AddSagaStateMachine<OrderStateMachine, OrderState>()

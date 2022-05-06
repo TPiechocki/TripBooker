@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MassTransit;
 using TripBooker.Common.Transport.Contract;
+using TripBooker.Common.TravelAgency.Model;
 using TripBooker.TravelAgencyService.Model;
 using TripBooker.TravelAgencyService.Repositories;
 

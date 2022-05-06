@@ -8,5 +8,7 @@ internal class HotelMappings : Profile
     public HotelMappings()
     {
         CreateMap<HotelOccupationViewContract, HotelOccupationModel>();
+        CreateMap<HotelOccupationModel, HotelOccupationViewContract>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

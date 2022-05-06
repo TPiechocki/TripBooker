@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using TripBooker.Common.Transport;
 
-namespace TripBooker.TravelAgencyService.Model;
+namespace TripBooker.Common.TravelAgency.Model;
 
-internal class TransportModel
+public class TransportModel
 {
     public int AvailablePlaces { get; set; }
 

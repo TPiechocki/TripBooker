@@ -1,5 +1,4 @@
 ﻿using MassTransit;
-using MassTransit.Clients;
 using Microsoft.AspNetCore.Mvc;
 using TripBooker.Common.TravelAgency.Contract.Query;
 

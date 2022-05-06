@@ -1,4 +1,4 @@
-﻿using TripBooker.Common.Order;
+using TripBooker.Common.Order;
 using TripBooker.Common.TravelAgency.Contract.Query;
 
 namespace TripBooker.Common.Extensions;
@@ -26,6 +26,18 @@ public static class OccupationExtensions
     public static int NumberOfOccupiedSeats(this OrderData data)
     {
         return NumberOfOccupiedSeats(data.NumberOfAdults, data.NumberOfChildrenUpTo18, data.NumberOfChildrenUpTo10);
+    }
+
+
+    public static int NumberOfOccupiedSeats(this TripQueryContract data)
+    {
+        return NumberOfOccupiedSeats(data.NumberOfAdults, data.NumberOfChildrenUpTo18, data.NumberOfChildrenUpTo10);
+    }
+
+    public static int NumberOfHotelPlaces(this TripQueryContract data)
+    {
+        return NumberOfHotelPlaces(data.NumberOfAdults, data.NumberOfChildrenUpTo18, data.NumberOfChildrenUpTo10,
+            data.NumberOfChildrenUpTo3);
     }
 
 
