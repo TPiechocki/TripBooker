@@ -26,6 +26,12 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
         During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(), SetRejectReturnTransportHandler());
         During(AwaitingHotelConfirmation, SetAcceptHotelHandler(), SetRejectHotelHandler());
         During(AwaitingPaymentConfirmation, SetAcceptPaymentHandler(), SetRejectPaymentHandler());
+
+        DuringAny(
+            When(OrderStatus)
+                .ThenAsync(x => 
+                    x.RespondAsync(x.Saga))
+        );
     }
 
     private void ConfigureEventCorrelationIds()
@@ -42,6 +48,20 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             x.CorrelateById(c => c.Message.CorrelationId));
         Event(() => RejectPayment, x =>
             x.CorrelateById(c => c.Message.CorrelationId));
+
+        Event(() => OrderStatus, x =>
+        {
+            x.CorrelateById(c => c.Message.OrderId);
+            x.ReadOnly = true;
+
+            x.OnMissingInstance(m =>
+            {
+                return m.ExecuteAsync(e => e.RespondAsync(new OrderState
+                {
+                    CorrelationId = Guid.Empty
+                }));
+            });
+        });
     }
 
     private EventActivityBinder<OrderState, SubmitOrder> SetSubmitOrderHandler() =>
@@ -92,7 +112,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x.Saga.Order.FailureMessage = "Transport reservation was rejected.";
             })
             .Then(x => _logger.LogInformation($"Transport reservation rejected (OrderId={x.Message.CorrelationId})."))
-            .Finalize();
+            .TransitionTo(Rejected);
 
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptReturnTransportHandler() =>
@@ -128,7 +148,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                             x.Saga.CorrelationId,
                             x.Saga.Order.TransportReservationId!.Value
                         ))))
-            .Finalize();
+            .TransitionTo(Rejected);
 
 
     private EventActivityBinder<OrderState, HotelReservationAccepted> SetAcceptHotelHandler() =>
@@ -172,7 +192,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                             x.Saga.CorrelationId,
                             x.Saga.Order.ReturnTransportReservationId!.Value
                         ))))
-            .Finalize();
+            .TransitionTo(Rejected);
 
 
 
@@ -204,7 +224,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 Order = x.Saga.Order
             }))
-            .Finalize();
+            .TransitionTo(Confirmed);
 
     private EventActivityBinder<OrderState, PaymentTimeout> SetRejectPaymentHandler() =>
         When(RejectPayment)
@@ -231,7 +251,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                             x.Saga.CorrelationId,
                             x.Saga.Order.ReturnTransportReservationId!.Value
                         ))))
-            .Finalize();
+            .TransitionTo(Rejected);
 
 
     private static void UpdateSagaState(OrderState state, OrderCommand data)
@@ -266,5 +286,13 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<PaymentAccepted> AcceptPayment { get; private set; } = null!;
 
     public Event<PaymentTimeout> RejectPayment { get; private set; } = null!;
+
+
+    public SagaState Confirmed { get; private set; } = null!;
+
+    public SagaState Rejected { get; private set; } = null!;
+
+
+    public Event<OrderStatus> OrderStatus { get; private set; } = null!;
 
 }

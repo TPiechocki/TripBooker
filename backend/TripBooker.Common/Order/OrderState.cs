@@ -1,9 +1,9 @@
-﻿using MassTransit;
-using TripBooker.Common.Order;
+﻿using System;
+using MassTransit;
 
-namespace TripBooker.TravelAgencyService.Order.State;
+namespace TripBooker.Common.Order;
 
-internal class OrderState : SagaStateMachineInstance, ISagaVersion
+public class OrderState : SagaStateMachineInstance, ISagaVersion
 {
     public Guid CorrelationId { get; set; }
     public int Version { get; set; }
