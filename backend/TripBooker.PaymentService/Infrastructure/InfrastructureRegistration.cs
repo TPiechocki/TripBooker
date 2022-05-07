@@ -20,22 +20,6 @@ internal static class InfrastructureRegistration
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
-            .AddSingleton(s =>
-            {
-                var connectionString = configuration.GetConnectionString("MongoDb");
-                var settings = MongoClientSettings.FromConnectionString(connectionString);
-                settings.ClusterConfigurator = cb =>
-                {
-                    cb.Subscribe<CommandStartedEvent>(e =>
-                    {
-                        var logger = s.GetRequiredService<ILogger<IMongoClient>>();
-                        logger.LogInformation($"MongoLog: {e.CommandName} - {e.Command.ToJson()}");
-                    });
-                };
-
-                var mongoClient = new MongoClient(settings);
-                return mongoClient.GetDatabase(GlobalConstants.MongoDbName);
-            })
             .AddQuartz();
 
     }
@@ -61,22 +45,22 @@ internal static class InfrastructureRegistration
             .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; });
     }
 
-    private static IServiceCollection AddQuartz(this IServiceCollection services)
-    {
-        // configure job to create update view event every 15s
-        return services.AddQuartz(q =>
-        {
-            q.UseMicrosoftDependencyInjectionJobFactory();
-
-            var jobKey = new JobKey(nameof(UpdateViewJob));
-            q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
-            q.AddTrigger(opt => opt
-                .ForJob(jobKey)
-                .WithIdentity(jobKey + "-trigger")
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(15)
-                    .RepeatForever()));
-        })
-            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-    }
+    //private static IServiceCollection AddQuartz(this IServiceCollection services)
+    //{
+    //    // configure job to create update view event every 15s
+    //    return services.AddQuartz(q =>
+    //    {
+    //        q.UseMicrosoftDependencyInjectionJobFactory();
+    //
+    //        var jobKey = new JobKey(nameof(UpdateViewJob));
+    //        q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
+    //        q.AddTrigger(opt => opt
+    //            .ForJob(jobKey)
+    //            .WithIdentity(jobKey + "-trigger")
+    //            .WithSimpleSchedule(x => x
+    //                .WithIntervalInSeconds(15)
+    //                .RepeatForever()));
+    //    })
+    //        .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+    //}
 }

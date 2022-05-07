@@ -21,12 +21,12 @@ internal interface IPaymentEventRepository
 
 internal class PaymentEventRepository : IPaymentEventRepository
 {
-    private readonly HotelDbContext _dbContext;
+    private readonly PaymentDbContext _dbContext;
     private readonly ILogger<ReservationEventRepository> _logger;
     private readonly IBus _bus;
 
     public PaymentEventRepository(
-        HotelDbContext dbContext,
+        PaymentDbContext dbContext,
         ILogger<PaymentEventRepository> logger,
         IBus bus)
     {
