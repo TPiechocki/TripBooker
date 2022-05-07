@@ -1,6 +1,15 @@
 version: "3.4"
 
 services:
+    frontend:
+        container_name: frontend
+        build:
+            context: frontend
+            args:
+                - WEB_API_URL=http://localhost:8081/
+        ports:
+            - 8080:80
+
     webapi:
         container_name: webapi
         build:
@@ -28,8 +37,6 @@ services:
             - "rabbitmq"
             - "mongodb"
             - "travel-agency-service"           # remove if travel agency will query the data on startup
-        ports:
-            - 8082:80
         environment:
             ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Transport;Username=admin;Password=password"
             ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
@@ -48,8 +55,6 @@ services:
             - "rabbitmq"
             - "mongodb"
             - "travel-agency-service"           # remove if travel agency will query the data on startup
-        ports:
-            - 8084:80
         environment:
             ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Hotels;Username=admin;Password=password"
             ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
@@ -67,8 +72,6 @@ services:
             - "postgres"
             - "mongodb"
             - "rabbitmq"
-        ports:
-            - 8083:80
         environment:
             ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TravelAgency;Username=admin;Password=password"
             ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
@@ -85,8 +88,6 @@ services:
         depends_on:
             - "postgres"
             - "rabbitmq"
-        ports:
-            - 8085:80
         environment:
             # ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
             # ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
@@ -102,8 +103,6 @@ services:
             dockerfile: TripBooker.TourOperator/Dockerfile
         depends_on:
             - "rabbitmq"
-        ports:
-            - 8086:80
         environment:
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
