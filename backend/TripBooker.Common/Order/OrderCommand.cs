@@ -23,9 +23,15 @@ public class OrderData
 
     public string DiscountCode { get; set; } = null!;
 
-    public Guid TransportId { get; set; }
+    /// <remarks>
+    /// Null means no transport, and the clients would travel on their own.
+    /// </remarks>
+    public Guid? TransportId { get; set; }
 
-    public Guid ReturnTransportId { get; set; }
+    /// <remarks>
+    /// Null means no transport, and the clients would travel on their own.
+    /// </remarks>
+    public Guid? ReturnTransportId { get; set; }
 
     public string HotelCode { get; set; } = null!;
 

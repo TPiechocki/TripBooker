@@ -41,8 +41,8 @@ internal class TransportReservationService : ITransportReservationService
     public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
     {
         var transportId = reservation.IsReturn
-            ? reservation.Order.ReturnTransportId
-            : reservation.Order.TransportId;
+            ? reservation.Order.ReturnTransportId!.Value
+            : reservation.Order.TransportId!.Value;
         var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats();
 
         // add reservation
