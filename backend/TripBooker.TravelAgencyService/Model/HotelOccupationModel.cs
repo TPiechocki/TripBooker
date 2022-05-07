@@ -64,12 +64,34 @@ internal class HotelOccupationModel
         np -= nStudio * RoomType.Studio.GetMaxPeople();
         minPrice += nStudio * StudioPrice;
 
-        // If there is no other option put people in Apartments
-        if (np > 0)
+        var nApartment = 0;
+        // If there is no other option put people with filling rooms partially or Apartments
+        while (np > 0)
         {
-            var nApartment = Math.Min(np / RoomType.Apartment.GetMaxPeople(), RoomsApartment);
-            if (np % RoomType.Apartment.GetMaxPeople() > 0) nApartment++;
-            minPrice += nApartment * ApartmentPrice;
+            if (RoomsSmall - nSmall > 0)
+            {
+                nSmall++;
+                np -= RoomType.Small.GetMaxPeople();
+                minPrice += SmallPrice;
+            } 
+            else if (RoomsMedium - nMedium > 0)
+            {
+                nMedium++;
+                np -= RoomType.Medium.GetMaxPeople();
+                minPrice += MediumPrice;
+            }
+            else if (RoomsLarge - nLarge > 0)
+            {
+                nLarge++;
+                np -= RoomType.Large.GetMaxPeople();
+                minPrice += LargePrice;
+            }
+            else if (RoomsApartment - nApartment > 0)
+            {
+                nApartment++;
+                np -= RoomType.Apartment.GetMaxPeople();
+                minPrice += ApartmentPrice;
+            }
         }
 
         return minPrice * numberOfDays;
