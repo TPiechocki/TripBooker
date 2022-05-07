@@ -21,7 +21,7 @@ const IndexPage = () => {
           Destinations
         </Typography>
         <Grid spacing={2} container>
-          {data && data.map((destination, i) => <Grid key={destination.airportCode} item xs><Card sx={{minWidth: 200}}>
+          {data && data.map((destination, i) => <Grid key={destination.airportCode} item xs><Card sx={{minWidth: 200}} className="offerCard">
             <CardMedia
               component="img"
               height="200"
