@@ -65,10 +65,10 @@ internal static class ServicesRegistration
                         // for the first saga
                     {
 
-                        cfg.UseConcurrentMessageLimit(1);
+                        cfg.UseConcurrentMessageLimit(4);
                         cfg.UseInMemoryOutbox();
 
-                        var partition = cfg.CreatePartitioner(1);
+                        var partition = cfg.CreatePartitioner(4);
                         cfg.Message<SubmitOrder>(s => s.UsePartitioner(partition, m => m.Message.Order.OrderId));
 
                         cfg.Message<TransportReservationAccepted>(s =>
@@ -83,7 +83,7 @@ internal static class ServicesRegistration
 
                         cfg.Message<PaymentAccepted>(s =>
                             s.UsePartitioner(partition, m => m.Message.CorrelationId));
-                        cfg.Message<PaymentRejected>(s =>
+                        cfg.Message<PaymentTimeout>(s =>
                             s.UsePartitioner(partition, m => m.Message.CorrelationId));
                     })
                     .MongoDbRepository(c =>
