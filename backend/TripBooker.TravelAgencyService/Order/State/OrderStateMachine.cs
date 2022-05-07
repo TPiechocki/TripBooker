@@ -1,6 +1,7 @@
 using AutoMapper;
 using MassTransit;
 using TripBooker.Common.Order;
+using TripBooker.Common.Order.Hotel;
 using TripBooker.Common.Order.Payment;
 using TripBooker.Common.Order.Transport;
 using SagaState = MassTransit.State;
@@ -23,7 +24,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
         Initially(SetSubmitOrderHandler());
         During(AwaitingTransportConfirmation, SetAcceptTransportHandler(), SetRejectTransportHandler());
         During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(), SetRejectReturnTransportHandler());
-        // TODO: hotel reservation
+        During(AwaitingHotelConfirmation, SetAcceptHotelHandler(), SetRejectHotelHandler());
         During(AwaitingPaymentConfirmation, SetAcceptPaymentHandler(), SetRejectPaymentHandler());
     }
 
@@ -79,9 +80,10 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Then(x => _logger.LogInformation($"Transport reservation rejected (OrderId={x.Message.CorrelationId})."))
             .Finalize();
 
+
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptReturnTransportHandler() =>
         When(AcceptTransport)
-            .TransitionTo(AwaitingPaymentConfirmation)
+            .TransitionTo(AwaitingHotelConfirmation)
             .Then(x =>
             {
                 x.Saga.Order.ReturnTransportPrice = x.Message.Price;
@@ -89,10 +91,10 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             })
             .Then(x => _logger.LogInformation(
                 $"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x => x.Publish(new NewPayment
-                (
-                    x.Saga.CorrelationId, x.Saga.Order.Price
-                )
+            .ThenAsync(x => x.Publish(new NewHotelReservation
+                {
+                    Order = x.Saga.Order
+                }
             ));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectReturnTransportHandler() =>
@@ -110,15 +112,64 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Finalize();
 
 
+    private EventActivityBinder<OrderState, HotelReservationAccepted> SetAcceptHotelHandler() =>
+        When(AcceptHotel)
+            .TransitionTo(AwaitingPaymentConfirmation)
+            .Then(x =>
+            {
+                x.Saga.Order.HotelPrice = x.Message.Price;
+                x.Saga.Order.HotelReservationId = x.Message.ReservationId;
+            })
+            .Then(x => _logger.LogInformation(
+                $"Hotel reservation accepted (OrderId={x.Message.CorrelationId})."))
+            .ThenAsync(x => x.Publish(new NewPayment
+                (
+                    x.Saga.CorrelationId, x.Saga.Order.Price
+                )
+            ));
+
+    private EventActivityBinder<OrderState, HotelReservationRejected> SetRejectHotelHandler() =>
+        When(RejectHotel)
+            .Then(x =>
+            {
+                x.Saga.Order.HotelReservationId = x.Message.ReservationId;
+                x.Saga.Order.FailureMessage = "Return transport reservation was rejected.";
+            })
+            .Then(x => _logger.LogInformation(
+                $"Hotel reservation rejected (OrderId={x.Message.CorrelationId})."))
+            .ThenAsync(x =>
+                x.Publish(new CancelTransportReservation(
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.TransportReservationId!.Value
+                )))
+            .ThenAsync(x =>
+                x.Publish(new CancelTransportReservation
+                (
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.ReturnTransportReservationId!.Value
+                )))
+            .Finalize();
+
+
 
     private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x => x.Publish(new ConfirmTransportReservation(x.Saga.CorrelationId,
-                x.Saga.Order.TransportReservationId!.Value)))
-            .ThenAsync(x => x.Publish(new ConfirmTransportReservation(x.Saga.CorrelationId,
-                x.Saga.Order.ReturnTransportReservationId!.Value)))
-            // TODO: confirm payment and update those statuses for hotel
+            .ThenAsync(x =>
+                x.Publish(new ConfirmTransportReservation(
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.TransportReservationId!.Value
+                )))
+            .ThenAsync(x =>
+                x.Publish(new ConfirmTransportReservation(
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.ReturnTransportReservationId!.Value
+                )))
+            .ThenAsync(x =>
+                x.Publish(new ConfirmHotelReservation(
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.HotelReservationId!.Value
+                )))
             .ThenAsync(x => x.Publish(new TourOperatorReport
             {
                 Order = x.Saga.Order
@@ -146,7 +197,12 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                     x.Saga.CorrelationId,
                     x.Saga.Order.ReturnTransportReservationId!.Value
                 )))
-            // TODO: cancel hotel
+            .ThenAsync(x =>
+                x.Publish(new CancelHotelReservation
+                (
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.HotelReservationId!.Value
+                )))
             .Finalize();
 
 
@@ -167,11 +223,20 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     public Event<TransportReservationRejected> RejectTransport { get; private set; } = null!;
 
+    public SagaState AwaitingReturnTransportConfirmation { get; private set; } = null!;
+
+
+    public SagaState AwaitingHotelConfirmation { get; private set; } = null!;
+
+    public Event<HotelReservationAccepted> AcceptHotel { get; private set; } = null!;
+
+    public Event<HotelReservationRejected> RejectHotel { get; private set; } = null!;
+
+
+    public SagaState AwaitingPaymentConfirmation { get; private set; } = null!;
+
     public Event<PaymentAccepted> AcceptPayment { get; private set; } = null!;
 
     public Event<PaymentRejected> RejectPayment { get; private set; } = null!;
 
-    public SagaState AwaitingReturnTransportConfirmation { get; private set; } = null!;
-
-    public SagaState AwaitingPaymentConfirmation { get; private set; } = null!;
 }

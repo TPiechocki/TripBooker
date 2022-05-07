@@ -56,7 +56,10 @@ internal static class ServicesRegistration
                 x.AddConsumer<TripQueryConsumer>();
 
                 // sagas
-                x.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                x.AddSagaStateMachine<OrderStateMachine, OrderState>(cfg =>
+                        // workaround to prevent reading single event multiple times
+                        // for the first saga
+                        cfg.UseConcurrentMessageLimit(1))
                     .MongoDbRepository(c =>
                     {
                         c.Connection = configuration.GetConnectionString("MongoDb");

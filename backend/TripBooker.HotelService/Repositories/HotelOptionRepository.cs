@@ -11,6 +11,8 @@ internal interface IHotelOptionRepository
     Task<HotelOption?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
     Task<ICollection<HotelOption>> QuerryAllAsync(CancellationToken cancellationToken);
+
+    IQueryable<HotelOption> QueryAll();
 }
 
 internal class HotelOptionRepository : IHotelOptionRepository
@@ -37,5 +39,11 @@ internal class HotelOptionRepository : IHotelOptionRepository
     {
         // Retrieves Hotels with the Rooms loaded
         return await _dbContext.HotelOption.Include(h => h.Rooms).ToListAsync(cancellationToken);
+    }
+
+    public IQueryable<HotelOption> QueryAll()
+    {
+        // Retrieves Hotels with the Rooms loaded
+        return _dbContext.HotelOption.Include(h => h.Rooms);
     }
 }

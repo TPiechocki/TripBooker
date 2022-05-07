@@ -4,6 +4,7 @@ using System.Transactions;
 using TripBooker.Common;
 using TripBooker.Common.Extensions;
 using TripBooker.Common.Hotel;
+using TripBooker.Common.Order;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
@@ -43,13 +44,15 @@ internal class HotelReservationService : IHotelReservationService
 
     public async Task<ReservationModel> AddNewReservation(NewHotelReservation reservation, CancellationToken cancellationToken)
     {
-        var data = new NewReservationEventData(reservation.HotelDays,
-                                               reservation.RoomsStudio,
-                                               reservation.RoomsSmall,
-                                               reservation.RoomsMedium,
-                                               reservation.RoomsLarge,
-                                               reservation.RoomsApartment,
-                                               reservation.MealOption);
+        var order = reservation.Order;
+
+        var data = new NewReservationEventData(order.HotelDays,
+            order.RoomsStudio,
+            order.RoomsSmall,
+            order.RoomsMedium,
+            order.RoomsLarge,
+            order.RoomsApartment,
+            order.MealOption);
         var reservationStreamId = await _reservationRepository.AddNewAsync(data, cancellationToken);
 
         bool transactionSuccesfull;
@@ -60,8 +63,9 @@ internal class HotelReservationService : IHotelReservationService
             var hotelOccupations = new List<HotelOccupationModel>();
 
             // Check hotel
-            var hotel = await _hotelRepository.GetByIdAsync(reservation.Order.HotelId, cancellationToken);
-            if (hotel == null || (hotel.AllInclusive == false && reservation.MealOption == MealOption.AllInclusive))
+            var hotel = await _hotelRepository.QueryAll()
+                .FirstOrDefaultAsync(x => x.Code == order.HotelCode, cancellationToken: cancellationToken);
+            if (hotel == null || (hotel.AllInclusive == false && order.MealOption == MealOption.AllInclusive))
             {
                 // There is no such hotel or the hotel cannot provide required service
                 await _reservationRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
@@ -70,17 +74,17 @@ internal class HotelReservationService : IHotelReservationService
 
             // Check for all days
             bool checkSuccesfull = true;
-            foreach(var hotelday in reservation.HotelDays)
+            foreach(var hotelday in order.HotelDays)
             {
                 var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelday, cancellationToken);
                 var occupation = HotelOccupationBuilder.Build(hotelEvents);
 
                 // Check if enough rooms awailable
-                if (occupation.RoomsStudio < reservation.RoomsStudio 
-                    && occupation.RoomsSmall < reservation.RoomsSmall 
-                    && occupation.RoomsMedium < reservation.RoomsMedium 
-                    && occupation.RoomsLarge < reservation.RoomsLarge 
-                    && occupation.RoomsApartment < reservation.RoomsApartment)
+                if (occupation.RoomsStudio < order.RoomsStudio 
+                    && occupation.RoomsSmall < order.RoomsSmall 
+                    && occupation.RoomsMedium < order.RoomsMedium 
+                    && occupation.RoomsLarge < order.RoomsLarge 
+                    && occupation.RoomsApartment < order.RoomsApartment)
                 {
                     checkSuccesfull = false;
                     break;
@@ -99,7 +103,7 @@ internal class HotelReservationService : IHotelReservationService
             // Check succesfull can reserve
             try
             {
-                await ValidateNewReservationTransaction(reservationStreamId, reservation, hotel, hotelOccupations,
+                await ValidateNewReservationTransaction(reservationStreamId, order, hotel, hotelOccupations,
                     cancellationToken);
             }
             catch (DbUpdateException e)
@@ -209,7 +213,7 @@ internal class HotelReservationService : IHotelReservationService
     }
 
     private async Task ValidateNewReservationTransaction(Guid reservationStreamId,
-                                                         NewHotelReservation reservation,
+                                                         OrderData order,
                                                          HotelOption hotel,
                                                          List<HotelOccupationModel> hotelOccupations,
                                                          CancellationToken cancellationToken)
@@ -219,23 +223,23 @@ internal class HotelReservationService : IHotelReservationService
         var updateEvent = new OccupatonUpdateEvent
         {
             ReservationEventId = reservationStreamId,
-            RoomsApartment = -reservation.RoomsApartment,
-            RoomsMedium = -reservation.RoomsMedium,
-            RoomsLarge = -reservation.RoomsLarge,
-            RoomsSmall = -reservation.RoomsSmall,
-            RoomsStudio = -reservation.RoomsStudio
+            RoomsApartment = -order.RoomsApartment,
+            RoomsMedium = -order.RoomsMedium,
+            RoomsLarge = -order.RoomsLarge,
+            RoomsSmall = -order.RoomsSmall,
+            RoomsStudio = -order.RoomsStudio
         };
 
         await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
         // Calculate price
-        var price = reservation.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
-                    + reservation.RoomsSmall * hotel.GetPriceFor(RoomType.Small)
-                    + reservation.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
-                    + reservation.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
-                    + reservation.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
-                    + reservation.Order.NumberOfHotelPlaces() * hotel.GetPriceFor(reservation.MealOption);
+        var price = order.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
+                    + order.RoomsSmall * hotel.GetPriceFor(RoomType.Small)
+                    + order.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
+                    + order.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
+                    + order.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
+                    + order.NumberOfHotelPlaces() * hotel.GetPriceFor(order.MealOption);
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 
