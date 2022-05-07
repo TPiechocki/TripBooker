@@ -49,8 +49,8 @@ internal static class InfrastructureRegistration
                 {
                     // public
                     x.AddConsumer<NewHotelReservationEventConsumer>();
-                    x.AddConsumer<CancelReservationEventConsumer>();
-                    x.AddConsumer<ConfirmReservationEventConsumer>();
+                    x.AddConsumer<CancelHotelReservationEventConsumer>();
+                    x.AddConsumer<ConfirmHotelReservationEventConsumer>();
 
                     // internal
                     x.AddConsumer<OccupationViewUpdateEventConsumer>(opt =>

@@ -81,10 +81,10 @@ internal class HotelReservationService : IHotelReservationService
 
                 // Check if enough rooms awailable
                 if (occupation.RoomsStudio < order.RoomsStudio 
-                    && occupation.RoomsSmall < order.RoomsSmall 
-                    && occupation.RoomsMedium < order.RoomsMedium 
-                    && occupation.RoomsLarge < order.RoomsLarge 
-                    && occupation.RoomsApartment < order.RoomsApartment)
+                    || occupation.RoomsSmall < order.RoomsSmall 
+                    || occupation.RoomsMedium < order.RoomsMedium 
+                    || occupation.RoomsLarge < order.RoomsLarge 
+                    || occupation.RoomsApartment < order.RoomsApartment)
                 {
                     checkSuccesfull = false;
                     break;
@@ -240,6 +240,7 @@ internal class HotelReservationService : IHotelReservationService
                     + order.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
                     + order.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
                     + order.NumberOfHotelPlaces() * hotel.GetPriceFor(order.MealOption);
+        price *= order.HotelDays.Count();
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 

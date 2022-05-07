@@ -51,8 +51,8 @@ internal static class InfrastructureRegistration
                 {
                     // public
                     x.AddConsumer<NewTransportReservationEventConsumer>();
-                    x.AddConsumer<CancelReservationEventConsumer>();
-                    x.AddConsumer<ConfirmReservationEventConsumer>();
+                    x.AddConsumer<CancelTransportReservationEventConsumer>();
+                    x.AddConsumer<ConfirmTransportReservationEventConsumer>();
 
                     // internal
                     x.AddConsumer<TransportViewUpdateEventConsumer>(opt =>

@@ -4,14 +4,14 @@ using TripBooker.HotelService.Services;
 
 namespace TripBooker.HotelService.EventConsumers.Public;
 
-internal class CancelReservationEventConsumer : IConsumer<CancelHotelReservation>
+internal class CancelHotelReservationEventConsumer : IConsumer<CancelHotelReservation>
 {
     private readonly IHotelReservationService _reservationService;
-    private readonly ILogger<CancelReservationEventConsumer> _logger;
+    private readonly ILogger<CancelHotelReservationEventConsumer> _logger;
 
-    public CancelReservationEventConsumer(
+    public CancelHotelReservationEventConsumer(
         IHotelReservationService reservationService, 
-        ILogger<CancelReservationEventConsumer> logger)
+        ILogger<CancelHotelReservationEventConsumer> logger)
     {
         _reservationService = reservationService;
         _logger = logger;

@@ -1,6 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.Common;
+using TripBooker.Common.Order;
+using TripBooker.Common.Order.Hotel;
+using TripBooker.Common.Order.Payment;
+using TripBooker.Common.Order.Transport;
 using TripBooker.TravelAgencyService.EventConsumers.Public;
 using TripBooker.TravelAgencyService.EventConsumers.Public.Query;
 using TripBooker.TravelAgencyService.Order.State;
@@ -59,7 +63,29 @@ internal static class ServicesRegistration
                 x.AddSagaStateMachine<OrderStateMachine, OrderState>(cfg =>
                         // workaround to prevent reading single event multiple times
                         // for the first saga
-                        cfg.UseConcurrentMessageLimit(1))
+                    {
+
+                        cfg.UseConcurrentMessageLimit(1);
+                        cfg.UseInMemoryOutbox();
+
+                        var partition = cfg.CreatePartitioner(1);
+                        cfg.Message<SubmitOrder>(s => s.UsePartitioner(partition, m => m.Message.Order.OrderId));
+
+                        cfg.Message<TransportReservationAccepted>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+                        cfg.Message<TransportReservationRejected>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+
+                        cfg.Message<HotelReservationAccepted>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+                        cfg.Message<HotelReservationRejected>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+
+                        cfg.Message<PaymentAccepted>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+                        cfg.Message<PaymentRejected>(s =>
+                            s.UsePartitioner(partition, m => m.Message.CorrelationId));
+                    })
                     .MongoDbRepository(c =>
                     {
                         c.Connection = configuration.GetConnectionString("MongoDb");
