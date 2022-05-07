@@ -116,7 +116,7 @@ internal class TripsService : ITripsService
 
         // GET HOTEL INFO
         var hotelDays = await _hotelRepository.QueryAll()
-            .Where(x => x.HotelCode == query.HotelCode && allDates.Contains(x.Date))
+            .Where(x => x.HotelCode == query.HotelCode && allDates.SkipLast(1).Contains(x.Date))
             .ToListAsync(cancellationToken);
         result.HotelDays = hotelDays.Select(x => x.Id);
         
@@ -202,7 +202,7 @@ internal class TripsService : ITripsService
     {
         // find hotels
         var hotels = await _hotelRepository.QueryAll()
-            .Where(x => x.AirportCode == query.AirportCode && allDates.Contains(x.Date))
+            .Where(x => x.AirportCode == query.AirportCode && allDates.SkipLast(1).Contains(x.Date))
             .ToListAsync(cancellationToken);
 
         // Set minimal values for rooms occupation

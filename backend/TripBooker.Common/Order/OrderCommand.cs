@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using TripBooker.Common.Hotel;
 
 namespace TripBooker.Common.Order;
 
@@ -23,8 +25,22 @@ public class OrderData
 
     public Guid ReturnTransportId { get; set; }
 
-    public Guid HotelId { get; set; }
-    
+    public string HotelCode { get; set; } = null!;
+
+    public IEnumerable<Guid> HotelDays { get; set; } = null!;
+
+    public int RoomsStudio { get; set; }
+
+    public int RoomsSmall { get; set; }
+
+    public int RoomsMedium { get; set; }
+
+    public int RoomsLarge { get; set; }
+
+    public int RoomsApartment { get; set; }
+
+    public MealOption MealOption { get; set; }
+
     #endregion
 
 
@@ -53,7 +69,7 @@ public class OrderData
 
 
     // HOTEL
-    public Guid HotelReservationId { get; set; }
+    public Guid? HotelReservationId { get; set; }
 
     public double HotelPrice { get; set; }
 

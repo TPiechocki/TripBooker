@@ -4,14 +4,14 @@ using TripBooker.TransportService.Services;
 
 namespace TripBooker.TransportService.EventConsumers.Public;
 
-internal class ConfirmReservationEventConsumer : IConsumer<ConfirmTransportReservation>
+internal class ConfirmTransportReservationEventConsumer : IConsumer<ConfirmTransportReservation>
 {
     private readonly ITransportReservationService _reservationService;
-    private readonly ILogger<ConfirmReservationEventConsumer> _logger;
+    private readonly ILogger<ConfirmTransportReservationEventConsumer> _logger;
 
-    public ConfirmReservationEventConsumer(
+    public ConfirmTransportReservationEventConsumer(
         ITransportReservationService reservationService, 
-        ILogger<ConfirmReservationEventConsumer> logger)
+        ILogger<ConfirmTransportReservationEventConsumer> logger)
     {
         _reservationService = reservationService;
         _logger = logger;
