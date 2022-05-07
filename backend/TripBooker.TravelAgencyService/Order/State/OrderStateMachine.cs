@@ -49,11 +49,18 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Then(x => UpdateSagaState(x.Saga, x.Message))
             .Then(x => _logger.LogInformation($"New order received (OrderId={x.Message.Order.OrderId})."))
             .TransitionTo(AwaitingTransportConfirmation)
-            .ThenAsync(x => x.Publish(new NewTransportReservation
-            {
-                Order = x.Saga.Order,
-                IsReturn = false
-            }));
+            .IfElse(x => x.Saga.Order.TransportId != null,
+                x =>
+                    x.ThenAsync(a => a.Publish(new NewTransportReservation
+                    {
+                        Order = a.Saga.Order,
+                        IsReturn = false
+                    })),
+                x => x.ThenAsync(a =>
+                    a.Publish(new TransportReservationAccepted
+                    (
+                        a.Saga.CorrelationId, 0, Guid.Empty
+                    ))));
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
         When(AcceptTransport)
@@ -64,11 +71,18 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x.Saga.Order.TransportReservationId = x.Message.ReservationId;
             })
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x => x.Publish(new NewTransportReservation
-            {
-                Order = x.Saga.Order,
-                IsReturn = true
-            }));
+            .IfElse(x => x.Saga.Order.TransportId != null,
+                x =>
+                    x.ThenAsync(a => a.Publish(new NewTransportReservation
+                    {
+                        Order = a.Saga.Order,
+                        IsReturn = true
+                    })),
+                x => x.ThenAsync(a =>
+                    a.Publish(new TransportReservationAccepted
+                    (
+                        a.Saga.CorrelationId, 0, Guid.Empty
+                    ))));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
         When(RejectTransport)
@@ -106,9 +120,14 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             })
             .Then(x => _logger.LogInformation(
                 $"Return transport reservation rejected (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation(x.Saga.CorrelationId,
-                    x.Saga.Order.TransportReservationId!.Value)))
+            .If(x => x.Saga.Order.TransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new CancelTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.TransportReservationId!.Value
+                        ))))
             .Finalize();
 
 
@@ -137,17 +156,22 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             })
             .Then(x => _logger.LogInformation(
                 $"Hotel reservation rejected (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation(
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.TransportReservationId!.Value
-                )))
-            .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation
-                (
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.ReturnTransportReservationId!.Value
-                )))
+            .If(x => x.Saga.Order.TransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new CancelTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.TransportReservationId!.Value
+                        ))))
+            .If(x => x.Saga.Order.ReturnTransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new CancelTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.ReturnTransportReservationId!.Value
+                        ))))
             .Finalize();
 
 
@@ -155,16 +179,22 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
     private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))
-            .ThenAsync(x =>
-                x.Publish(new ConfirmTransportReservation(
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.TransportReservationId!.Value
-                )))
-            .ThenAsync(x =>
-                x.Publish(new ConfirmTransportReservation(
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.ReturnTransportReservationId!.Value
-                )))
+            .If(x => x.Saga.Order.TransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new ConfirmTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.TransportReservationId!.Value
+                        ))))
+            .If(x => x.Saga.Order.ReturnTransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new ConfirmTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.ReturnTransportReservationId!.Value
+                        ))))
             .ThenAsync(x =>
                 x.Publish(new ConfirmHotelReservation(
                     x.Saga.CorrelationId,
@@ -185,24 +215,22 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Then(x => _logger.LogInformation(
                 $"Payment timed out (OrderId={x.Message.CorrelationId})."))
             // TODO optionally: cancel differently for rejected payment to get different status of reservation
-            .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation
-                (
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.TransportReservationId!.Value
-                )))
-            .ThenAsync(x =>
-                x.Publish(new CancelTransportReservation
-                (
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.ReturnTransportReservationId!.Value
-                )))
-            .ThenAsync(x =>
-                x.Publish(new CancelHotelReservation
-                (
-                    x.Saga.CorrelationId,
-                    x.Saga.Order.HotelReservationId!.Value
-                )))
+            .If(x => x.Saga.Order.TransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new CancelTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.TransportReservationId!.Value
+                        ))))
+            .If(x => x.Saga.Order.ReturnTransportId != null,
+                a =>
+                    a.ThenAsync(x =>
+                        x.Publish(new CancelTransportReservation
+                        (
+                            x.Saga.CorrelationId,
+                            x.Saga.Order.ReturnTransportReservationId!.Value
+                        ))))
             .Finalize();
 
 
