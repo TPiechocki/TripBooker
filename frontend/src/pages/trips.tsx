@@ -22,7 +22,7 @@ import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 
 
-const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) => {
+const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: string, name: string } } | any>) => {
   const [data, setData] = useState<any[]>();
   useEffect(() => {
     request('GET', '/Destinations').then(data => {
@@ -30,10 +30,11 @@ const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) =>
     })
   }, [])
   const {state} = location;
-  const [destination, setDestination] = useState(state?.destination ?? '')
+  const [destination, setDestination] = useState(state?.destination.airportCode ?? '')
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
   const [numberOfDays, setNumberOfDays] = useState<string>('')
   const [numberOfAdults, setNumberOfAdults] = useState<string>('')
+  const [departure, setDeparture] = useState('')
   const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>('')
   const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>('')
   const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>('')
@@ -57,10 +58,10 @@ const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) =>
         NumberOfChildrenUpTo18: numberOfChildrenUpTo18 ? numberOfChildrenUpTo18 : 0,
         NumberOfChildrenUpTo10: numberOfChildrenUpTo10 ? numberOfChildrenUpTo10 : 0,
         NumberOfChildrenUpTo3: numberOfChildrenUpTo3 ? numberOfChildrenUpTo3 : 0,
+        DepartureAirportCode: departure,
       }).then((data) => {
         setLoading(false);
         setTrips(data?.trips);
-        console.log(trips)
       })
     } else {
       setError(true);
@@ -110,7 +111,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) =>
                 label="Number of days"
                 type="number"
                 value={numberOfDays}
-                onChange={(event) => setNumberOfDays(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfDays('0') : setNumberOfDays(event.target.value)}
               />
               <TextField
                 required
@@ -119,28 +120,60 @@ const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) =>
                 label="Number of adults"
                 type="number"
                 value={numberOfAdults}
-                onChange={(event) => setNumberOfAdults(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfAdults('0') : setNumberOfAdults(event.target.value)}
               />
+              <FormControl>
+                <InputLabel id="departure" required error={error}>Departure Airport</InputLabel>
+                <Select
+                  error={error}
+                  id="departure"
+                  label="Departure Airport"
+                  value={departure}
+                  onChange={(event) => setDeparture(event.target.value)}
+                >
+                  <MenuItem value='' key='unknown'>
+                    Any
+                  </MenuItem>
+                  <MenuItem value='WRO' key='WRO'>
+                    Wrocław
+                  </MenuItem>
+                  <MenuItem value='WAW' key='WAW'>
+                    Warszawa-Chopina
+                  </MenuItem>
+                  <MenuItem value='KTW' key='KTW'>
+                    Katowice
+                  </MenuItem>
+                  <MenuItem value='GDN' key='GDN'>
+                    Gdańsk
+                  </MenuItem>
+                  <MenuItem value='KRK' key='KRK'>
+                    Kraków
+                  </MenuItem>
+                  <MenuItem value='LUZ' key='LUZ'>
+                    Lublin
+                  </MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 id="outlined-number"
                 label="Children up to 18"
                 type="number"
                 value={numberOfChildrenUpTo18}
-                onChange={(event) => setNumberOfChildrenUpTo18(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo18('0') : setNumberOfChildrenUpTo18(event.target.value)}
               />
               <TextField
                 id="outlined-number"
                 label="Children up to 10"
                 type="number"
                 value={numberOfChildrenUpTo10}
-                onChange={(event) => setNumberOfChildrenUpTo10(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo10('0') : setNumberOfChildrenUpTo10(event.target.value)}
               />
               <TextField
                 id="outlined-number"
                 label="Children up to 3"
                 type="number"
                 value={numberOfChildrenUpTo3}
-                onChange={(event) => setNumberOfChildrenUpTo3(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo3('0') : setNumberOfChildrenUpTo3(event.target.value)}
               />
               <Box sx={{display: 'flex', justifyContent: 'flex-end', p: 2}}>
                 <Button variant="contained" size="large" onClick={loadTrips}>
@@ -179,6 +212,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: string } | any>) =>
                       numberOfChildrenUpTo18,
                       numberOfChildrenUpTo10,
                       numberOfChildrenUpTo3,
+                      departure,
                       trip,
                     }
                   })}>

@@ -13,7 +13,6 @@ const IndexPage = () => {
       setData(data.destinations)
     })
   }, [])
-  console.log(data)
   return (
     <Layout>
       <>
