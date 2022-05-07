@@ -2,9 +2,9 @@ using System;
 
 namespace TripBooker.Common.Order.Payment;
 
-public class PaymentRejected : ContractBase
+public class PaymentTimeout : ContractBase
 {
-    public PaymentRejected(
+    public PaymentTimeout(
         Guid correlationId)
         : base(correlationId)
     {

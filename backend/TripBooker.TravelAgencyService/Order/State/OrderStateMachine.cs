@@ -133,7 +133,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .Then(x =>
             {
                 x.Saga.Order.HotelReservationId = x.Message.ReservationId;
-                x.Saga.Order.FailureMessage = "Return transport reservation was rejected.";
+                x.Saga.Order.FailureMessage = "Hotel reservation was rejected.";
             })
             .Then(x => _logger.LogInformation(
                 $"Hotel reservation rejected (OrderId={x.Message.CorrelationId})."))
@@ -176,14 +176,14 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             }))
             .Finalize();
 
-    private EventActivityBinder<OrderState, PaymentRejected> SetRejectPaymentHandler() =>
+    private EventActivityBinder<OrderState, PaymentTimeout> SetRejectPaymentHandler() =>
         When(RejectPayment)
             .Then(x =>
             {
-                x.Saga.Order.FailureMessage = "Payment was rejected.";
+                x.Saga.Order.FailureMessage = "Payment timed out.";
             })
             .Then(x => _logger.LogInformation(
-                $"Payment rejected (OrderId={x.Message.CorrelationId})."))
+                $"Payment timed out (OrderId={x.Message.CorrelationId})."))
             // TODO optionally: cancel differently for rejected payment to get different status of reservation
             .ThenAsync(x =>
                 x.Publish(new CancelTransportReservation
@@ -237,6 +237,6 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     public Event<PaymentAccepted> AcceptPayment { get; private set; } = null!;
 
-    public Event<PaymentRejected> RejectPayment { get; private set; } = null!;
+    public Event<PaymentTimeout> RejectPayment { get; private set; } = null!;
 
 }
