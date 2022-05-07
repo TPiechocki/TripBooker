@@ -21,6 +21,8 @@ public class OrderData
 
     public int NumberOfChildrenUpTo3 { get; set; }
 
+    public string DiscountCode { get; set; } = null!;
+
     public Guid TransportId { get; set; }
 
     public Guid ReturnTransportId { get; set; }
