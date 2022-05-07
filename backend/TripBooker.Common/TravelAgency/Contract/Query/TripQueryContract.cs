@@ -29,6 +29,8 @@ public class TripQueryContract
     public int NumberOfStudios { get; set; }
 
     public MealOption MealOption { get; set; }
+
+    public string DiscountCode { get; set; } = string.Empty;
 }
 
 public class TripQueryResponse
