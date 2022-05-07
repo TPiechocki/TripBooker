@@ -4,6 +4,7 @@ using TripBooker.Common.Extensions;
 using TripBooker.Common.Helpers;
 using TripBooker.Common.Hotel;
 using TripBooker.Common.Hotel.Contract;
+using TripBooker.Common.Payment;
 using TripBooker.Common.TravelAgency.Contract.Query;
 using TripBooker.Common.TravelAgency.Model;
 using TripBooker.TravelAgencyService.Model;
@@ -100,8 +101,12 @@ internal class TripsService : ITripsService
             _ => 0
         };
 
+        if (query.DiscountCode != null && Discount.IsViable(query.DiscountCode))
+            price = Discount.Apply(query.DiscountCode, price);
+
         result.IsAvailable = true;
         result.FinalPrice = Math.Round(price, 2);
+
         return result;
     }
 
