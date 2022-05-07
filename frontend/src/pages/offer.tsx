@@ -87,12 +87,12 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       setOptions(data)
     })
   }, [])
-  const [numberOfAdults, setNumberOfAdults] = useState<string>(state.numberOfAdults)
-  const [departure, setDeparture] = useState(state.departure ? state.departure : 'individual')
-  const [arrival, setArrival] = useState(state.departure ? state.departure : 'individual')
-  const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>(state.numberOfChildrenUpTo18)
-  const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>(state.numberOfChildrenUpTo10)
-  const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>(state.numberOfChildrenUpTo3)
+  const [numberOfAdults, setNumberOfAdults] = useState<string>(state?.numberOfAdults)
+  const [departure, setDeparture] = useState(state?.departure ? state.departure : 'individual')
+  const [arrival, setArrival] = useState(state?.departure ? state.departure : 'individual')
+  const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>(state?.numberOfChildrenUpTo18)
+  const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>(state?.numberOfChildrenUpTo10)
+  const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>(state?.numberOfChildrenUpTo3)
   const [mealOption, setMealOption] = useState(options?.hotelAvailability.allInclusive ? '2' : '1');
   const [discount, setDiscount] = useState('');
   const [numberOfStudioRooms, setNumberOfStudioRooms] = useState<string>('')
@@ -134,7 +134,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
     <Layout>
       <>
         <Box sx={{py: 2}}>
-          <Typography variant="h5" sx={{mb: 2}}>{state.trip.hotelName}</Typography>
+          <Typography variant="h5" sx={{mb: 2}}>{state?.trip.hotelName}</Typography>
           <Box sx={{display: 'flex'}}>
             <Paper sx={{flexBasis: 500, flexGrow: 1, p: 2, mr: 2}}>
               <Typography variant="h5">Options</Typography>
@@ -144,14 +144,14 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 <TextField
                   id="outlined-number"
                   label="Departure date"
-                  value={state.departureDate?.toISOString().split('T')[0]}
+                  value={state?.departureDate?.toISOString().split('T')[0]}
                   variant="standard"
                   disabled
                 />
                 <TextField
                   id="outlined-number"
                   label="Number of days"
-                  value={state.numberOfDays}
+                  value={state?.numberOfDays}
                   variant="standard"
                   disabled
                 />
