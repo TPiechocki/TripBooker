@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using TripBooker.WebApi.Infrastructure;
 using TripBooker.WebApi.Repositories;
-using WebApi.Services;
+using TripBooker.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
