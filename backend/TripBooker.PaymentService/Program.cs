@@ -15,6 +15,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+CreateDbIfNotExists(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -27,3 +29,20 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+static void CreateDbIfNotExists(IHost host)
+{
+    using var scope = host.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<PaymentDbContext>();
+
+        SqlDbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}
