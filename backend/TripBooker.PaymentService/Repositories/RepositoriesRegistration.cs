@@ -5,7 +5,7 @@ internal static class RepositoriesRegistration
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         return services
-            .AddScoped<IPaymentEventRepository, PaymentEventRepository>()
+            .AddScoped<IPaymentEventRepository, PaymentEventRepository>();
     }
 
 }

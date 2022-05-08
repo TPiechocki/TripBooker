@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TripBooker.Common;
-using TripBooker.PaymentService.Model;
 
 namespace TripBooker.PaymentService.Infrastructure;
 
@@ -8,7 +7,7 @@ internal class PaymentDbContext : DbContext
 {
 
     // EVENTS
-    public DbSet<PaymentEvent> ReservationEvent { get; set; } = null!;
+    public DbSet<PaymentEvent> PaymentEvent { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

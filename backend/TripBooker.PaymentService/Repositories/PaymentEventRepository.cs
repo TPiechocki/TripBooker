@@ -10,7 +10,7 @@ internal interface IPaymentEventRepository
 {
     Task<Guid> AddNewAsync(NewPaymentEventData paymentEvent, CancellationToken cancellationToken);
 
-    Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data, CancellationToken cancellationToken);
+    Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
     Task AddRejectedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
@@ -22,7 +22,7 @@ internal interface IPaymentEventRepository
 internal class PaymentEventRepository : IPaymentEventRepository
 {
     private readonly PaymentDbContext _dbContext;
-    private readonly ILogger<ReservationEventRepository> _logger;
+    private readonly ILogger<PaymentEventRepository> _logger;
     private readonly IBus _bus;
 
     public PaymentEventRepository(
@@ -53,10 +53,10 @@ internal class PaymentEventRepository : IPaymentEventRepository
         return guid;
     }
 
-    public async Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data, CancellationToken cancellationToken)
+    public async Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
     {
         await _dbContext.PaymentEvent.AddAsync(new PaymentEvent(
-                streamId, previousVersion + 1, nameof(PaymentAcceptedEventData), data),
+                streamId, previousVersion + 1, nameof(PaymentAcceptedEventData), new PaymentAcceptedEventData()),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);

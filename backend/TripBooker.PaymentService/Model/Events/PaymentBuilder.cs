@@ -48,8 +48,6 @@ internal static class PaymentBuilder
 
     private static void ApplyAccepted(this PaymentModel item, BaseEvent @event)
     {
-        var data = JsonConvert.DeserializeObject<ReservationAcceptedEventData>(@event.Data)!;
-
         item.Version = @event.Version;
 
         item.Status = PaymentStatus.Accepted;

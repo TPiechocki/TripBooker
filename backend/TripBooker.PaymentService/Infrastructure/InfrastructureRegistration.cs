@@ -1,10 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using Quartz;
-using TripBooker.Common;
 using TripBooker.PaymentService.Consumers;
 
 namespace TripBooker.PaymentService.Infrastructure;
@@ -45,22 +41,22 @@ internal static class InfrastructureRegistration
             .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; });
     }
 
-    //private static IServiceCollection AddQuartz(this IServiceCollection services)
-    //{
-    //    // configure job to create update view event every 15s
-    //    return services.AddQuartz(q =>
-    //    {
-    //        q.UseMicrosoftDependencyInjectionJobFactory();
-    //
-    //        var jobKey = new JobKey(nameof(UpdateViewJob));
-    //        q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
-    //        q.AddTrigger(opt => opt
-    //            .ForJob(jobKey)
-    //            .WithIdentity(jobKey + "-trigger")
-    //            .WithSimpleSchedule(x => x
-    //                .WithIntervalInSeconds(15)
-    //                .RepeatForever()));
-    //    })
-    //        .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-    //}
+    private static IServiceCollection AddQuartz(this IServiceCollection services)
+    {
+        // configure job to create update view event every 15s
+        return services.AddQuartz(q =>
+        {
+            q.UseMicrosoftDependencyInjectionJobFactory();
+    
+            var jobKey = new JobKey(/*nameof(UpdateViewJob)*/"job");
+            // q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
+            q.AddTrigger(opt => opt
+                .ForJob(jobKey)
+                .WithIdentity(jobKey + "-trigger")
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInSeconds(1)
+                    .RepeatForever()));
+        })
+            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+    }
 }
