@@ -77,9 +77,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   const [open, setOpen] = React.useState(false);
   const {state} = location;
   const [options, setOptions] = useState<Options | null>(null);
-  if (state == null) {
-    navigate('/trips');
-  }
+
   useEffect(() => {
     request('POST', '/Trip/Options', {
       HotelCode: state?.trip.hotelCode,
@@ -137,6 +135,21 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       setLoading(false)
     })
   }, [arrival, departure, mealOption, numberOfAdults, numberOfApartmentRooms, numberOfChildrenUpTo10, numberOfChildrenUpTo18, numberOfChildrenUpTo3, numberOfLargeRooms, numberOfMediumRooms, numberOfSmallRooms, numberOfStudioRooms, options?.hotelDays, options?.returnTransportOptions, options?.transportOptions, discount])
+
+  if (state == null) {
+    return (
+      <Layout>
+        <>
+          <Typography variant="h2" sx={{ m: 2 }}>
+            No selected offer
+          </Typography>
+          <Button variant="contained" size="large" sx={{ m: 2 }} onClick={() => navigate("/trips")}>
+            Return to trips
+          </Button>
+        </>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>
@@ -361,7 +374,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 ) : <Typography variant="h5">Offer is not available for current configuration</Typography>}
               </Box>
               <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
-                <Button variant="contained" size="large" disabled={loading || !priceData?.isAvailable}>
+                <Button variant="contained" size="large" disabled={state == null || loading || !priceData?.isAvailable}>
                   Reserve
                 </Button>
               </Box>
