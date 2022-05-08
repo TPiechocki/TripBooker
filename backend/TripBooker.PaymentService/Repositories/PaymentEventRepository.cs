@@ -8,11 +8,13 @@ namespace TripBooker.PaymentService.Repositories;
 
 internal interface IPaymentEventRepository
 {
-    Task<Guid> AddNewAsync(NewPaymentEventData paymentEvent, CancellationToken cancellationToken);
+    Task AddNewAsync(Guid streamId, NewPaymentEventData paymentEvent, CancellationToken cancellationToken);
 
     Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
     Task AddRejectedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
+
+    Task AddInProgressAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
     Task AddTimeoutAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
@@ -23,23 +25,19 @@ internal class PaymentEventRepository : IPaymentEventRepository
 {
     private readonly PaymentDbContext _dbContext;
     private readonly ILogger<PaymentEventRepository> _logger;
-    private readonly IBus _bus;
 
     public PaymentEventRepository(
         PaymentDbContext dbContext,
-        ILogger<PaymentEventRepository> logger,
-        IBus bus)
+        ILogger<PaymentEventRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _bus = bus;
     }
 
-    public async Task<Guid> AddNewAsync(NewPaymentEventData paymentEvent, CancellationToken cancellationToken)
+    public async Task AddNewAsync(Guid streamId, NewPaymentEventData paymentEvent, CancellationToken cancellationToken)
     {
-        var guid = Guid.NewGuid();
         await _dbContext.PaymentEvent.AddAsync(new PaymentEvent(
-                guid, 1, nameof(NewPaymentEventData), paymentEvent),
+                streamId, 1, nameof(NewPaymentEventData), paymentEvent),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
@@ -49,8 +47,6 @@ internal class PaymentEventRepository : IPaymentEventRepository
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }
-
-        return guid;
     }
 
     public async Task AddAcceptedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
@@ -78,6 +74,21 @@ internal class PaymentEventRepository : IPaymentEventRepository
         if (status == 0)
         {
             var message = $"Could not add a reject payment event: streamId={streamId}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
+    }
+
+    public async Task AddInProgressAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
+    {
+        await _dbContext.PaymentEvent.AddAsync(new PaymentEvent(
+                streamId, previousVersion + 1, nameof(PaymentInProgressEventData), new PaymentInProgressEventData()),
+            cancellationToken);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add an in progress payment event: streamId={streamId}";
             _logger.LogError(message);
             throw new DbUpdateException(message);
         }

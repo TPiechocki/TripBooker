@@ -18,6 +18,11 @@ public enum PaymentStatus
     Rejected,
 
     /// <summary>
+    /// Payment is in progress.
+    /// </summary>
+    InProgress,
+
+    /// <summary>
     /// Payment was not done in time.
     /// </summary>
     Timeout,

@@ -17,7 +17,6 @@ internal static class InfrastructureRegistration
                     .EnableSensitiveDataLogging())
             .AddBus(configuration)
             .AddQuartz();
-
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)
@@ -43,20 +42,22 @@ internal static class InfrastructureRegistration
 
     private static IServiceCollection AddQuartz(this IServiceCollection services)
     {
+        return services;
+
         // configure job to create update view event every 15s
-        return services.AddQuartz(q =>
-        {
-            q.UseMicrosoftDependencyInjectionJobFactory();
-    
-            var jobKey = new JobKey(/*nameof(UpdateViewJob)*/"job");
-            // q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
-            q.AddTrigger(opt => opt
-                .ForJob(jobKey)
-                .WithIdentity(jobKey + "-trigger")
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(1)
-                    .RepeatForever()));
-        })
-            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        // return services.AddQuartz(q =>
+        // {
+        //     q.UseMicrosoftDependencyInjectionJobFactory();
+        //
+        //     var jobKey = new JobKey(nameof(UpdateViewJob));
+        //      q.AddJob<UpdateViewJob>(opt => opt.WithIdentity(jobKey));
+        //     q.AddTrigger(opt => opt
+        //         .ForJob(jobKey)
+        //         .WithIdentity(jobKey + "-trigger")
+        //         .WithSimpleSchedule(x => x
+        //             .WithIntervalInSeconds(1)
+        //             .RepeatForever()));
+        // })
+        //     .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
 }

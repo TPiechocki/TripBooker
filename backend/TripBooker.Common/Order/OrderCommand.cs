@@ -21,7 +21,7 @@ public class OrderData
 
     public int NumberOfChildrenUpTo3 { get; set; }
 
-    public string DiscountCode { get; set; } = null!;
+    public string? DiscountCode { get; set; } = null!;
 
     /// <remarks>
     /// Null means no transport, and the clients would travel on their own.

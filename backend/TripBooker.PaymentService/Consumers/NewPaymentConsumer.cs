@@ -18,14 +18,13 @@ internal class NewPaymentConsumer : IConsumer<NewPayment>
         _logger = logger;
     }
 
-    public Task Consume(ConsumeContext<NewPayment> context)
+    public async Task Consume(ConsumeContext<NewPayment> context)
     {
         _logger.LogInformation($"Received new payment for order (OrderId={context.Message.CorrelationId}).");
 
         var data = new NewPaymentEventData(context.Message.Price);
-        _paymentEventRepository.AddNewAsync(data, context.CancellationToken);
+        await _paymentEventRepository.AddNewAsync(context.Message.CorrelationId, data, context.CancellationToken);
 
         _logger.LogInformation($"New payment persisted in database for order (OrderId={context.Message.CorrelationId}).");
-        return Task.CompletedTask;
     }
 }

@@ -90,8 +90,7 @@ services:
             - "postgres"
             - "rabbitmq"
         environment:
-            # ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
-            # ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
