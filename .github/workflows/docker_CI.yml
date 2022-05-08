@@ -86,4 +86,4 @@ jobs:
           push: true
           tags: tpiechocki/rsww_175641_frontend:latest
           build-args:
-            WEB_API_URL=http://piechole.tplinkdns.com:8081/
+            WEB_API_URL=http://localhost:17565/
