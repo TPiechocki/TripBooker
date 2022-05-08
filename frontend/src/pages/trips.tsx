@@ -30,11 +30,11 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
     })
   }, [])
   const {state} = location;
-  const [destination, setDestination] = useState(state?.destination.airportCode ?? '')
-  const [departureDate, setDepartureDate] = useState<Date | null>(null);
-  const [numberOfDays, setNumberOfDays] = useState<string>('')
-  const [numberOfAdults, setNumberOfAdults] = useState<string>('')
-  const [departure, setDeparture] = useState('')
+  const [destination, setDestination] = useState(state?.destination.airportCode ?? 'AYT')
+  const [departureDate, setDepartureDate] = useState<Date | null>(new Date("2022-07-02"));
+  const [numberOfDays, setNumberOfDays] = useState<string>('7')
+  const [numberOfAdults, setNumberOfAdults] = useState<string>('1')
+  const [departure, setDeparture] = useState('any')
   const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>('')
   const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>('')
   const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>('')
