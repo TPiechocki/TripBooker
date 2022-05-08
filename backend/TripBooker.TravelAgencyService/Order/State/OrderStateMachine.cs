@@ -220,10 +220,11 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                     x.Saga.CorrelationId,
                     x.Saga.Order.HotelReservationId!.Value
                 )))
-            .ThenAsync(x => x.Publish(new TourOperatorReport
-            {
-                Order = x.Saga.Order
-            }))
+            .ThenAsync(x =>
+                x.Publish(new TourOperatorReport
+                {
+                    Order = x.Saga.Order
+                }))
             .TransitionTo(Confirmed);
 
     private EventActivityBinder<OrderState, PaymentTimeout> SetRejectPaymentHandler() =>
@@ -251,6 +252,11 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                             x.Saga.CorrelationId,
                             x.Saga.Order.ReturnTransportReservationId!.Value
                         ))))
+            .ThenAsync(x =>
+                x.Publish(new CancelHotelReservation(
+                    x.Saga.CorrelationId,
+                    x.Saga.Order.HotelReservationId!.Value
+                )))
             .TransitionTo(Rejected);
 
 
