@@ -131,7 +131,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
                   value={departure}
                   onChange={(event) => setDeparture(event.target.value)}
                 >
-                  <MenuItem value='' key='unknown'>
+                  <MenuItem value='any' key='unknown'>
                     Any
                   </MenuItem>
                   <MenuItem value='WRO' key='WRO'>
