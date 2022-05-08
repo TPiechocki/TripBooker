@@ -9,12 +9,15 @@ internal class NewPaymentConsumer : IConsumer<NewPayment>
 {
     private readonly ILogger<NewPaymentConsumer> _logger;
     private readonly IPaymentEventRepository _paymentEventRepository;
+    private readonly ITimeoutTimestampRepository _timestampRepository;
 
     public NewPaymentConsumer(
         IPaymentEventRepository paymentEventRepository,
+        ITimeoutTimestampRepository timestampRepository,
         ILogger<NewPaymentConsumer> logger)
     {
         _paymentEventRepository = paymentEventRepository;
+        _timestampRepository = timestampRepository;
         _logger = logger;
     }
 
@@ -24,6 +27,7 @@ internal class NewPaymentConsumer : IConsumer<NewPayment>
 
         var data = new NewPaymentEventData(context.Message.Price);
         await _paymentEventRepository.AddNewAsync(context.Message.CorrelationId, data, context.CancellationToken);
+        await _timestampRepository.AddNewAsync(context.Message.CorrelationId, context.CancellationToken);
 
         _logger.LogInformation($"New payment persisted in database for order (OrderId={context.Message.CorrelationId}).");
     }
