@@ -25,8 +25,13 @@ internal static class PaymentBuilder
                 case nameof(PaymentRejectedEventData):
                     item.ApplyRejected(@event);
                     break;
+
                 case nameof(PaymentTimeoutEventData):
                     item.ApplyTimeout(@event);
+                    break;
+
+                case nameof(PaymentInProgressEventData):
+                    item.ApplyInProgress(@event);
                     break;
             }
         }
@@ -65,5 +70,12 @@ internal static class PaymentBuilder
         item.Version = @event.Version;
 
         item.Status = PaymentStatus.Timeout;
+    }
+
+    private static void ApplyInProgress(this PaymentModel item, BaseEvent @event)
+    {
+        item.Version = @event.Version;
+
+        item.Status = PaymentStatus.InProgress;
     }
 }
