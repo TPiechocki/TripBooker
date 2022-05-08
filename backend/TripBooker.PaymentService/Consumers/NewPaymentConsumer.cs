@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using TripBooker.Common.Order.Payment;
+using TripBooker.Common.Payment;
 using TripBooker.PaymentService.Repositories;
 using TripBooker.PaymentService.Model.Events.Payment;
 
@@ -22,7 +23,13 @@ internal class NewPaymentConsumer : IConsumer<NewPayment>
     {
         _logger.LogInformation($"Received new payment for order (OrderId={context.Message.CorrelationId}).");
 
-        var data = new NewPaymentEventData(context.Message.Price);
+        var price = context.Message.Price;
+        if (Discount.IsViable(context.Message.DiscountCode ?? string.Empty))
+        {
+            price = Discount.Apply(context.Message.DiscountCode!, price);
+        }
+
+        var data = new NewPaymentEventData(price);
         await _paymentEventRepository.AddNewAsync(context.Message.CorrelationId, data, context.CancellationToken);
 
         _logger.LogInformation($"New payment persisted in database for order (OrderId={context.Message.CorrelationId}).");

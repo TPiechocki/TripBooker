@@ -163,7 +163,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 $"Hotel reservation accepted (OrderId={x.Message.CorrelationId})."))
             .ThenAsync(x => x.Publish(new NewPayment
                 (
-                    x.Saga.CorrelationId, x.Saga.Order.Price
+                    x.Saga.CorrelationId, x.Saga.Order.Price, x.Saga.Order.DiscountCode
                 )
             ));
 
