@@ -31,7 +31,7 @@ services:
             - "travel-agency-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Transport;Username=postgres;Password=student"
-            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
@@ -47,7 +47,7 @@ services:
             - "travel-agency-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
-            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
@@ -62,7 +62,7 @@ services:
             - "rabbitmq"
         environment:
             ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_TravelAgency;Username=postgres;Password=student"
-            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
