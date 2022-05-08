@@ -30,7 +30,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
     })
   }, [])
   const {state} = location;
-  const [destination, setDestination] = useState(state?.destination.airportCode ?? 'AYT')
+  const [destination, setDestination] = useState(state?.destination?.airportCode ?? 'AYT')
   const [departureDate, setDepartureDate] = useState<Date | null>(new Date("2022-07-02"));
   const [numberOfDays, setNumberOfDays] = useState<string>('7')
   const [numberOfAdults, setNumberOfAdults] = useState<string>('1')

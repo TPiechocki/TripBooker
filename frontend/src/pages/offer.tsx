@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {PageProps} from "gatsby";
+import {navigate, PageProps} from "gatsby";
 import Layout from "../components/Layout";
 import {
   Alert,
@@ -77,19 +77,22 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   const [open, setOpen] = React.useState(false);
   const {state} = location;
   const [options, setOptions] = useState<Options | null>(null);
+  if (state == null) {
+    navigate('/trips');
+  }
   useEffect(() => {
     request('POST', '/Trip/Options', {
-      HotelCode: state.trip.hotelCode,
-      DepartureDate: state.departureDate?.toISOString().split('T')[0],
-      NumberOfDays: state.numberOfDays,
-      NumberOfAdults: state.numberOfAdults
+      HotelCode: state?.trip.hotelCode,
+      DepartureDate: state?.departureDate?.toISOString().split('T')[0],
+      NumberOfDays: state?.numberOfDays,
+      NumberOfAdults: state?.numberOfAdults
     }).then(data => {
       setOptions(data)
     })
   }, [])
   const [numberOfAdults, setNumberOfAdults] = useState<string>(state?.numberOfAdults)
-  const [departure, setDeparture] = useState(state?.departure ? state.departure : 'individual')
-  const [arrival, setArrival] = useState(state?.departure ? state.departure : 'individual')
+  const [departure, setDeparture] = useState(state && state.departure !== 'any' ? state.departure : 'individual' ?? 'individual')
+  const [arrival, setArrival] = useState(state && state.departure !== 'any' ? state.departure : 'individual' ?? 'individual')
   const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>(state?.numberOfChildrenUpTo18)
   const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>(state?.numberOfChildrenUpTo10)
   const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>(state?.numberOfChildrenUpTo3)

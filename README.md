@@ -9,3 +9,15 @@ docker-compose -f .\docker-compose.developer.yml up -d --build
 ```
 
 Option build is optional, but recomennded and this option forces to build all applications in composition.
+
+
+## Build and deploy on KASK cluster
+Deploy stack:
+```
+sudo docker stack deploy -c docker-compose.yml RSWW_175641
+```
+
+Tunneling:
+```
+ssh -L 17564:actina15.maas:17564 -L 17565:actina15.maas:17565 -N -f rsww@172.20.83.101
+```
