@@ -97,7 +97,7 @@ internal class PaymentEventRepository : IPaymentEventRepository
     public async Task AddTimeoutAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
     {
         await _dbContext.PaymentEvent.AddAsync(new PaymentEvent(
-                streamId, previousVersion + 1, nameof(PaymentRejectedEventData), new PaymentTimeoutEventData()),
+                streamId, previousVersion + 1, nameof(PaymentTimeoutEventData), new PaymentTimeoutEventData()),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);

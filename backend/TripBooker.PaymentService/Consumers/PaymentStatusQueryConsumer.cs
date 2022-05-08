@@ -25,12 +25,12 @@ internal class PaymentStatusQueryConsumer : IConsumer<PaymentStatusQuery>
 
     public async Task Consume(ConsumeContext<PaymentStatusQuery> context)
     {
-        _logger.LogInformation($"Received payment action for order (OrderId={context.Message.CorrelationId}).");
+        _logger.LogInformation($"Received payment status query for order (OrderId={context.Message.CorrelationId}).");
 
         var model = await GetModel(context.Message.CorrelationId, context.CancellationToken);
         await context.RespondAsync(model);
        
-        _logger.LogInformation($"Accepted payment action for order (OrderId={context.Message.CorrelationId}).");
+        _logger.LogInformation($"Accepted payment status query for order (OrderId={context.Message.CorrelationId}).");
     }
     
     private async Task<PaymentModel> GetModel(Guid id, CancellationToken cancellationToken)

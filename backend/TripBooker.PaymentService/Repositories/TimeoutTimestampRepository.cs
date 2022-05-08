@@ -8,7 +8,7 @@ internal interface ITimeoutTimestampRepository
 {
     Task AddNewAsync(Guid paymentId, CancellationToken cancellationToken);
 
-    Task<IEnumerable<TimeoutTimestamp>> QueryAll(CancellationToken cancellationToken);
+    Task<IEnumerable<TimeoutTimestamp>> QueryAllOlderThan1Minute(CancellationToken cancellationToken);
 
     void Remove(TimeoutTimestamp timeoutTimestamp); 
 }
@@ -25,15 +25,19 @@ internal class TimeoutTimestampRepository : ITimeoutTimestampRepository
     public async Task AddNewAsync(Guid paymentId, CancellationToken cancellationToken)
     {
         await _dbContext.TimeoutTimestamp.AddAsync(new TimeoutTimestamp(paymentId), cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TimeoutTimestamp>> QueryAll(CancellationToken cancellationToken)
+    public async Task<IEnumerable<TimeoutTimestamp>> QueryAllOlderThan1Minute(CancellationToken cancellationToken)
     {
-        return await _dbContext.TimeoutTimestamp.Select(x => x).ToListAsync(cancellationToken);
+        return await _dbContext.TimeoutTimestamp
+            .Where(x => x.Timestamp.AddMinutes(1) < DateTime.UtcNow)
+            .ToListAsync(cancellationToken);
     }
 
     public void Remove(TimeoutTimestamp timeoutTimestamp)
     {
         _dbContext.TimeoutTimestamp.Remove(timeoutTimestamp);
+        _dbContext.SaveChanges();
     }
 }
