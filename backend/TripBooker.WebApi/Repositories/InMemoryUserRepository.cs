@@ -1,17 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebApi.Models;
+﻿using WebApi.Models;
 
-namespace WebApi.Repositories
+namespace TripBooker.WebApi.Repositories
 {
-	/// <summary>
-	/// NOTE: DO NOT USE THIS IMPLEMENTATION. THIS IS FOR DEMO PURPOSE ONLY
-	/// </summary>
-	public class InMemoryUserRepository : IUserRepository
+    public class InMemoryUserRepository : IUserRepository
 	{
-		private List<User> _users = new List<User>
-		{
+		private readonly List<User> _users = new()
+        {
 			new User { Username = "TestUser1", Password = "1234" },
 			new User { Username = "TestUser2", Password = "1234" },
 			new User { Username = "TestUser3", Password = "1234" },
@@ -27,15 +21,14 @@ namespace WebApi.Repositories
 			new User { Username = "TestUser13", Password = "1234" },
 		};
 
-
-		public Task<User> GetUserByUsername(string username)
+		public User? GetUserByUsername(string username)
 		{
-			return Task.FromResult(_users.FirstOrDefault(u => u.Username == username));
+			return _users.FirstOrDefault(u => u.Username == username);
 		}
 
-		public Task<IEnumerable<User>> GetUsers()
+		public IEnumerable<User> GetUsers()
 		{
-			return Task.FromResult<IEnumerable<User>>(_users);
+			return _users;
 		}
 	}
 }

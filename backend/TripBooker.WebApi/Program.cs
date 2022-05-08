@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
-using TripBooker.WebApi.Infrastructure;
 using AspNetCore.Authentication.Basic;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using WebApi.Repositories;
+using TripBooker.WebApi.Infrastructure;
+using TripBooker.WebApi.Repositories;
 using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);

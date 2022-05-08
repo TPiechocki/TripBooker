@@ -49,6 +49,8 @@ public class OrderData
 
     public MealOption MealOption { get; set; }
 
+    public string? UserName { get; set; }
+
     #endregion
 
 

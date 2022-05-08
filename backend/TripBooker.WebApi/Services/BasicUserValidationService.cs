@@ -1,12 +1,9 @@
 ﻿using AspNetCore.Authentication.Basic;
-using Microsoft.Extensions.Logging;
-using WebApi.Repositories;
-using System;
-using System.Threading.Tasks;
+using TripBooker.WebApi.Repositories;
 
-namespace WebApi.Services
+namespace TripBooker.WebApi.Services
 {
-	internal class BasicUserValidationService : IBasicUserValidationService
+    internal class BasicUserValidationService : IBasicUserValidationService
 	{
 		private readonly ILogger<BasicUserValidationService> _logger;
 		private readonly IUserRepository _userRepository;
@@ -17,13 +14,13 @@ namespace WebApi.Services
 			_userRepository = userRepository;
 		}
 
-		public async Task<bool> IsValidAsync(string username, string password)
+		public Task<bool> IsValidAsync(string username, string password)
 		{
 			try
 			{
-				var user = await _userRepository.GetUserByUsername(username);
+				var user = _userRepository.GetUserByUsername(username);
 				var isValid = user != null && user.Password == password;
-				return isValid;
+                return Task.FromResult(isValid);
 			}
 			catch (Exception e)
 			{

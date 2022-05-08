@@ -1,12 +1,10 @@
 ﻿using WebApi.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace WebApi.Repositories
+namespace TripBooker.WebApi.Repositories
 {
-	public interface IUserRepository
+    public interface IUserRepository
 	{
-		Task<User> GetUserByUsername(string username);
-		Task<IEnumerable<User>> GetUsers();
+		User? GetUserByUsername(string username);
+		IEnumerable<User> GetUsers();
 	}
 }

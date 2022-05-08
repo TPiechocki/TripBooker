@@ -32,6 +32,7 @@ public class OrderController : ControllerBase
         var guid = Guid.NewGuid();
 
         submitOrder.Order.OrderId = guid;
+        submitOrder.Order.UserName = HttpContext.User.Identity?.Name;
         _bus.Publish(submitOrder, cancellationToken);
 
         return guid;
