@@ -34,11 +34,11 @@ public class OrderController : ControllerBase
         return guid;
     }
 
-    [HttpPost("Pay")]
-    public void Pay(PaymentCommand paymentCommand, CancellationToken cancellationToken)
+    [HttpPost("Pay/{guid}")]
+    public void Pay(Guid guid, CancellationToken cancellationToken)
     {
         // TODO optionally: replace wih API contract and map to current business internal object
-        _bus.Publish(paymentCommand, cancellationToken);
+        _bus.Publish(new PaymentCommand(guid), cancellationToken);
     }
 
     [AllowAnonymous]
