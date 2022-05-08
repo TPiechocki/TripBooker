@@ -10,7 +10,10 @@ internal static class InfrastructureRegistration
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         return services
-            .AddDbContext<PaymentDbContext>()
+            .AddDbContext<PaymentDbContext>(opt =>
+                opt
+                    .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
+            )
             .AddBus(configuration)
             .AddQuartz();
     }
