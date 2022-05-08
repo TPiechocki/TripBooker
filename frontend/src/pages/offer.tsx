@@ -103,11 +103,14 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
 
   const [priceData, setPriceData] = useState<{ validationError?: string | null, isAvailable: boolean, finalPrice: number } | null>(null);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    setLoading(true);
     request('POST', '/Trip', {
       Flights: [
-        departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure) : null,
-        arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival) : null,
+        departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
+        arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival)?.id : null,
       ].filter(element => element !== null),
       HotelDays: options?.hotelDays,
       NumberOfAdults: numberOfAdults,
@@ -120,6 +123,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       NumberOfLargeRooms: numberOfLargeRooms ? numberOfLargeRooms : 0,
       NumberOfApartmentRooms: numberOfApartmentRooms ? numberOfApartmentRooms : 0,
       MealOption: mealOption,
+      DiscountCode: discount,
     }).then(data => {
       if (data?.validationError) {
         setOpen(true);
@@ -127,6 +131,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
         setOpen(false)
       }
       setPriceData(data);
+      setLoading(false)
     })
   }, [arrival, departure, mealOption, numberOfAdults, numberOfApartmentRooms, numberOfChildrenUpTo10, numberOfChildrenUpTo18, numberOfChildrenUpTo3, numberOfLargeRooms, numberOfMediumRooms, numberOfSmallRooms, numberOfStudioRooms, options?.hotelDays, options?.returnTransportOptions, options?.transportOptions])
 
@@ -353,7 +358,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 ) : <Typography variant="h5">Offer is not available for current configuration</Typography>}
               </Box>
               <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
-                <Button variant="contained" size="large">
+                <Button variant="contained" size="large" disabled={loading || !priceData?.isAvailable}>
                   Reserve
                 </Button>
               </Box>

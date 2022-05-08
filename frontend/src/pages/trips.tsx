@@ -26,7 +26,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
   const [data, setData] = useState<any[]>();
   useEffect(() => {
     request('GET', '/Destinations').then(data => {
-      setData(data.destinations)
+      setData(data?.destinations)
     })
   }, [])
   const {state} = location;
@@ -58,7 +58,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
         NumberOfChildrenUpTo18: numberOfChildrenUpTo18 ? numberOfChildrenUpTo18 : 0,
         NumberOfChildrenUpTo10: numberOfChildrenUpTo10 ? numberOfChildrenUpTo10 : 0,
         NumberOfChildrenUpTo3: numberOfChildrenUpTo3 ? numberOfChildrenUpTo3 : 0,
-        DepartureAirportCode: departure,
+        DepartureAirportCode: departure && departure !== 'any' ? departure : null,
       }).then((data) => {
         setLoading(false);
         setTrips(data?.trips);
