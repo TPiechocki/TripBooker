@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TripBooker.Common.Order;
 using TripBooker.Common.Payment;
@@ -40,6 +41,7 @@ public class OrderController : ControllerBase
         _bus.Publish(paymentCommand, cancellationToken);
     }
 
+    [AllowAnonymous]
     [HttpGet("{guid}")]
     [ProducesResponseType(typeof(OrderStatusResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Status(Guid guid, CancellationToken cancellationToken)

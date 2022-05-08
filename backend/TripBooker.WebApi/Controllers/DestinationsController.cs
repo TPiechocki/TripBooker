@@ -1,10 +1,12 @@
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TripBooker.Common.TravelAgency.Contract.Query;
 
 namespace TripBooker.WebApi.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("[controller]")]
     public class DestinationsController : ControllerBase
     {

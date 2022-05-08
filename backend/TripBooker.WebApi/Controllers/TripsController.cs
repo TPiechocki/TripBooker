@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TripBooker.Common.TravelAgency.Contract.Query;
 
@@ -6,6 +7,7 @@ namespace TripBooker.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[AllowAnonymous]
 public class TripsController : ControllerBase
 {
 
