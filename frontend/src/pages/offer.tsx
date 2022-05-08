@@ -202,7 +202,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Number of adults"
                   type="number"
                   value={numberOfAdults}
-                  onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfAdults('0') : setNumberOfAdults(event.target.value)}
+                  onChange={(event) => parseInt(event.target.value) < 1 ? setNumberOfAdults('1') : setNumberOfAdults(event.target.value)}
                 />
                 <TextField
                   id="outlined-number"

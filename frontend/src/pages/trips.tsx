@@ -120,7 +120,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
                 label="Number of adults"
                 type="number"
                 value={numberOfAdults}
-                onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfAdults('0') : setNumberOfAdults(event.target.value)}
+                onChange={(event) => parseInt(event.target.value) < 1 ? setNumberOfAdults('1') : setNumberOfAdults(event.target.value)}
               />
               <FormControl>
                 <InputLabel id="departure" required error={error}>Departure Airport</InputLabel>
