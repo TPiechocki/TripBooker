@@ -1,6 +1,16 @@
 version: "3.4"
 
 services:
+    frontend:
+       container_name: frontend
+       build:
+            context: frontend
+            args:
+                - WEB_API_URL=http://localhost:8081/
+       ports:
+            - 8080:80
+
+
     webapi:
         container_name: webapi
         build:

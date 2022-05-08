@@ -14,7 +14,7 @@ builder.Services.AddTransient<IUserRepository, InMemoryUserRepository>();
 builder.Services.AddAuthentication(BasicDefaults.AuthenticationScheme)
     .AddBasic<BasicUserValidationService>(options =>
     {
-        options.Realm = "Sample Web API";
+        options.Realm = "TripBooker";
         options.Events = new BasicEvents
         {
 

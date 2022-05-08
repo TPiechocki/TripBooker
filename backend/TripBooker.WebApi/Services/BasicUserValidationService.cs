@@ -21,8 +21,6 @@ namespace WebApi.Services
 		{
 			try
 			{
-				// NOTE: DO NOT USE THIS IMPLEMENTATION. THIS IS FOR DEMO PURPOSE ONLY
-				// Write your implementation here and return true or false depending on the validation..
 				var user = await _userRepository.GetUserByUsername(username);
 				var isValid = user != null && user.Password == password;
 				return isValid;
