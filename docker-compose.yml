@@ -30,7 +30,7 @@ services:
             - "mongodb"
             - "travel-agency-service"
         environment:
-            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Transport;Username=postgres;Password=student"
+            ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Transport;Username=postgres;Password=student"
             ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
@@ -46,8 +46,8 @@ services:
             - "mongodb"
             - "travel-agency-service"
         environment:
-            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
-            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
+            ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017"
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
@@ -61,7 +61,7 @@ services:
             - "mongodb"
             - "rabbitmq"
         environment:
-            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_TravelAgency;Username=postgres;Password=student"
+            ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_TravelAgency;Username=postgres;Password=student"
             ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
@@ -75,7 +75,7 @@ services:
             - "postgres"
             - "rabbitmq"
         environment:
-            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Payments;Username=postgres;Password=student"
+            ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Payments;Username=postgres;Password=student"
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
@@ -95,10 +95,6 @@ services:
     rabbitmq:
         image: rabbitmq:3-management-alpine
         container_name: rabbitmq
-        volumes:
-            - ./rabbitmq/etc/:/etc/rabbitmq/
-            - rabbitmq-data:/var/lib/rabbitmq/
-            - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
         ports:
             - 5672:5672
             - 15672:15672
