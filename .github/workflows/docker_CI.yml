@@ -85,3 +85,5 @@ jobs:
           context: "{{defaultContext}}:frontend"
           push: true
           tags: tpiechocki/rsww_175641_frontend:latest
+          build-args:
+            WEB_API_URL=http://piechole.tplinkdns.com:8081/
