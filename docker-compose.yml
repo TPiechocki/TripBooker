@@ -1,0 +1,114 @@
+version: "3.4"
+
+services:
+    frontend:
+       container_name: frontend
+       image: tpiechocki/rsww_175641_frontend
+       ports:
+            - 17564:80
+
+    webapi:
+        container_name: webapi
+        image: tpiechocki/rsww_175641_webapi
+        depends_on:
+            - "rabbitmq"
+            - "travel-agency-service"
+        ports:
+            - 17565:80
+        environment:
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    transport-service:
+        container_name: transport-service
+        image: tpiechocki/rsww_175641_transport
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+            - "mongodb"
+            - "travel-agency-service"
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Transport;Username=postgres;Password=student"
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+            
+    hotel-service:
+        container_name: hotel-service
+        image: tpiechocki/rsww_175641_hotel
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+            - "mongodb"
+            - "travel-agency-service"
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    travel-agency-service:
+        container_name: travel-agency-service
+        image: tpiechocki/rsww_175641_travel_agency
+        depends_on:
+            - "postgres"
+            - "mongodb"
+            - "rabbitmq"
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_TravelAgency;Username=postgres;Password=student"
+            ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:270177" 
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    payment-service:
+        container_name: payment-service
+        image: tpiechocki/rsww_175641_payment
+        depends_on:
+            - "postgres"
+            - "rabbitmq"
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=admin-postgres_db:5432;Database=RSWW_175641_Payments;Username=postgres;Password=student"
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    tour-operator-service:
+        container_name: tour-operator-service
+        image: tpiechocki/rsww_175641_tour_operator
+        depends_on:
+            - "rabbitmq"
+        environment:
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
+
+    rabbitmq:
+        image: rabbitmq:3-management-alpine
+        container_name: rabbitmq
+        volumes:
+            - ./rabbitmq/etc/:/etc/rabbitmq/
+            - rabbitmq-data:/var/lib/rabbitmq/
+            - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+        ports:
+            - 5672:5672
+            - 15672:15672
+        networks:
+            - network
+
+networks:
+    network: {}
+
+volumes:
+    postgres-data:
+    mongodb-data:
+    rabbitmq-data:

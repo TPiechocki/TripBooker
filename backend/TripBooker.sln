@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		..\docker-compose.developer.yml = ..\docker-compose.developer.yml
+		..\docker-compose.yml = ..\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.TravelAgencyService", "TripBooker.TravelAgencyService\TripBooker.TravelAgencyService.csproj", "{87DE922E-7FE0-4C27-9A23-B49350F2BDFF}"
@@ -28,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.TourOperator", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomatedTests", "AutomatedTests", "{1B9C1857-03B2-40D6-8034-23049150A24E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripBooker.AutomatedTests", "TripBooker.AutomatedTests\TripBooker.AutomatedTests.csproj", "{2BBFBC64-52B0-4E88-A954-0A796C6F5349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TripBooker.AutomatedTests", "TripBooker.AutomatedTests\TripBooker.AutomatedTests.csproj", "{2BBFBC64-52B0-4E88-A954-0A796C6F5349}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
