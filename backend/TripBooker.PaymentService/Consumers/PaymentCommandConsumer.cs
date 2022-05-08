@@ -33,7 +33,7 @@ internal class PaymentCommandConsumer : IConsumer<PaymentCommand>
         var result = await AddInProgress(context.Message.CorrelationId, context.CancellationToken);
         if (result == false)
         {
-            _logger.LogInformation($"Payment is in progress, was completed or timed out. (OrderId={context.Message.CorrelationId}).");
+            _logger.LogInformation($"Payment is already in progress, was completed or timed out. (OrderId={context.Message.CorrelationId}).");
             return;
         }
 
@@ -43,12 +43,13 @@ internal class PaymentCommandConsumer : IConsumer<PaymentCommand>
         if (rd.NextDouble() < 0.2)
         {
             await AddRejectedAsync(context.Message.CorrelationId, context.CancellationToken);
+            _logger.LogInformation($"Payment rejected for order (OrderId={context.Message.CorrelationId}).");
         }
         else
         {
             await AddAcceptedAsync(context.Message.CorrelationId, context.CancellationToken);
+            _logger.LogInformation($"Payment accepted for order (OrderId={context.Message.CorrelationId}).");
         }
-        _logger.LogInformation($"Accepted payment action for order (OrderId={context.Message.CorrelationId}).");
     }
 
     private async Task<bool> AddInProgress(Guid reservationId, CancellationToken cancellationToken)
@@ -62,7 +63,6 @@ internal class PaymentCommandConsumer : IConsumer<PaymentCommand>
 
             if (payment.Status is PaymentStatus.InProgress or PaymentStatus.Accepted or PaymentStatus.Timeout)
             {
-                _logger.LogInformation($"Cannot confirm rejected reservation (ReservationId={payment})");
                 return false;
             }
 

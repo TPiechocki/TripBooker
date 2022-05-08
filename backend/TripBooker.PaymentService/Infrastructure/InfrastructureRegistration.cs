@@ -28,6 +28,7 @@ internal static class InfrastructureRegistration
                     // public
                     x.AddConsumer<NewPaymentConsumer>();
                     x.AddConsumer<PaymentCommandConsumer>();
+                    x.AddConsumer<PaymentStatusQueryConsumer>();
 
                     x.UsingRabbitMq((context, cfg) =>
                         {

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using TripBooker.Common;
+using TripBooker.Common.Payment;
 using TripBooker.PaymentService.Model.Events.Payment;
 
 namespace TripBooker.PaymentService.Model.Events;

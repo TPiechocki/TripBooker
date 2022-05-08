@@ -12,13 +12,16 @@ public class OrderController : ControllerBase
 {
     private readonly IBus _bus;
     private readonly IRequestClient<OrderStatus> _orderStatusClient;
+    private readonly IRequestClient<PaymentStatusQuery> _paymentStatusClient;
 
     public OrderController(
         IBus bus, 
-        IRequestClient<OrderStatus> orderStatusClient)
+        IRequestClient<OrderStatus> orderStatusClient, 
+        IRequestClient<PaymentStatusQuery> paymentStatusClient)
     {
         _bus = bus;
         _orderStatusClient = orderStatusClient;
+        _paymentStatusClient = paymentStatusClient;
     }
 
     [HttpPost("Submit")]
@@ -54,6 +57,13 @@ public class OrderController : ControllerBase
             return NotFound();
         }
 
-        return Ok(new OrderStatusResponse(orderStatus.Message));
+        var paymentStatus = await _paymentStatusClient
+            .GetResponse<PaymentModel>(new PaymentStatusQuery(guid), cancellationToken);
+
+        var paymentResult = paymentStatus.Message.Id == Guid.Empty
+            ? null
+            : paymentStatus.Message;
+
+        return Ok(new OrderStatusResponse(orderStatus.Message, paymentResult));
     }
 }

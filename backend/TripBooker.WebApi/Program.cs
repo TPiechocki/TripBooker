@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using TripBooker.WebApi.Infrastructure;
 using AspNetCore.Authentication.Basic;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Converters;
 using WebApi.Repositories;
 using WebApi.Services;
 
@@ -36,6 +37,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(x =>
     {
         x.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        x.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
 
 
