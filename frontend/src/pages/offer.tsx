@@ -111,8 +111,8 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       Flights: [
         departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
         arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival)?.id : null,
-      ].filter(element => element !== null),
-      HotelDays: options?.hotelDays,
+      ].filter(element => element != null),
+      HotelDays: options == null ? [] : options.hotelDays,
       NumberOfAdults: numberOfAdults,
       NumberOfChildrenUpTo18: numberOfChildrenUpTo18 ? numberOfChildrenUpTo18 : 0,
       NumberOfChildrenUpTo10: numberOfChildrenUpTo10 ? numberOfChildrenUpTo10 : 0,
