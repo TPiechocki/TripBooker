@@ -10,11 +10,15 @@ internal class HotelOccupationViewContractConsumer : IConsumer<Batch<HotelOccupa
 {
     private readonly IHotelOccupationViewRepository _repository;
     private readonly IMapper _mapper;
+    private readonly ILogger<HotelOccupationViewContractConsumer> _logger;
 
-    public HotelOccupationViewContractConsumer(IHotelOccupationViewRepository repository, IMapper mapper)
+    public HotelOccupationViewContractConsumer(IHotelOccupationViewRepository repository, 
+        IMapper mapper, 
+        ILogger<HotelOccupationViewContractConsumer> logger)
     {
         _repository = repository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task Consume(ConsumeContext<Batch<HotelOccupationViewContract>> context)
@@ -23,7 +27,9 @@ internal class HotelOccupationViewContractConsumer : IConsumer<Batch<HotelOccupa
             context.Message.Select(x => x.Message));
 
         var distinctData = data.GroupBy(x =>
-            new { x.HotelId, x.Date }).Select(x => x.Last());
+            new { x.HotelId, x.Date }).Select(x => x.Last()).ToList();
+
+        _logger.LogInformation($"Received updates for hotel view (Count={distinctData.Count()})");
 
         await _repository.AddOrUpdateManyAsync(distinctData, context.CancellationToken);
     }
