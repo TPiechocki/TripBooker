@@ -4,6 +4,7 @@ import './layout.css';
 import {UserContext} from "../../context/UserContext";
 import {navigate} from "gatsby"
 import LoginDialog from "../LoginDialog";
+import {Home} from "@mui/icons-material";
 
 interface LayoutProps {
   children: React.ReactChild,
@@ -18,10 +19,11 @@ const Layout = ({children}: LayoutProps) => {
         <Toolbar>
           <Button
             color="inherit" onClick={() => navigate('/')}
+            startIcon={<Home />}
           >
             Home
           </Button>
-          <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
+          <Typography variant="h6" component="div" sx={{ml: 2, flexGrow: 1}}>
             Trip Booker
           </Typography>
           <Typography variant="h6" component="div">
