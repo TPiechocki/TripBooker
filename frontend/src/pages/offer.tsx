@@ -470,7 +470,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   <Button
                     variant="contained"
                     size="large"
-                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username}
+                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username || paymentLoading}
                     onClick={pay}
                   >
                     Pay
@@ -479,7 +479,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   <Button
                     variant="contained"
                     size="large"
-                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username}
+                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username || orderLoading}
                     onClick={reserve}
                   >
                     Reserve
@@ -492,10 +492,10 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 Payment has been rejected!
               </Typography>}
               {paymentStatus === 'Accepted' && <Typography>
-                Payment has been accepted.
+                Payment has been accepted. Order confirmed.
               </Typography>}
               {paymentTimeout === 'Timeout' && <Typography>
-                Payment has timed out.
+                Payment expired. Order has been cancelled.
               </Typography>}
               <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
                 {orderLoading && <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
