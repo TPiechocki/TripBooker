@@ -1,8 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
 using TripBooker.TransportService.EventConsumers.Internal;
@@ -18,25 +16,13 @@ internal static class InfrastructureRegistration
             .AddDbContext<TransportDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSimpleConsole(opt =>
-                    {
-                        opt.TimestampFormat = "[HH:mm:ss.fff] ";
-                    })))
-                    .EnableSensitiveDataLogging())
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
+            )
             .AddBus(configuration)
             .AddSingleton(s =>
             {
                 var connectionString = configuration.GetConnectionString("MongoDb");
                 var settings = MongoClientSettings.FromConnectionString(connectionString);
-                settings.ClusterConfigurator = cb =>
-                {
-                    cb.Subscribe<CommandStartedEvent>(e =>
-                    {
-                        var logger = s.GetRequiredService<ILogger<IMongoClient>>();
-                        logger.LogInformation($"MongoLog: {e.CommandName} - {e.Command.ToJson()}");
-                    });
-                };
-
                 var mongoClient = new MongoClient(settings);
                 return mongoClient.GetDatabase(GlobalConstants.MongoDbName);
             })

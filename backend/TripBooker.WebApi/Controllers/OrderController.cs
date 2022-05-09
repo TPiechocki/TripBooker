@@ -13,19 +13,22 @@ public class OrderController : ControllerBase
     private readonly IBus _bus;
     private readonly IRequestClient<OrderStatus> _orderStatusClient;
     private readonly IRequestClient<PaymentStatusQuery> _paymentStatusClient;
+    private readonly IRequestClient<PaymentCommand> _paymentCommandClient;
 
     public OrderController(
         IBus bus, 
         IRequestClient<OrderStatus> orderStatusClient, 
-        IRequestClient<PaymentStatusQuery> paymentStatusClient)
+        IRequestClient<PaymentStatusQuery> paymentStatusClient, 
+        IRequestClient<PaymentCommand> paymentCommandClient)
     {
         _bus = bus;
         _orderStatusClient = orderStatusClient;
         _paymentStatusClient = paymentStatusClient;
+        _paymentCommandClient = paymentCommandClient;
     }
 
     [HttpPost("Submit")]
-    public Guid Submit(SubmitOrder submitOrder, CancellationToken cancellationToken)
+    public async Task<Guid> Submit(SubmitOrder submitOrder, CancellationToken cancellationToken)
     {
         // TODO: replace with minimal API contract and map to internal SubmitOrder model
 
@@ -33,16 +36,16 @@ public class OrderController : ControllerBase
 
         submitOrder.Order.OrderId = guid;
         submitOrder.Order.UserName = HttpContext.User.Identity?.Name;
-        _bus.Publish(submitOrder, cancellationToken);
+        await _bus.Publish(submitOrder, cancellationToken);
 
         return guid;
     }
 
     [HttpPost("Pay/{guid}")]
-    public void Pay(Guid guid, CancellationToken cancellationToken)
+    public async Task Pay(Guid guid, CancellationToken cancellationToken)
     {
         // TODO optionally: replace wih API contract and map to current business internal object
-        _bus.Publish(new PaymentCommand(guid), cancellationToken);
+        await _paymentCommandClient.GetResponse<PaymentCommandResponse>(new PaymentCommand(guid), cancellationToken);
     }
 
     [AllowAnonymous]

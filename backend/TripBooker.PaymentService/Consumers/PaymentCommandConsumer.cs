@@ -31,6 +31,7 @@ internal class PaymentCommandConsumer : IConsumer<PaymentCommand>
         _logger.LogInformation($"Received payment action for order (OrderId={context.Message.CorrelationId}).");
 
         var result = await AddInProgress(context.Message.CorrelationId, context.CancellationToken);
+        await context.RespondAsync(new PaymentCommandResponse(context.Message.CorrelationId));
         if (result == false)
         {
             _logger.LogInformation($"Payment is already in progress, was completed or timed out. (OrderId={context.Message.CorrelationId}).");

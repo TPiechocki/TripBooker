@@ -18,27 +18,17 @@ internal static class InfrastructureRegistration
             .AddDbContext<HotelDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
-                    .EnableSensitiveDataLogging())
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
+            )
             .AddBus(configuration)
             .AddSingleton(s =>
             {
                 var connectionString = configuration.GetConnectionString("MongoDb");
                 var settings = MongoClientSettings.FromConnectionString(connectionString);
-                settings.ClusterConfigurator = cb =>
-                {
-                    cb.Subscribe<CommandStartedEvent>(e =>
-                    {
-                        var logger = s.GetRequiredService<ILogger<IMongoClient>>();
-                        logger.LogInformation($"MongoLog: {e.CommandName} - {e.Command.ToJson()}");
-                    });
-                };
-
                 var mongoClient = new MongoClient(settings);
                 return mongoClient.GetDatabase(GlobalConstants.MongoDbName);
             })
             .AddQuartz();
-
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)

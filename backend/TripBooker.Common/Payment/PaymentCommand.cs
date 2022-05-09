@@ -8,3 +8,10 @@ public class PaymentCommand : ContractBase
     {
     }
 }
+
+public class PaymentCommandResponse : ContractBase
+{
+    public PaymentCommandResponse(Guid correlationId) : base(correlationId)
+    {
+    }
+}

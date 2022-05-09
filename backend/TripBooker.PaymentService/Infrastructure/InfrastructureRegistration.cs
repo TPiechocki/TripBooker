@@ -13,6 +13,7 @@ internal static class InfrastructureRegistration
             .AddDbContext<PaymentDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
             )
             .AddBus(configuration)
             .AddQuartz();

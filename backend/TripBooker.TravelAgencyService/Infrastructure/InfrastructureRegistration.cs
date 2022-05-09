@@ -19,11 +19,8 @@ internal static class ServicesRegistration
             .AddDbContext<TravelAgencyDbContext>(opt =>
                 opt
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
-                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSimpleConsole(opt =>
-                    {
-                        opt.TimestampFormat = "[HH:mm:ss.fff] ";
-                    })))
-                    .EnableSensitiveDataLogging())
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
+            )
             .AddBus(configuration);
     }
 
