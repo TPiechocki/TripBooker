@@ -133,7 +133,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       NumberOfSmallRooms: numberOfSmallRooms ? numberOfSmallRooms : 0,
       NumberOfMediumRooms: numberOfMediumRooms ? numberOfMediumRooms : 0,
       NumberOfLargeRooms: numberOfLargeRooms ? numberOfLargeRooms : 0,
-      NumberOfApartmentRooms: numberOfApartmentRooms ? numberOfApartmentRooms : 0,
+      NumberOfApartments: numberOfApartmentRooms ? numberOfApartmentRooms : 0,
       MealOption: mealOption,
       DiscountCode: discount,
     }).then(data => {
