@@ -56,10 +56,9 @@ public class OrderController : ControllerBase
         var orderStatus = await _orderStatusClient
             .GetResponse<OrderState>(new OrderStatus(guid), cancellationToken);
 
-        if (orderStatus.Message.CorrelationId == Guid.Empty)
-        {
-            return NotFound();
-        }
+        var orderResult = orderStatus.Message.CorrelationId == Guid.Empty
+            ? null
+            : orderStatus.Message;
 
         var paymentStatus = await _paymentStatusClient
             .GetResponse<PaymentModel>(new PaymentStatusQuery(guid), cancellationToken);
@@ -68,6 +67,6 @@ public class OrderController : ControllerBase
             ? null
             : paymentStatus.Message;
 
-        return Ok(new OrderStatusResponse(orderStatus.Message, paymentResult));
+        return Ok(new OrderStatusResponse(orderResult, paymentResult));
     }
 }

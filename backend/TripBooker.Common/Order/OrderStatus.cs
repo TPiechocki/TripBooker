@@ -16,14 +16,14 @@ public class OrderStatus
 public class OrderStatusResponse
 {
     public OrderStatusResponse(
-        OrderState order, 
+        OrderState? order, 
         PaymentModel? payment)
     {
         Order = order;
         Payment = payment;
     }
 
-    public OrderState Order { get; }
+    public OrderState? Order { get; }
 
     public PaymentModel? Payment { get; }
 }
