@@ -25,6 +25,14 @@ internal static class ReservationBuilder
                 case nameof(ReservationRejectedEventData):
                     item.ApplyRejected(@event);
                     break;
+
+                case nameof(ReservationConfirmedEventData):
+                    item.ApplyConfirmedEventData(@event);
+                    break;
+
+                case nameof(ReservationCancelledEventData):
+                    item.ApplyCancelledEventData(@event);
+                    break;
             }
         }
 
@@ -63,5 +71,19 @@ internal static class ReservationBuilder
         item.Version = @event.Version;
 
         item.Status = ReservationStatus.Rejected;
+    }
+
+    private static void ApplyConfirmedEventData(this ReservationModel item, BaseEvent @event)
+    {
+        item.Version = @event.Version;
+
+        item.Status = ReservationStatus.Confirmed;
+    }
+
+    private static void ApplyCancelledEventData(this ReservationModel item, BaseEvent @event)
+    {
+        item.Version = @event.Version;
+
+        item.Status = ReservationStatus.Cancelled;
     }
 }

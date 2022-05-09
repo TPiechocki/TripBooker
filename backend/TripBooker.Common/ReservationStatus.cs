@@ -25,5 +25,10 @@ public enum ReservationStatus
     /// <summary>
     /// Payment was rejected or payment timeout was hit, so the reserved places were set free.
     /// </summary>
-    PaymentRejected
+    PaymentRejected,
+
+    /// <summary>
+    /// Reservation was cancelled.
+    /// </summary>
+    Cancelled
 }
