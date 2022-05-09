@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {navigate, PageProps} from "gatsby";
 import Layout from "../components/Layout";
 import {
   Alert,
   Box, Button,
   Card,
-  CardMedia,
+  CardMedia, CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -15,6 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import {request} from "../api/request";
+import {UserContext} from "../context/UserContext";
 
 interface TransportOption {
   availablePlaces: number,
@@ -77,6 +78,9 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   const [open, setOpen] = React.useState(false);
   const {state} = location;
   const [options, setOptions] = useState<Options | null>(null);
+  const [reservationCode, setReservationCode] = useState('');
+
+  const auth = useContext(UserContext);
 
   useEffect(() => {
     request('POST', '/Trip/Options', {
@@ -105,6 +109,13 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   const [priceData, setPriceData] = useState<{ validationError?: string | null, isAvailable: boolean, finalPrice: number } | null>(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [paymentStatus, setPaymentStatus] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [orderStatus, setOrderStatus] = useState('');
+  const [orderLoading, setOrderLoading] = useState(false);
+
+  const [paymentTimeout, setPaymentTimeout] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -140,15 +151,86 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
     return (
       <Layout>
         <>
-          <Typography variant="h2" sx={{ m: 2 }}>
+          <Typography variant="h2" sx={{m: 2}}>
             No selected offer
           </Typography>
-          <Button variant="contained" size="large" sx={{ m: 2 }} onClick={() => navigate("/trips")}>
+          <Button variant="contained" size="large" sx={{m: 2}} onClick={() => navigate("/trips")}>
             Return to trips
           </Button>
         </>
       </Layout>
     )
+  }
+
+  const checkOrder = (reservationId: string) => {
+    setOrderLoading(true);
+    request('GET', `/Order/${reservationId}`, '', auth.user)
+      .then((data) => {
+        if (data.payment?.status !== 'New' && data.order?.state !== 'Rejected') {
+          setTimeout(() => checkOrder(reservationId), 500);
+        } else {
+          setPaymentStatus(data.payment?.status);
+          setOrderStatus(data.order?.state);
+          setOrderLoading(false)
+        }
+      }).catch(error => console.log(error));
+  }
+
+  const checkPayment = () => {
+    request('GET', `/Order/${reservationCode}`, '', auth.user)
+      .then((data) => {
+        if (data.payment?.status !== 'Accepted' && data.payment?.status !== 'Rejected' && data.payment?.status !== 'Timeout') {
+          setTimeout(() => checkPayment(), 500);
+        } else if (data.payment?.status === 'Timeout') {
+          setOrderStatus('')
+          setPaymentStatus('')
+          setPaymentLoading(false)
+          setPaymentTimeout(data.payment?.status)
+        } else if (data.payment?.status === 'Rejected') {
+          setPaymentLoading(false)
+          setPaymentStatus(data.payment?.status)
+        } else {
+          setPaymentStatus(data.payment.status)
+          setPaymentLoading(false)
+        }
+      }).catch(error => console.log(error));
+  }
+
+  const pay = () => {
+    setPaymentLoading(true);
+    request('POST', `/Order/Pay/${reservationCode}`, {}, auth.user)
+      .then((data) => {
+        if (!data.payment?.status) {
+          setTimeout(() => checkPayment(), 500);
+        }
+      }).catch(error => console.log(error));
+  }
+
+  const reserve = () => {
+    setPaymentTimeout('');
+    request('POST', '/Order/Submit', {
+      Order: {
+        TransportId: departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
+        ReturnTransportId: arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival)?.id : null,
+        HotelDays: options == null ? [] : options.hotelDays,
+        NumberOfAdults: numberOfAdults,
+        NumberOfChildrenUpTo18: numberOfChildrenUpTo18 ? numberOfChildrenUpTo18 : 0,
+        NumberOfChildrenUpTo10: numberOfChildrenUpTo10 ? numberOfChildrenUpTo10 : 0,
+        NumberOfChildrenUpTo3: numberOfChildrenUpTo3 ? numberOfChildrenUpTo3 : 0,
+        roomsStudio: numberOfStudioRooms ? numberOfStudioRooms : 0,
+        roomsSmall: numberOfSmallRooms ? numberOfSmallRooms : 0,
+        roomsMedium: numberOfMediumRooms ? numberOfMediumRooms : 0,
+        roomsLarge: numberOfLargeRooms ? numberOfLargeRooms : 0,
+        roomsApartment: numberOfApartmentRooms ? numberOfApartmentRooms : 0,
+        MealOption: mealOption,
+        DiscountCode: discount,
+        HotelCode: state.trip.hotelCode,
+        userName: auth.user.username,
+      }
+    }, auth.user).then((data) => {
+      setReservationCode(data);
+      checkOrder(data);
+    }).catch(error => console.log(error));
   }
 
   return (
@@ -176,7 +258,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   variant="standard"
                   disabled
                 />
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="departure" required>Departure Airport</InputLabel>
                   <Select
                     id="departure"
@@ -194,7 +276,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="arrival" required>Arrival Airport</InputLabel>
                   <Select
                     id="arrival"
@@ -218,6 +300,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Number of adults"
                   type="number"
                   value={numberOfAdults}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 1 ? setNumberOfAdults('1') : setNumberOfAdults(event.target.value)}
                 />
                 <TextField
@@ -225,6 +308,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 18"
                   type="number"
                   value={numberOfChildrenUpTo18}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo18('0') : setNumberOfChildrenUpTo18(event.target.value)}
                 />
                 <TextField
@@ -232,6 +316,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 10"
                   type="number"
                   value={numberOfChildrenUpTo10}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo10('0') : setNumberOfChildrenUpTo10(event.target.value)}
                 />
                 <TextField
@@ -239,9 +324,10 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 3"
                   type="number"
                   value={numberOfChildrenUpTo3}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo3('0') : setNumberOfChildrenUpTo3(event.target.value)}
                 />
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="arrival" required>Meals</InputLabel>
                   <Select
                     id="arrival"
@@ -267,6 +353,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfStudioRooms}
                   error={parseInt(numberOfStudioRooms) > (options?.hotelAvailability.roomsStudio || 0)}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfStudioRooms('0') : setNumberOfStudioRooms(event.target.value)}
                 />
                 <TextField
@@ -275,6 +362,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfSmallRooms}
                   error={parseInt(numberOfSmallRooms) > (options?.hotelAvailability.smallPrice || 0)}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfSmallRooms('0') : setNumberOfSmallRooms(event.target.value)}
                 />
                 <TextField
@@ -283,6 +371,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfMediumRooms}
                   error={parseInt(numberOfMediumRooms) > (options?.hotelAvailability.mediumPrice || 0)}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfMediumRooms('0') : setNumberOfMediumRooms(event.target.value)}
                 />
                 <TextField
@@ -291,6 +380,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfLargeRooms}
                   error={parseInt(numberOfLargeRooms) > (options?.hotelAvailability.largePrice || 0)}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfLargeRooms('0') : setNumberOfLargeRooms(event.target.value)}
                 />
                 <TextField
@@ -299,6 +389,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfApartmentRooms}
                   error={parseInt(numberOfApartmentRooms) > (options?.hotelAvailability.apartmentPrice || 0)}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfApartmentRooms('0') : setNumberOfApartmentRooms(event.target.value)}
                 />
                 <Typography variant="h6" sx={{width: '100%'}}>Discount</Typography>
@@ -306,6 +397,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   id="outlined-number"
                   label="Discount code"
                   value={discount}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => setDiscount(event.target.value)}
                 />
               </Box>
@@ -316,14 +408,14 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 <Card sx={{flexGrow: 1}}>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=34611`}
                     alt="destination"
                   />
                 </Card>
                 <Card sx={{flexGrow: 1}}>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=22135`}
                     alt="destination"
                   />
                 </Card>
@@ -332,35 +424,35 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 <Card>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=38976`}
                     alt="destination"
                   />
                 </Card>
                 <Card>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=253`}
                     alt="destination"
                   />
                 </Card>
                 <Card>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=654`}
                     alt="destination"
                   />
                 </Card>
                 <Card>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=7452`}
                     alt="destination"
                   />
                 </Card>
                 <Card>
                   <CardMedia
                     component="img"
-                    image={`https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`}
+                    image={`https://picsum.photos/200/200?random=31461435`}
                     alt="destination"
                   />
                 </Card>
@@ -374,9 +466,48 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 ) : <Typography variant="h5">Offer is not available for current configuration</Typography>}
               </Box>
               <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
-                <Button variant="contained" size="large" disabled={state == null || loading || !priceData?.isAvailable}>
-                  Reserve
-                </Button>
+                {(paymentStatus === 'New' || paymentStatus === 'Rejected') &&
+                  <Button
+                    variant="contained"
+                    size="large"
+                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username || paymentLoading}
+                    onClick={pay}
+                  >
+                    Pay
+                  </Button>}
+                {!paymentStatus &&
+                  <Button
+                    variant="contained"
+                    size="large"
+                    disabled={state === null || loading || !priceData?.isAvailable || !auth.user.username || orderLoading}
+                    onClick={reserve}
+                  >
+                    Reserve
+                  </Button>}
+              </Box>
+              {orderStatus === 'Rejected' && <Typography>
+                Order has been rejected!
+              </Typography>}
+              {paymentStatus === 'Rejected' && <Typography>
+                Payment has been rejected!
+              </Typography>}
+              {paymentStatus === 'Accepted' && <Typography>
+                Payment has been accepted. Order confirmed.
+              </Typography>}
+              {paymentTimeout === 'Timeout' && <Typography>
+                Payment expired. Order has been cancelled.
+              </Typography>}
+              <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
+                {orderLoading && <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                  <Typography>Waiting for reservation...</Typography>
+                  <CircularProgress/>
+                </Box>}
+              </Box>
+              <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
+                {paymentLoading && <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                  <Typography>Waiting for payment...</Typography>
+                  <CircularProgress/>
+                </Box>}
               </Box>
             </Box>
           </Box>
