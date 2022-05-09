@@ -207,7 +207,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   }
 
   const reserve = () => {
-    setPaymentStatus('');
+    setPaymentTimeout('');
     request('POST', '/Order/Submit', {
       Order: {
         TransportId: departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
