@@ -94,13 +94,19 @@ internal class TripsService : ITripsService
         price += query.NumberOfApartments * hotelDays.Sum(x => x.ApartmentPrice);
         price += query.NumberOfStudios * hotelDays.Sum(x => x.StudioPrice);
 
+        var mealPriceMultiplier = query.NumberOfAdults
+                                  + query.NumberOfChildrenUpTo18
+                                  * HotelConstants.MealChildren10To18PriceFactor
+                                  + (query.NumberOfChildrenUpTo3 + query.NumberOfChildrenUpTo10)
+                                  * HotelConstants.MealChildrenUnder10PriceFactor;
         price += query.MealOption switch
         {
-            MealOption.ContinentalBreakfeast => query.NumberOfHotelPlaces() * hotelDays.Sum(x => x.BreakfastPrice),
-            MealOption.AllInclusive => query.NumberOfHotelPlaces() * hotelDays.Sum(x => x.AllInclusivePrice),
+            MealOption.ContinentalBreakfeast => mealPriceMultiplier * hotelDays.Sum(x => x.BreakfastPrice),
+            MealOption.AllInclusive => mealPriceMultiplier * hotelDays.Sum(x => x.AllInclusivePrice),
             _ => 0
         };
 
+        // DISCOUNT
         if (query.DiscountCode != null && Discount.IsViable(query.DiscountCode))
             price = Discount.Apply(query.DiscountCode, price);
 

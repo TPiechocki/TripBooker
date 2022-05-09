@@ -1,4 +1,6 @@
-﻿using TripBooker.HotelService.Model.Events.Hotel;
+﻿using TripBooker.Common.Hotel;
+using TripBooker.Common.Order;
+using TripBooker.HotelService.Model.Events.Hotel;
 
 namespace TripBooker.HotelService.Model.Extensions;
 
@@ -16,19 +18,19 @@ internal static class HotelExtensions
         {
             switch (roomOption.RoomType)
             {
-                case Common.Hotel.RoomType.Small:
+                case RoomType.Small:
                     eventData.RoomsSmall++;
                     break;
-                case Common.Hotel.RoomType.Medium:
+                case RoomType.Medium:
                     eventData.RoomsMedium++;
                     break;
-                case Common.Hotel.RoomType.Large:
+                case RoomType.Large:
                     eventData.RoomsLarge++;
                     break;
-                case Common.Hotel.RoomType.Apartment:
+                case RoomType.Apartment:
                     eventData.RoomsApartment++;
                     break;
-                case Common.Hotel.RoomType.Studio:
+                case RoomType.Studio:
                     eventData.RoomsStudio++;
                     break;
                 default:
@@ -37,5 +39,27 @@ internal static class HotelExtensions
         }
 
         return eventData;
+    }
+
+    public static double CalculatePrice(OrderData order, HotelOption hotel)
+    {
+        // Rooms
+        var price = order.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
+                    + order.RoomsSmall * hotel.GetPriceFor(RoomType.Small)
+                    + order.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
+                    + order.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
+                    + order.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment);
+
+        // Meals
+        var mealPrice = hotel.GetPriceFor(order.MealOption);
+        price += order.NumberOfAdults * mealPrice;
+        price += order.NumberOfChildrenUpTo18 * HotelConstants.MealChildren10To18PriceFactor * mealPrice;
+        price += (order.NumberOfChildrenUpTo3
+                  + order.NumberOfChildrenUpTo10) * HotelConstants.MealChildrenUnder10PriceFactor * mealPrice;
+
+        // Multiply by number of days
+        price *= order.HotelDays.Count();
+
+        return price;
     }
 }
