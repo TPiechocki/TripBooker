@@ -188,7 +188,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
           setPaymentTimeout(data.payment?.status)
         } else if (data.payment?.status === 'Rejected') {
           setPaymentLoading(false)
-          setPaymentTimeout(data.payment?.status)
+          setPaymentStatus(data.payment?.status)
         } else {
           setPaymentStatus(data.payment.status)
           setPaymentLoading(false)
