@@ -186,6 +186,9 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
           setPaymentStatus('')
           setPaymentLoading(false)
           setPaymentTimeout(data.payment?.status)
+        } else if (data.payment?.status === 'Rejected') {
+          setPaymentLoading(false)
+          setPaymentTimeout(data.payment?.status)
         } else {
           setPaymentStatus(data.payment.status)
           setPaymentLoading(false)
@@ -254,7 +257,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   variant="standard"
                   disabled
                 />
-                <FormControl fullWidth disabled={!!orderStatus || orderLoading}>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="departure" required>Departure Airport</InputLabel>
                   <Select
                     id="departure"
@@ -272,7 +275,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth disabled={!!orderStatus || orderLoading}>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="arrival" required>Arrival Airport</InputLabel>
                   <Select
                     id="arrival"
@@ -296,7 +299,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Number of adults"
                   type="number"
                   value={numberOfAdults}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 1 ? setNumberOfAdults('1') : setNumberOfAdults(event.target.value)}
                 />
                 <TextField
@@ -304,7 +307,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 18"
                   type="number"
                   value={numberOfChildrenUpTo18}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo18('0') : setNumberOfChildrenUpTo18(event.target.value)}
                 />
                 <TextField
@@ -312,7 +315,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 10"
                   type="number"
                   value={numberOfChildrenUpTo10}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo10('0') : setNumberOfChildrenUpTo10(event.target.value)}
                 />
                 <TextField
@@ -320,10 +323,10 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   label="Children up to 3"
                   type="number"
                   value={numberOfChildrenUpTo3}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo3('0') : setNumberOfChildrenUpTo3(event.target.value)}
                 />
-                <FormControl fullWidth  disabled={!!orderStatus || orderLoading}>
+                <FormControl fullWidth disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}>
                   <InputLabel id="arrival" required>Meals</InputLabel>
                   <Select
                     id="arrival"
@@ -349,7 +352,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfStudioRooms}
                   error={parseInt(numberOfStudioRooms) > (options?.hotelAvailability.roomsStudio || 0)}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfStudioRooms('0') : setNumberOfStudioRooms(event.target.value)}
                 />
                 <TextField
@@ -358,7 +361,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfSmallRooms}
                   error={parseInt(numberOfSmallRooms) > (options?.hotelAvailability.smallPrice || 0)}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfSmallRooms('0') : setNumberOfSmallRooms(event.target.value)}
                 />
                 <TextField
@@ -367,7 +370,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfMediumRooms}
                   error={parseInt(numberOfMediumRooms) > (options?.hotelAvailability.mediumPrice || 0)}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfMediumRooms('0') : setNumberOfMediumRooms(event.target.value)}
                 />
                 <TextField
@@ -376,7 +379,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfLargeRooms}
                   error={parseInt(numberOfLargeRooms) > (options?.hotelAvailability.largePrice || 0)}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfLargeRooms('0') : setNumberOfLargeRooms(event.target.value)}
                 />
                 <TextField
@@ -385,7 +388,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfApartmentRooms}
                   error={parseInt(numberOfApartmentRooms) > (options?.hotelAvailability.apartmentPrice || 0)}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfApartmentRooms('0') : setNumberOfApartmentRooms(event.target.value)}
                 />
                 <Typography variant="h6" sx={{width: '100%'}}>Discount</Typography>
@@ -393,7 +396,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   id="outlined-number"
                   label="Discount code"
                   value={discount}
-                  disabled={!!orderStatus || orderLoading}
+                  disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => setDiscount(event.target.value)}
                 />
               </Box>
@@ -462,7 +465,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 ) : <Typography variant="h5">Offer is not available for current configuration</Typography>}
               </Box>
               <Box sx={{display: 'flex', justifyContent: 'flex-end', my: 2}}>
-                {paymentStatus === 'New' &&
+                {(paymentStatus === 'New' || paymentStatus === 'Rejected') &&
                   <Button
                     variant="contained"
                     size="large"
