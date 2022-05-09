@@ -2,6 +2,5 @@
 
 internal class TestConsts
 {
-    public const string Url = "http://localhost:8080";
-    public const string TripsUrl = "http://localhost:8080/trips";
+    public const string Url = "http://piechole.tplinkdns.com:8080";
 }

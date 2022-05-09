@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
@@ -18,7 +19,7 @@ namespace TripBooker.AutomatedTests
         {
             // Local Selenium WebDriver
             var chromeOptions = new ChromeOptions();
-            // chromeOptions.AddArguments("headless");
+            chromeOptions.AddArguments("headless");
 
             _driver = new ChromeDriver(chromeOptions);
             _driver.Manage().Window.Maximize();
@@ -26,7 +27,7 @@ namespace TripBooker.AutomatedTests
         }
 
         [Test]
-        public void ShouldDisplayTripsWithDefaultValues()
+        public void ShouldDisplayTripsWithDefaultFilterValues()
         {
             Thread.Sleep(2000);
 
@@ -38,7 +39,28 @@ namespace TripBooker.AutomatedTests
 
 
             var trips = _driver.FindElement(By.ClassName("MuiGrid-container"));
-            trips.Should().NotBeNull();
+            trips.FindElements(By.XPath(".//*")).Should().NotBeEmpty();
+        }
+
+        [Test]
+        public void AllTripsShouldHavePositivePrices()
+        {
+            Thread.Sleep(2000);
+
+            // Button
+            var button = _driver.FindElement(By.XPath("//button[text()='Search Trips']"));
+            button.Click();
+
+            Thread.Sleep(2000);
+
+
+            var trips = _driver.FindElement(By.ClassName("MuiGrid-container"));
+            var prices = trips.FindElements(By.XPath("//p[contains(text(),'From:')]/following-sibling::p"));
+            var pricesTexts = prices.Select(x => x.Text).ToList();
+
+            pricesTexts.Should().NotBeEmpty();
+            pricesTexts.Select(x => double.Parse(x.Replace("§", string.Empty), CultureInfo.InvariantCulture))
+                    .Should().OnlyContain(x => x > 0);
         }
 
         [Test]
@@ -56,6 +78,11 @@ namespace TripBooker.AutomatedTests
             days.SendKeys(Keys.Control + "a");
             days.SendKeys(Keys.Delete);
             days.SendKeys("0");
+
+            // Button
+            var button = _driver.FindElement(By.XPath("//button[text()='Search Trips']"));
+            button.Click();
+            Thread.Sleep(2000);
 
             var trips = _driver.FindElements(By.ClassName("MuiGrid-container"));
 
