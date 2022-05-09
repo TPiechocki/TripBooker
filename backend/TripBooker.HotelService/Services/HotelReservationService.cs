@@ -2,7 +2,6 @@
 using Npgsql;
 using System.Transactions;
 using TripBooker.Common;
-using TripBooker.Common.Extensions;
 using TripBooker.Common.Hotel;
 using TripBooker.Common.Order;
 using TripBooker.Common.Order.Hotel;
@@ -10,6 +9,7 @@ using TripBooker.HotelService.Model;
 using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Hotel;
 using TripBooker.HotelService.Model.Events.Reservation;
+using TripBooker.HotelService.Model.Extensions;
 using TripBooker.HotelService.Repositories;
 
 namespace TripBooker.HotelService.Services;
@@ -233,14 +233,7 @@ internal class HotelReservationService : IHotelReservationService
         await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
-        // Calculate price
-        var price = order.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
-                    + order.RoomsSmall * hotel.GetPriceFor(RoomType.Small)
-                    + order.RoomsMedium * hotel.GetPriceFor(RoomType.Medium)
-                    + order.RoomsLarge * hotel.GetPriceFor(RoomType.Large)
-                    + order.RoomsApartment * hotel.GetPriceFor(RoomType.Apartment)
-                    + order.NumberOfHotelPlaces() * hotel.GetPriceFor(order.MealOption);
-        price *= order.HotelDays.Count();
+        var price = HotelExtensions.CalculatePrice(order, hotel);
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 
