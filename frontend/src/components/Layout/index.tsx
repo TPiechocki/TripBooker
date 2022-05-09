@@ -1,10 +1,9 @@
 import React, {useContext} from 'react';
 import {AppBar, Button, Container, IconButton, Toolbar, Typography} from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
 import './layout.css';
-import LoginDialog from "../LoginDialog";
 import {UserContext} from "../../context/UserContext";
-
+import {navigate} from "gatsby"
+import LoginDialog from "../LoginDialog";
 
 interface LayoutProps {
   children: React.ReactChild,
@@ -17,6 +16,11 @@ const Layout = ({children}: LayoutProps) => {
     <>
       <AppBar position="static">
         <Toolbar>
+          <Button
+            color="inherit" onClick={() => navigate('/')}
+          >
+            Home
+          </Button>
           <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
             Trip Booker
           </Typography>
