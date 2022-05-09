@@ -23,6 +23,11 @@ import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 
 
 const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: string, name: string } } | any>) => {
+  const randomImages: number[] = [];
+  useEffect(() => {
+    for (let i = 0; i < 7; i++)
+      randomImages.push(Math.floor(Math.random() * i * 1000))
+  }, [])
   const [data, setData] = useState<any[]>();
   useEffect(() => {
     request('GET', '/Destinations').then(data => {
@@ -46,6 +51,10 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
   })[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setTrips([]);
+  }, [destination, departureDate, numberOfDays, numberOfAdults, numberOfChildrenUpTo18, numberOfChildrenUpTo10, numberOfChildrenUpTo3, departure])
 
   const loadTrips = () => {
     setLoading(true);
