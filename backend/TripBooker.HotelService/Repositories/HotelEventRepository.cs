@@ -107,6 +107,7 @@ internal class HotelEventRepository : IHotelEventRepository
     {
         return await _dbContext.HotelEvent
             .Where(x => x.Timestamp > timestamp)
+            .OrderBy(x => x.Timestamp)
             .ToListAsync(cancellationToken);
     }
 

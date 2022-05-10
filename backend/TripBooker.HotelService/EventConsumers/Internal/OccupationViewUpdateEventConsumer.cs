@@ -65,6 +65,7 @@ internal class OccupationViewUpdateEventConsumer : IConsumer<OccupationViewUpdat
 
         // read all events after old timestamp
         var newEvents = await _hotelRepository.GetEventsSinceAsync(oldTimestamp, cancellationToken);
+        newEvents = newEvents.Take(5000).ToList();
         var newViewsEvents = newEvents.Where(x => x.Version == 1).ToDictionary(x => x.StreamId);
         var hotelDayIdsToUpdate = newEvents.Select(x => x.StreamId).Distinct().Except(newViewsEvents.Keys).ToList();
         
