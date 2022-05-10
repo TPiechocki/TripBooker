@@ -23,7 +23,7 @@ internal class HotelService : IHotelService
     public async Task AddNewHotelDay(DateTime day, CancellationToken cancellationToken, int days = 1)
     {
         var hotels = await _hotelOptionRepository.QuerryAllAsync(cancellationToken);
-        var events = new List<NewHotelDayEventData>();
+        var events = new List<NewHotelDayEventData>(1000);
 
         for (int i = 0; i < days; i++)
         {
@@ -33,8 +33,9 @@ internal class HotelService : IHotelService
             }
 
             day = day.AddDays(1);
+            await _eventRepository.AddNewRangeAsync(events, cancellationToken);
+            events = new List<NewHotelDayEventData>(1000);
         }
 
-        await _eventRepository.AddNewRangeAsync(events, cancellationToken);
     }
 }
