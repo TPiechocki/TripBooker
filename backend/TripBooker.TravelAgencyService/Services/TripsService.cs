@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.Common.Extensions;
 using TripBooker.Common.Helpers;
@@ -221,6 +221,9 @@ internal class TripsService : ITripsService
         foreach (var group in hotels.GroupBy(x => x.HotelId))
         {
             var hotel = group.First();
+            if (group.Count() != allDates.SkipLast(1).Count())
+                continue;
+
             foreach (var day in group.ToList())
             {
                 hotel.RoomsLarge = Math.Min(hotel.RoomsLarge, day.RoomsLarge);
