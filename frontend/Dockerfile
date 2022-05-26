@@ -2,6 +2,7 @@ FROM node:16.14.0-alpine as builder
 WORKDIR /app
 
 COPY package.json .
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 RUN npm update
 RUN npm install
 
@@ -12,5 +13,12 @@ COPY . .
 RUN npm run build
 
 FROM nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
-COPY --from=builder /app/public /usr/share/nginx/html
+
+WORKDIR /usr/share/nginx/html
+# Remove default nginx static assets
+RUN rm -rf ./*
+
+COPY --from=builder /app/public .
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
