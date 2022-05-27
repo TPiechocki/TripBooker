@@ -2,6 +2,7 @@ using AspNetCore.Authentication.Basic;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using TripBooker.WebApi.Hubs;
 using TripBooker.WebApi.Infrastructure;
 using TripBooker.WebApi.Repositories;
 using TripBooker.WebApi.Services;
@@ -32,7 +33,7 @@ builder.Services.AddCors(options =>
 builder.Services
     .AddInfrastructure(builder.Configuration);
 
-
+builder.Services.AddSignalR();
 builder.Services.AddControllers()
     .AddNewtonsoftJson(x =>
     {
@@ -66,6 +67,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.MapHub<PurchasedOfferNotificationHub>("/purchasedNotification")
+    .AllowAnonymous();
 
 app.MapControllers();
 

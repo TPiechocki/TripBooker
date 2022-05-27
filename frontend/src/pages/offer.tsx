@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import {request} from "../api/request";
 import {UserContext} from "../context/UserContext";
+import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
 interface TransportOption {
   availablePlaces: number,
@@ -81,6 +82,20 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   const [reservationCode, setReservationCode] = useState('');
 
   const auth = useContext(UserContext);
+
+  // TODO: code below creates correct connection to signalR websocket, however it is created on each render which is bad
+  // use it as single instance in component scope
+  //
+  // const purchasedNotificationsHubConnection = new HubConnectionBuilder()
+  //     .withUrl(process.env.WEB_API_URL + '/purchasedNotification')
+  //     .configureLogging(LogLevel.Debug)
+  //     .withAutomaticReconnect()
+  //     .build();
+
+  //   purchasedNotificationsHubConnection.start();
+  //   purchasedNotificationsHubConnection.on("SendNotification", notification => {
+  //     console.log(notification);
+  //   });
 
   useEffect(() => {
     request('POST', '/Trip/Options', {

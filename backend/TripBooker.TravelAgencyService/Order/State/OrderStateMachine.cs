@@ -1,5 +1,6 @@
 using AutoMapper;
 using MassTransit;
+using TripBooker.Common.Hubs;
 using TripBooker.Common.Order;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.Common.Order.Payment;
@@ -224,6 +225,11 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x.Publish(new TourOperatorReport
                 {
                     Order = x.Saga.Order
+                }))
+            .ThenAsync(x =>
+                x.Publish(new PurchasedOfferNotification
+                {
+                    PurchasedHotelDays = x.Saga.Order.HotelDays
                 }))
             .TransitionTo(Confirmed);
 

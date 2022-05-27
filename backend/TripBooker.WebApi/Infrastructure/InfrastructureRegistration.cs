@@ -1,5 +1,6 @@
 using MassTransit;
 using TripBooker.Common.TravelAgency.Contract.Query;
+using TripBooker.WebApi.Consumers;
 
 namespace TripBooker.WebApi.Infrastructure
 {
@@ -19,6 +20,7 @@ namespace TripBooker.WebApi.Infrastructure
                 .AddMassTransit(x =>
                     {
                         // public
+                        x.AddConsumer<PurchasedOfferNotificationConsumer>();
 
                         x.UsingRabbitMq((context, cfg) =>
                             {
