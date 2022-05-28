@@ -1,4 +1,4 @@
-﻿using WebApi.Models;
+﻿using TripBooker.WebApi.Models;
 
 namespace TripBooker.WebApi.Repositories
 {
