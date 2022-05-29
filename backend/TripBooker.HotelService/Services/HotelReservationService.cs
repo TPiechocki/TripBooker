@@ -233,7 +233,7 @@ internal class HotelReservationService : IHotelReservationService
         await _eventRepository.AddToManyAsync(updateEvent, hotelOccupations.Select(x => x.Id), 
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
-        var price = HotelExtensions.CalculatePrice(order, hotel);
+        var price = HotelExtensions.CalculatePrice(order, hotelOccupations, hotel);
 
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 

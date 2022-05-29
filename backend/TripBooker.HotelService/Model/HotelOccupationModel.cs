@@ -8,6 +8,8 @@ internal class HotelOccupationModel : EventModel
     
     public DateTime Date { get; set; }
 
+    public double PriceModifier { get; set; } = 1.0;
+
     public int RoomsStudio { get; set; }
 
     public int RoomsSmall { get; set; }

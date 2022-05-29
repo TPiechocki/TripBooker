@@ -1,8 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using Quartz;
 using TripBooker.Common;
 using TripBooker.HotelService.EventConsumers.Internal;
@@ -41,6 +39,7 @@ internal static class InfrastructureRegistration
                     x.AddConsumer<NewHotelReservationEventConsumer>();
                     x.AddConsumer<CancelHotelReservationEventConsumer>();
                     x.AddConsumer<ConfirmHotelReservationEventConsumer>();
+                    x.AddConsumer<NewHotelUpdateEventConsumer>();
 
                     // internal
                     x.AddConsumer<OccupationViewUpdateEventConsumer>(opt =>

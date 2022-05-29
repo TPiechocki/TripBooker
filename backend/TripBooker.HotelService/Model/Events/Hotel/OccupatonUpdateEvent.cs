@@ -4,13 +4,15 @@ internal class OccupatonUpdateEvent
 {
     public Guid ReservationEventId { get; set; }
 
-    public int RoomsStudio { get; set; }
+    public double PriceModifierFactor { get; set; } = 1.0;
 
-    public int RoomsSmall { get; set; }
+    public int RoomsStudio { get; set; } = 0;
 
-    public int RoomsMedium { get; set; }
+    public int RoomsSmall { get; set; } = 0;
 
-    public int RoomsLarge { get; set; }
+    public int RoomsMedium { get; set; } = 0;
 
-    public int RoomsApartment { get; set; }
+    public int RoomsLarge { get; set; } = 0;
+
+    public int RoomsApartment { get; set; } = 0;
 }
