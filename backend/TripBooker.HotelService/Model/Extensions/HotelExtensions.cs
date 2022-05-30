@@ -41,7 +41,7 @@ internal static class HotelExtensions
         return eventData;
     }
 
-    public static double CalculatePrice(OrderData order, HotelOption hotel)
+    public static double CalculatePrice(OrderData order, IEnumerable<HotelOccupationModel> occupationModels, HotelOption hotel)
     {
         // Rooms
         var price = order.RoomsStudio * hotel.GetPriceFor(RoomType.Studio)
@@ -57,8 +57,8 @@ internal static class HotelExtensions
         price += (order.NumberOfChildrenUpTo3
                   + order.NumberOfChildrenUpTo10) * HotelConstants.MealChildrenUnder10PriceFactor * mealPrice;
 
-        // Multiply by number of days
-        price *= order.HotelDays.Count();
+        // Multiply by the sum of price modifiers to get final price
+        price *= occupationModels.Sum(x => x.PriceModifier);
 
         return price;
     }

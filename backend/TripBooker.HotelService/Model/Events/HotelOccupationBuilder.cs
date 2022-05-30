@@ -49,6 +49,7 @@ internal static class HotelOccupationBuilder
 
         item.Version = @event.Version;
 
+        item.PriceModifier *= data.PriceModifierFactor;
         item.RoomsStudio += data.RoomsStudio;
         item.RoomsSmall += data.RoomsSmall;
         item.RoomsMedium += data.RoomsMedium;
