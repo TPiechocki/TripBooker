@@ -69,6 +69,9 @@ app.UseAuthorization();
 
 app.MapHub<PurchasedOfferNotificationHub>("/purchasedNotification")
     .AllowAnonymous();
+app.MapHub<DestinationStatisticsHub>("/destinationsHub")
+    .AllowAnonymous();
+
 
 app.MapControllers();
 
