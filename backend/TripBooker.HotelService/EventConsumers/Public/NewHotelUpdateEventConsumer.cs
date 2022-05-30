@@ -66,6 +66,10 @@ internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 
         }
         while (!transactionSuccesfull);
+
+        // TODO: request/response to Rabbit with change confirmation
+
+        _logger.LogInformation($"Hotel Update Contract consumed (HotelId = {context.Message.HotelId}, number of days = {context.Message.Days.Count})");
     }
 
     private async Task ValidateHotelUpdateTransaction(HotelUpdateContract contract, IEnumerable<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)

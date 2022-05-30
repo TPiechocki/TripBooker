@@ -57,7 +57,7 @@ internal static class HotelExtensions
         price += (order.NumberOfChildrenUpTo3
                   + order.NumberOfChildrenUpTo10) * HotelConstants.MealChildrenUnder10PriceFactor * mealPrice;
 
-        // Multiply by number of days
+        // Multiply by the sum of price modifiers to get final price
         price *= occupationModels.Sum(x => x.PriceModifier);
 
         return price;
