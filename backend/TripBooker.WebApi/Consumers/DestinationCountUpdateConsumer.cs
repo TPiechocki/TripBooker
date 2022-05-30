@@ -6,7 +6,7 @@ using TripBooker.WebApi.Hubs;
 
 namespace TripBooker.WebApi.Consumers;
 
-public class DestinationCountUpdateConsumer : IConsumer<DestinationCountUpdate>
+internal class DestinationCountUpdateConsumer : IConsumer<DestinationCountUpdate>
 {
     private readonly IHubContext<DestinationStatisticsHub, IDestinationStatisticsClient> _hubContext;
     private readonly ILogger<DestinationCountUpdateConsumer> _logger;
