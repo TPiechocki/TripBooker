@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using TripBooker.StatisticsService.Consumers;
 
 namespace TripBooker.StatisticsService.Infrastructure;
 
@@ -17,6 +18,7 @@ internal static class InfrastructureRegistration
         return services.AddMassTransit(x =>
             {
                 // PUBLIC
+                x.AddConsumer<NewReservationStatisticsConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                     {
