@@ -25,10 +25,7 @@ services:
         container_name: transport-service
         image: tpiechocki/rsww_175641_transport
         depends_on:
-            - "postgres"
             - "rabbitmq"
-            - "mongodb"
-            - "travel-agency-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Transport;Username=postgres;Password=student"
             ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
@@ -41,9 +38,7 @@ services:
         container_name: hotel-service
         image: tpiechocki/rsww_175641_hotel
         depends_on:
-            - "postgres"
             - "rabbitmq"
-            - "mongodb"
             - "travel-agency-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
@@ -57,8 +52,6 @@ services:
         container_name: travel-agency-service
         image: tpiechocki/rsww_175641_travel_agency
         depends_on:
-            - "postgres"
-            - "mongodb"
             - "rabbitmq"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_TravelAgency;Username=postgres;Password=student"
@@ -72,7 +65,6 @@ services:
         container_name: payment-service
         image: tpiechocki/rsww_175641_payment
         depends_on:
-            - "postgres"
             - "rabbitmq"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Payments;Username=postgres;Password=student"
@@ -91,6 +83,18 @@ services:
             RabbitMq__Host: "rabbitmq"
         networks:
             - network
+              
+    statistics-service:
+        container_name: statistics-service
+        image: tpiechocki/rsww_175641_statistics
+        depends_on:
+            - "rabbitmq"
+        environment:
+            ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Statistics;Username=postgres;Password=student"
+            Logging__Console__FormatterName: simple
+            RabbitMq__Host: "rabbitmq"
+        networks:
+            - network
 
     rabbitmq:
         image: rabbitmq:3-management-alpine
@@ -105,6 +109,4 @@ networks:
     network: {}
 
 volumes:
-    postgres-data:
-    mongodb-data:
     rabbitmq-data:
