@@ -6,7 +6,7 @@ internal class HotelOccupationModel
 
     public DateTime Date { get; set; }
 
-    public double PriceModifierFactor { get; set; } = 1.0;
+    public double PriceModifier { get; set; } = 1.0;
 
     public int RoomsStudio { get; set; }
 

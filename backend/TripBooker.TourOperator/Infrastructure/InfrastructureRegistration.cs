@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.TourOperator.Consumers;
+using TripBooker.TourOperator.EventConsumers.Public;
 
 namespace TripBooker.TourOperator.Infrastructure;
 
@@ -25,6 +26,16 @@ internal static class InfrastructureRegistration
             {
                 // PUBLIC
                 x.AddConsumer<TourOperatorReportConsumer>();
+
+                // View updates
+                x.AddConsumer<TourOperatorHotelOccupationViewContractConsumer>(cfg =>
+                {
+                    cfg.Options<BatchOptions>(opt =>
+                    {
+                        opt.ConcurrencyLimit = 1;
+                        opt.MessageLimit = 1000;
+                    });
+                });
 
                 x.UsingRabbitMq((context, cfg) =>
                     {

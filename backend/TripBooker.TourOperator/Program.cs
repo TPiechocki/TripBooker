@@ -1,11 +1,14 @@
 using TripBooker.TourOperator.Infrastructure;
+using TripBooker.TourOperator.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(builder.Configuration)
+    .AddRepositories();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
