@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using TripBooker.TourOperator.Consumers;
 
 namespace TripBooker.TourOperator.Infrastructure;
@@ -8,6 +9,11 @@ internal static class InfrastructureRegistration
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         return services
+            .AddDbContext<TourOperatorDbContext>(opt =>
+                opt
+                    .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
+            )
             .AddBus(configuration);
     }
 
