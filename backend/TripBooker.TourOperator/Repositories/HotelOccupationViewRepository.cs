@@ -11,7 +11,7 @@ internal interface IHotelOccupationViewRepository
 
     Task AddOrUpdateManyAsync(IEnumerable<HotelOccupationModel> hotelOccupation, CancellationToken cancellationToken);
 
-    IQueryable<HotelOccupationModel> QueryAll();
+    IEnumerable<HotelOccupationModel> QueryAll();
 }
 
 internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
@@ -74,8 +74,8 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
         await _dbContext.HotelOccupationView.AddAsync(hotelOccupation, cancellationToken);
     }
 
-    public IQueryable<HotelOccupationModel> QueryAll()
+    public IEnumerable<HotelOccupationModel> QueryAll()
     {
-        return _dbContext.HotelOccupationView.Select(x => x);
+        return _dbContext.HotelOccupationView.Select(x => x).ToList();
     }
 }
