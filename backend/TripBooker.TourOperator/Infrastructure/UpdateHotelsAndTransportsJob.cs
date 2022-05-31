@@ -9,15 +9,23 @@ internal class UpdateHotelsAndTransportsJob : IJob
 {
     private readonly IBus _bus;
     private readonly IHotelOccupationViewRepository _hotelRepository;
+    private readonly ILogger<UpdateHotelsAndTransportsJob> _logger;
 
-    public UpdateHotelsAndTransportsJob(IBus bus, IHotelOccupationViewRepository hotelRepository)
+
+    public UpdateHotelsAndTransportsJob(
+        IBus bus,
+        IHotelOccupationViewRepository hotelRepository,
+        ILogger<UpdateHotelsAndTransportsJob> logger)
     {
         _bus = bus;
         _hotelRepository = hotelRepository;
+        _logger = logger;
     }
 
     public Task Execute(IJobExecutionContext context)
     {
+        _logger.LogInformation("Updating Hotels and Transports");
+
         var rnd = new Random();
 
         // Hotels
@@ -52,11 +60,12 @@ internal class UpdateHotelsAndTransportsJob : IJob
             RoomsLargeChange = updateRoll < 0.5 ? 0 : -rnd.Next(minvals.RoomsLarge),
             RoomsApartmentChange = updateRoll < 0.5 ? 0 : -rnd.Next(minvals.RoomsApartment),
         });
+        _logger.LogInformation($"Updated Hotel: HotelId = {minvals.HotelId}, StartDate = {minvals.Date}, length = {hotelDays.Count}, updateRoll = {updateRoll}");
 
         // Transports
 
         // TODO
-        
+
         return Task.CompletedTask;
     }
 }
