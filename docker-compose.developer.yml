@@ -6,7 +6,7 @@ services:
        build:
             context: frontend
             args:
-                - WEB_API_URL=http://piechole.tplinkdns.com:8081
+                - WEB_API_URL=http://localhost:8081
        ports:
             - "8080:80"
 
@@ -101,8 +101,10 @@ services:
             context: backend
             dockerfile: TripBooker.TourOperator/Dockerfile
         depends_on:
+            - "postgres"
             - "rabbitmq"
         environment:
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TourOperator;Username=admin;Password=password"
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:
