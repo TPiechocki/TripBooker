@@ -72,10 +72,15 @@ public class OrderData
 
     public Guid? TransportReservationId { get; set; }
 
+    public string? DepartureAirportCode { get; set; }
+
+
     // RETURN TRANSPORT
     public double ReturnTransportPrice { get; set; }
 
     public Guid? ReturnTransportReservationId { get; set; }
+
+    public string? ReturnAirportCode { get; set; }
 
 
     // HOTEL
@@ -83,6 +88,9 @@ public class OrderData
 
     public double HotelPrice { get; set; }
 
-    #endregion
 
+    // STATISTICS
+    public string? DestinationAirportCode { get; set; } = null!;
+
+    #endregion
 }

@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using System.Transactions;
+﻿using System.Transactions;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Npgsql;
 using TripBooker.Common;
 using TripBooker.Common.Extensions;
 using TripBooker.Common.Order.Transport;
@@ -24,13 +24,13 @@ internal interface ITransportReservationService
 
 internal class TransportReservationService : ITransportReservationService
 {
-    private readonly ITransportEventRepository _transportRepository;
-    private readonly IReservationEventRepository _reservationEventRepository;
     private readonly ILogger<TransportReservationService> _logger;
+    private readonly IReservationEventRepository _reservationEventRepository;
+    private readonly ITransportEventRepository _transportRepository;
 
     public TransportReservationService(
         ITransportEventRepository transportRepository,
-        IReservationEventRepository reservationEventRepository, 
+        IReservationEventRepository reservationEventRepository,
         ILogger<TransportReservationService> logger)
     {
         _transportRepository = transportRepository;
@@ -38,12 +38,14 @@ internal class TransportReservationService : ITransportReservationService
         _logger = logger;
     }
 
-    public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation, CancellationToken cancellationToken)
+    public async Task<ReservationModel> AddNewReservation(NewTransportReservation reservation,
+        CancellationToken cancellationToken)
     {
         var transportId = reservation.IsReturn
             ? reservation.Order.ReturnTransportId!.Value
             : reservation.Order.TransportId!.Value;
         var numberOfPlaces = reservation.Order.NumberOfOccupiedSeats();
+        var transportOptionId = 0;
 
         // add reservation
         var data = new NewReservationEventData(transportId, numberOfPlaces);
@@ -76,12 +78,14 @@ internal class TransportReservationService : ITransportReservationService
 
             try
             {
-                await ValidateNewReservationTransaction(reservationStreamId, transportId, numberOfPlaces, 
+                await ValidateNewReservationTransaction(reservationStreamId, transportId, numberOfPlaces,
                     transportItem, cancellationToken);
+
+                transportOptionId = transportItem.TransportOptionId;
             }
             catch (DbUpdateException e)
             {
-                if (e.GetBaseException() is PostgresException { SqlState: GlobalConstants.PostgresUniqueViolationCode })
+                if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode})
                 {
                     // repeat if there was version violation, so the db read and business logic
                     // does not need to be inside transaction
@@ -96,12 +100,14 @@ internal class TransportReservationService : ITransportReservationService
         }
 
         // read can be safely outside transaction as reservationId is not known by anybody else at this point
-        var reservationEvents = 
+        var reservationEvents =
             await _reservationEventRepository.GetReservationEvents(reservationStreamId, cancellationToken);
-        return ReservationBuilder.Build(reservationEvents);
+        var result = ReservationBuilder.Build(reservationEvents);
+        result.TransportOptionId = transportOptionId;
+        return result;
     }
 
-    public async Task Cancel(Guid reservationId, CancellationToken cancellationToken) 
+    public async Task Cancel(Guid reservationId, CancellationToken cancellationToken)
     {
         var tryTransaction = true;
         while (tryTransaction)
@@ -127,16 +133,12 @@ internal class TransportReservationService : ITransportReservationService
             }
             catch (DbUpdateException e)
             {
-                if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode })
-                {
+                if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode})
                     // repeat if there was version violation, so the db read and business logic
                     // does not need to be inside transaction
                     tryTransaction = true;
-                }
                 else
-                {
                     throw;
-                }
             }
         }
     }
@@ -165,16 +167,12 @@ internal class TransportReservationService : ITransportReservationService
             }
             catch (DbUpdateException e)
             {
-                if (e.GetBaseException() is PostgresException { SqlState: GlobalConstants.PostgresUniqueViolationCode })
-                {
+                if (e.GetBaseException() is PostgresException {SqlState: GlobalConstants.PostgresUniqueViolationCode})
                     // repeat if there was version violation, so the db read and business logic
                     // does not need to be inside transaction
                     tryTransaction = true;
-                }
                 else
-                {
                     throw;
-                }
             }
         }
     }

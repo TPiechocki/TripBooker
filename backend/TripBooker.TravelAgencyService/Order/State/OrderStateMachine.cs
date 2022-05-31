@@ -5,6 +5,7 @@ using TripBooker.Common.Order;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.Common.Order.Payment;
 using TripBooker.Common.Order.Transport;
+using TripBooker.Common.Statistics;
 using SagaState = MassTransit.State;
 
 namespace TripBooker.TravelAgencyService.Order.State;
@@ -24,13 +25,14 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         Initially(SetSubmitOrderHandler());
         During(AwaitingTransportConfirmation, SetAcceptTransportHandler(), SetRejectTransportHandler());
-        During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(), SetRejectReturnTransportHandler());
+        During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(),
+            SetRejectReturnTransportHandler());
         During(AwaitingHotelConfirmation, SetAcceptHotelHandler(), SetRejectHotelHandler());
         During(AwaitingPaymentConfirmation, SetAcceptPaymentHandler(), SetRejectPaymentHandler());
 
         DuringAny(
             When(OrderStatus)
-                .ThenAsync(x => 
+                .ThenAsync(x =>
                     x.RespondAsync(x.Saga))
         );
     }
@@ -80,7 +82,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
@@ -90,9 +92,10 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.TransportPrice = x.Message.Price;
                 x.Saga.Order.TransportReservationId = x.Message.ReservationId;
+                x.Saga.Order.DepartureAirportCode = x.Message.LocalAirportCode;
             })
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
-            .IfElse(x => x.Saga.Order.TransportId != null,
+            .IfElse(x => x.Saga.Order.ReturnTransportId != null,
                 x =>
                     x.ThenAsync(a => a.Publish(new NewTransportReservation
                     {
@@ -102,7 +105,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
@@ -123,6 +126,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.ReturnTransportPrice = x.Message.Price;
                 x.Saga.Order.ReturnTransportReservationId = x.Message.ReservationId;
+                x.Saga.Order.ReturnAirportCode = x.Message.LocalAirportCode;
             })
             .Then(x => _logger.LogInformation(
                 $"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))
@@ -159,6 +163,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.HotelPrice = x.Message.Price;
                 x.Saga.Order.HotelReservationId = x.Message.ReservationId;
+                x.Saga.Order.DestinationAirportCode = x.Message.DestinationAirportCode;
             })
             .Then(x => _logger.LogInformation(
                 $"Hotel reservation accepted (OrderId={x.Message.CorrelationId})."))
@@ -166,7 +171,9 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 (
                     x.Saga.CorrelationId, x.Saga.Order.Price, x.Saga.Order.DiscountCode
                 )
-            ));
+            ))
+            .ThenAsync(x => x.Publish(
+                _mapper.Map<NewReservationEvent>(x.Saga.Order)));
 
     private EventActivityBinder<OrderState, HotelReservationRejected> SetRejectHotelHandler() =>
         When(RejectHotel)
@@ -195,8 +202,8 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                         ))))
             .TransitionTo(Rejected);
 
-
-
+    
+    
     private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))

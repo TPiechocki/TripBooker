@@ -11,4 +11,6 @@ internal class ReservationModel : EventModel
     public double Price { get; set; }
 
     public ReservationStatus Status { get; set; }
+
+    public int TransportOptionId { get; set; }
 }
