@@ -6,7 +6,7 @@ services:
     build:
       context: frontend
       args:
-        - WEB_API_URL=http://piechole.tplinkdns.com:8081
+        - WEB_API_URL=http://localhost:8081
     ports:
       - "8080:80"
   
@@ -100,28 +100,28 @@ services:
     build:
       context: backend
       dockerfile: TripBooker.TourOperator/Dockerfile
-        depends_on:
-            - "rabbitmq"
-        environment:
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
+    depends_on:
+      - "rabbitmq"
+    environment:
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
     
-    statistics-service:
-        container_name: statistics-service
-        build:
-            context: backend
-            dockerfile: TripBooker.StatisticsService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "rabbitmq"
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Statistics;Username=admin;Password=password"
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
+  statistics-service:
+    container_name: statistics-service
+    build:
+      context: backend
+      dockerfile: TripBooker.StatisticsService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "rabbitmq"
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Statistics;Username=admin;Password=password"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
   
   rabbitmq:
     image: rabbitmq:3-management-alpine
