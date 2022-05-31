@@ -20,7 +20,10 @@ internal static class ServicesRegistration
                 {
                     // public
                     x.AddConsumer<PurchasedOfferNotificationConsumer>();
+
                     x.AddConsumer<DestinationCountUpdateConsumer>();
+                    x.AddConsumer<HotelCountUpdateConsumer>();
+
                     x.AddConsumer<TransportViewUpdatedConsumer>();
                     x.AddConsumer<HotelViewUpdatedConsumer>();
 

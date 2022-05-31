@@ -10,10 +10,10 @@ internal interface IReservationRepository
 
     IQueryable<ReservationModel> QueryAll();
 
-    Task<IEnumerable<ReservationModel>> RemoveOlderThan(DateTime threshold, CancellationToken cancellationToken);
+    Task<ICollection<ReservationModel>> RemoveOlderThan(DateTime threshold, CancellationToken cancellationToken);
 
-    Task<string> UpdateTimeStamp(Guid orderId, CancellationToken cancellationToken);
-    Task<string> Remove(Guid orderId, CancellationToken cancellationToken);
+    Task UpdateTimeStamp(Guid orderId, CancellationToken cancellationToken);
+    Task<ReservationModel> Remove(Guid orderId, CancellationToken cancellationToken);
 }
 
 internal class ReservationRepository : IReservationRepository
@@ -36,7 +36,7 @@ internal class ReservationRepository : IReservationRepository
         return _context.Reservation.Select(x => x);
     }
 
-    public async Task<string> Remove(Guid orderId, CancellationToken cancellationToken)
+    public async Task<ReservationModel> Remove(Guid orderId, CancellationToken cancellationToken)
     {
         var entity =
             await _context.Reservation.FindAsync(new object?[] {orderId}, cancellationToken);
@@ -44,10 +44,10 @@ internal class ReservationRepository : IReservationRepository
         _context.Remove(entity!);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entity!.DestinationAirportCode;
+        return entity!;
     }
 
-    public async Task<IEnumerable<ReservationModel>> RemoveOlderThan(DateTime threshold,
+    public async Task<ICollection<ReservationModel>> RemoveOlderThan(DateTime threshold,
         CancellationToken cancellationToken)
     {
         var entities = await _context.Reservation.Where(x => x.TimeStamp < threshold)
@@ -59,14 +59,12 @@ internal class ReservationRepository : IReservationRepository
         return entities;
     }
 
-    public async Task<string> UpdateTimeStamp(Guid orderId, CancellationToken cancellationToken)
+    public async Task UpdateTimeStamp(Guid orderId, CancellationToken cancellationToken)
     {
         var entity =
             await _context.Reservation.FindAsync(new object?[] {orderId}, cancellationToken);
 
         entity!.TimeStamp = DateTime.UtcNow;
         await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.DestinationAirportCode;
     }
 }

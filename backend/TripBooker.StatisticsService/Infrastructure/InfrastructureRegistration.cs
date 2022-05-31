@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using TripBooker.StatisticsService.Consumers;
+using TripBooker.StatisticsService.Consumers.Queries;
 
 namespace TripBooker.StatisticsService.Infrastructure;
 
@@ -26,9 +27,11 @@ internal static class InfrastructureRegistration
             {
                 // PUBLIC
                 x.AddConsumer<NewReservationStatisticsConsumer>();
-                x.AddConsumer<GetDestinationCountsQueryConsumer>();
                 x.AddConsumer<PaymentAcceptedStatisticsConsumer>();
                 x.AddConsumer<PaymentTimeoutStatisticsConsumer>();
+
+                x.AddConsumer<GetDestinationCountsQueryConsumer>();
+                x.AddConsumer<GetHotelCountsQueryConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                     {

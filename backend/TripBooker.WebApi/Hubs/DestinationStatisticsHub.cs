@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.AspNetCore.SignalR;
-using TripBooker.Common.Statistics;
+using TripBooker.Common.Statistics.Query;
+using TripBooker.Common.Statistics.Updates;
 
 namespace TripBooker.WebApi.Hubs;
 
@@ -8,7 +9,7 @@ public interface IDestinationStatisticsClient
 {
     Task DestinationCountUpdate(DestinationCountUpdate update);
 
-    Task DestinationCountsUpdate(GetDestinationCountsResponse update);
+    Task DestinationCountsResponse(GetDestinationCountsResponse update);
 }
 
 public class DestinationStatisticsHub : Hub<IDestinationStatisticsClient>
@@ -26,6 +27,6 @@ public class DestinationStatisticsHub : Hub<IDestinationStatisticsClient>
         var counts = await _requestClient.GetResponse<GetDestinationCountsResponse>(
             new GetDestinationCountsQuery());
 
-        await Clients.Caller.DestinationCountsUpdate(counts.Message);
+        await Clients.Caller.DestinationCountsResponse(counts.Message);
     }
 }

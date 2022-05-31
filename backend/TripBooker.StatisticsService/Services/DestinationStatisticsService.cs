@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using TripBooker.Common.Statistics;
+using TripBooker.Common.Statistics.Updates;
 using TripBooker.StatisticsService.Repository;
 
 namespace TripBooker.StatisticsService.Services;
@@ -47,6 +47,6 @@ internal class DestinationStatisticsService : IDestinationStatisticsService
     {
         var destinationCount = await GetForOne(destinationCode, cancellationToken);
         await _bus.Publish(new DestinationCountUpdate(destinationCode, destinationCount), cancellationToken);
-        _logger.LogInformation($"New counter for {destinationCode}: {destinationCount}");
+        _logger.LogInformation($"New counter for {destinationCode} destination: {destinationCount}");
     }
 }

@@ -71,6 +71,8 @@ app.MapHub<PurchasedOfferNotificationHub>("/purchasedNotification")
     .AllowAnonymous();
 app.MapHub<DestinationStatisticsHub>("/destinationsHub")
     .AllowAnonymous();
+app.MapHub<HotelStatisticsHub>("/hotelsHub")
+    .AllowAnonymous();
 app.MapHub<OfferUpdatesHub>("/offerUpdatedNotifications")
     .AllowAnonymous();
 

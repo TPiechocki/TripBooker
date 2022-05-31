@@ -1,8 +1,8 @@
 ﻿using MassTransit;
-using TripBooker.Common.Statistics;
+using TripBooker.Common.Statistics.Query;
 using TripBooker.StatisticsService.Services;
 
-namespace TripBooker.StatisticsService.Consumers;
+namespace TripBooker.StatisticsService.Consumers.Queries;
 
 internal class GetDestinationCountsQueryConsumer : IConsumer<GetDestinationCountsQuery>
 {

@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using TripBooker.Common.Statistics;
+using TripBooker.Common.Statistics.Updates;
 using TripBooker.WebApi.Hubs;
 
 namespace TripBooker.WebApi.Consumers;

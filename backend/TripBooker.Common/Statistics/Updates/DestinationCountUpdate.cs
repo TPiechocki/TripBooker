@@ -1,4 +1,4 @@
-﻿namespace TripBooker.Common.Statistics;
+﻿namespace TripBooker.Common.Statistics.Updates;
 
 public class DestinationCountUpdate
 {

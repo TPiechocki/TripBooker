@@ -7,6 +7,7 @@ namespace TripBooker.StatisticsService.Infrastructure;
 internal class StatisticsTimeoutJob : IJob
 {
     private readonly IDestinationStatisticsService _destinationService;
+    private readonly IHotelStatisticsService _hotelService;
 
     private readonly ILogger<StatisticsTimeoutJob> _logger;
     private readonly TimeSpan _range = TimeSpan.FromMinutes(15);
@@ -15,11 +16,13 @@ internal class StatisticsTimeoutJob : IJob
     public StatisticsTimeoutJob(
         IReservationRepository repository,
         IDestinationStatisticsService destinationService,
-        ILogger<StatisticsTimeoutJob> logger)
+        ILogger<StatisticsTimeoutJob> logger,
+        IHotelStatisticsService hotelService)
     {
         _repository = repository;
         _destinationService = destinationService;
         _logger = logger;
+        _hotelService = hotelService;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -27,12 +30,20 @@ internal class StatisticsTimeoutJob : IJob
         var expiredStatistics =
             await _repository.RemoveOlderThan(DateTime.UtcNow - _range, context.CancellationToken);
 
-        if (expiredStatistics.Count() > 0)
-            _logger.LogInformation($"Statistics for {expiredStatistics.Count()} orders have expired.");
+        if (expiredStatistics.Any())
+            _logger.LogInformation($"Statistics for {expiredStatistics.Count} orders have expired.");
 
         var destinations = expiredStatistics.Select(x => x.DestinationAirportCode).Distinct();
+        var hotelCodes = expiredStatistics.Select(x => new
+        {
+            Destination = x.DestinationAirportCode,
+            x.HotelCode
+        }).Distinct();
 
-        var tasks = destinations.Select(x => _destinationService.UpdateCount(x, context.CancellationToken));
+        var tasks = destinations.Select(x => _destinationService.UpdateCount(
+            x, context.CancellationToken)).ToList();
+        tasks.AddRange(hotelCodes.Select(x => _hotelService.UpdateCount(
+            x.Destination, x.HotelCode, context.CancellationToken)));
         await Task.WhenAll(tasks);
     }
 }
