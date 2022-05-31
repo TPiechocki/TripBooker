@@ -2,6 +2,8 @@
 
 internal class HotelOccupationModel
 {
+    public Guid Id { get; set; }
+
     public Guid HotelId { get; set; }
 
     public DateTime Date { get; set; }

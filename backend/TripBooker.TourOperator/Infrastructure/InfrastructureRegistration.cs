@@ -1,6 +1,6 @@
 ﻿using MassTransit;
+using Quartz;
 using Microsoft.EntityFrameworkCore;
-using TripBooker.TourOperator.Consumers;
 using TripBooker.TourOperator.EventConsumers.Public;
 
 namespace TripBooker.TourOperator.Infrastructure;
@@ -15,7 +15,8 @@ internal static class InfrastructureRegistration
                     .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
                     .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
             )
-            .AddBus(configuration);
+            .AddBus(configuration)
+            .AddQuartz();
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)
@@ -46,5 +47,24 @@ internal static class InfrastructureRegistration
             })
             .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; });
         ;
+    }
+
+    private static IServiceCollection AddQuartz(this IServiceCollection services)
+    {
+        // configure job to create job that updates Hotels and Transports every minute
+        return services.AddQuartz(q =>
+        {
+            q.UseMicrosoftDependencyInjectionJobFactory();
+
+            var jobKey = new JobKey(nameof(UpdateHotelsAndTransportsJob));
+            q.AddJob<UpdateHotelsAndTransportsJob>(opt => opt.WithIdentity(jobKey));
+            q.AddTrigger(opt => opt
+                .ForJob(jobKey)
+                .WithIdentity(jobKey + "-trigger")
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInMinutes(1)
+                    .RepeatForever()));
+        })
+            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
 }
