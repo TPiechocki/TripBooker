@@ -25,13 +25,14 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         Initially(SetSubmitOrderHandler());
         During(AwaitingTransportConfirmation, SetAcceptTransportHandler(), SetRejectTransportHandler());
-        During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(), SetRejectReturnTransportHandler());
+        During(AwaitingReturnTransportConfirmation, SetAcceptReturnTransportHandler(),
+            SetRejectReturnTransportHandler());
         During(AwaitingHotelConfirmation, SetAcceptHotelHandler(), SetRejectHotelHandler());
         During(AwaitingPaymentConfirmation, SetAcceptPaymentHandler(), SetRejectPaymentHandler());
 
         DuringAny(
             When(OrderStatus)
-                .ThenAsync(x => 
+                .ThenAsync(x =>
                     x.RespondAsync(x.Saga))
         );
     }
@@ -81,7 +82,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
@@ -91,6 +92,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.TransportPrice = x.Message.Price;
                 x.Saga.Order.TransportReservationId = x.Message.ReservationId;
+                x.Saga.Order.DepartureAirportCode = x.Message.LocalAirportCode;
             })
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
             .IfElse(x => x.Saga.Order.ReturnTransportId != null,
@@ -103,7 +105,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
@@ -124,6 +126,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.ReturnTransportPrice = x.Message.Price;
                 x.Saga.Order.ReturnTransportReservationId = x.Message.ReservationId;
+                x.Saga.Order.ReturnAirportCode = x.Message.LocalAirportCode;
             })
             .Then(x => _logger.LogInformation(
                 $"Return transport reservation accepted (OrderId={x.Message.CorrelationId})."))

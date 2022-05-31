@@ -23,5 +23,5 @@ internal class ReservationModel : EventModel
 
     public ReservationStatus Status { get; set; }
 
-    public string DestinationAirportCode { get; set; }
+    public string DestinationAirportCode { get; set; } = null!;
 }
