@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using MassTransit;
+using TripBooker.Common.Hubs;
+using TripBooker.Common.Transport;
 using TripBooker.Common.Transport.Contract;
 using TripBooker.Common.TravelAgency.Model;
 using TripBooker.TravelAgencyService.Model;
@@ -29,8 +31,12 @@ internal class TransportViewContractConsumer : IConsumer<Batch<TransportViewCont
 
         var distinctTransports = transports.GroupBy(x => x.Id).Select(x => x.Last()).ToList();
 
-        _logger.LogInformation($"Received updates for hotel view (Count={distinctTransports.Count()})");
+        _logger.LogInformation($"Received updates for hotel view (Count={distinctTransports.Count})");
 
         await _repository.AddOrUpdateManyAsync(distinctTransports, context.CancellationToken);
+
+        await context.Publish(
+            new TransportViewUpdated(distinctTransports.Select(x => x.Id)),
+            context.CancellationToken);
     }
 }

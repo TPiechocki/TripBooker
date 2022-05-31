@@ -21,6 +21,8 @@ internal static class ServicesRegistration
                     // public
                     x.AddConsumer<PurchasedOfferNotificationConsumer>();
                     x.AddConsumer<DestinationCountUpdateConsumer>();
+                    x.AddConsumer<TransportViewUpdatedConsumer>();
+                    x.AddConsumer<HotelViewUpdatedConsumer>();
 
                     x.UsingRabbitMq((context, cfg) =>
                         {
