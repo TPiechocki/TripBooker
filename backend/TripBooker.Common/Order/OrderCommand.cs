@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TripBooker.Common.Hotel;
 
@@ -82,7 +82,10 @@ public class OrderData
     public Guid? HotelReservationId { get; set; }
 
     public double HotelPrice { get; set; }
+    
+    
+    // STATISTICS
+    public string? DestinationAirportCode { get; set; } = null!;
 
     #endregion
-
 }

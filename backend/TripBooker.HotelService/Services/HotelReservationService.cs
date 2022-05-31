@@ -54,7 +54,8 @@ internal class HotelReservationService : IHotelReservationService
             order.RoomsApartment,
             order.MealOption);
         var reservationStreamId = await _reservationRepository.AddNewAsync(data, cancellationToken);
-
+        var destinationAirportCode = string.Empty;
+        
         bool transactionSuccesfull;
         do
         {
@@ -71,12 +72,14 @@ internal class HotelReservationService : IHotelReservationService
                 await _reservationRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
                 break;
             }
+            
+            destinationAirportCode = hotel.AirportCode;
 
             // Check for all days
-            bool checkSuccesfull = true;
-            foreach(var hotelday in order.HotelDays)
+            var checkSuccessful = true;
+            foreach(var hotelDay in order.HotelDays)
             {
-                var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelday, cancellationToken);
+                var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelDay, cancellationToken);
                 var occupation = HotelOccupationBuilder.Build(hotelEvents);
 
                 // Check if enough rooms awailable
@@ -86,14 +89,14 @@ internal class HotelReservationService : IHotelReservationService
                     || occupation.RoomsLarge < order.RoomsLarge 
                     || occupation.RoomsApartment < order.RoomsApartment)
                 {
-                    checkSuccesfull = false;
+                    checkSuccessful = false;
                     break;
                 }
 
                 hotelOccupations.Add(occupation);
             }
 
-            if (!checkSuccesfull)
+            if (!checkSuccessful)
             {
                 // There is not enough free rooms
                 await _reservationRepository.AddRejectedAsync(reservationStreamId, 1, cancellationToken);
@@ -125,7 +128,10 @@ internal class HotelReservationService : IHotelReservationService
 
         var reservationEvents =
             await _reservationRepository.GetReservationEvents(reservationStreamId, cancellationToken);
-        return ReservationBuilder.Build(reservationEvents);
+        var result = ReservationBuilder.Build(reservationEvents);
+        result.DestinationAirportCode = destinationAirportCode;
+
+        return result;
     }
 
     public async Task Cancel(Guid reservationId, CancellationToken cancellationToken)
@@ -234,7 +240,7 @@ internal class HotelReservationService : IHotelReservationService
             hotelOccupations.Select(x => x.Version), cancellationToken);
 
         var price = HotelExtensions.CalculatePrice(order, hotelOccupations, hotel);
-
+        
         await _reservationRepository.AddAcceptedAsync(reservationStreamId, 1, new ReservationAcceptedEventData(price), cancellationToken);
 
         transaction.Complete();

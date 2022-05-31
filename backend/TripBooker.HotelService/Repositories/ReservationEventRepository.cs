@@ -1,5 +1,4 @@
-﻿using MassTransit;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TripBooker.HotelService.Infrastructure;
 using TripBooker.HotelService.Model.Events.Reservation;
@@ -10,7 +9,8 @@ internal interface IReservationEventRepository
 {
     Task<Guid> AddNewAsync(NewReservationEventData reservationEvent, CancellationToken cancellationToken);
 
-    Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data, CancellationToken cancellationToken);
+    Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data,
+        CancellationToken cancellationToken);
 
     Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken);
 
@@ -25,16 +25,13 @@ internal class ReservationEventRepository : IReservationEventRepository
 {
     private readonly HotelDbContext _dbContext;
     private readonly ILogger<ReservationEventRepository> _logger;
-    private readonly IBus _bus;
 
     public ReservationEventRepository(
         HotelDbContext dbContext,
-        ILogger<ReservationEventRepository> logger,
-        IBus bus)
+        ILogger<ReservationEventRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _bus = bus;
     }
 
     public async Task<Guid> AddNewAsync(NewReservationEventData reservationEvent, CancellationToken cancellationToken)
@@ -55,7 +52,8 @@ internal class ReservationEventRepository : IReservationEventRepository
         return guid;
     }
 
-    public async Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data, CancellationToken cancellationToken)
+    public async Task AddAcceptedAsync(Guid streamId, int previousVersion, ReservationAcceptedEventData data,
+        CancellationToken cancellationToken)
     {
         await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
                 streamId, previousVersion + 1, nameof(ReservationAcceptedEventData), data),
@@ -73,7 +71,8 @@ internal class ReservationEventRepository : IReservationEventRepository
     public async Task AddCancelledAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
     {
         await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
-                streamId, previousVersion + 1, nameof(ReservationCancelledEventData), new ReservationCancelledEventData()),
+                streamId, previousVersion + 1, nameof(ReservationCancelledEventData),
+                new ReservationCancelledEventData()),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
@@ -88,7 +87,8 @@ internal class ReservationEventRepository : IReservationEventRepository
     public async Task AddConfirmedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
     {
         await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
-                streamId, previousVersion + 1, nameof(ReservationConfirmedEventData), new ReservationConfirmedEventData()),
+                streamId, previousVersion + 1, nameof(ReservationConfirmedEventData),
+                new ReservationConfirmedEventData()),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
@@ -103,7 +103,8 @@ internal class ReservationEventRepository : IReservationEventRepository
     public async Task AddRejectedAsync(Guid streamId, int previousVersion, CancellationToken cancellationToken)
     {
         await _dbContext.ReservationEvent.AddAsync(new ReservationEvent(
-                streamId, previousVersion + 1, nameof(ReservationRejectedEventData), new ReservationRejectedEventData()),
+                streamId, previousVersion + 1, nameof(ReservationRejectedEventData),
+                new ReservationRejectedEventData()),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
@@ -115,7 +116,8 @@ internal class ReservationEventRepository : IReservationEventRepository
         }
     }
 
-    public async Task<ICollection<ReservationEvent>> GetReservationEvents(Guid streamId, CancellationToken cancellationToken)
+    public async Task<ICollection<ReservationEvent>> GetReservationEvents(Guid streamId,
+        CancellationToken cancellationToken)
     {
         return await _dbContext.ReservationEvent
             .Where(x => x.StreamId == streamId)

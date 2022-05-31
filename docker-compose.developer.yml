@@ -1,194 +1,194 @@
 version: "3.4"
 
 services:
-    frontend:
-       container_name: frontend
-       build:
-            context: frontend
-            args:
-                - WEB_API_URL=http://localhost:8081
-       ports:
-            - "8080:80"
-
-    webapi:
-        container_name: webapi
-        build:
-            context: backend
-            dockerfile: TripBooker.WebApi/Dockerfile
-        depends_on:
-            - "rabbitmq"
-            - "travel-agency-service"
-        ports:
-            - "8081:80"
-        environment:
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-
-
-    transport-service:
-        container_name: transport-service
-        build:
-            context: backend
-            dockerfile: TripBooker.TransportService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "rabbitmq"
-            - "mongodb"
-            - "travel-agency-service"           # remove if travel agency will query the data on startup
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Transport;Username=admin;Password=password"
-            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-            
-    hotel-service:
-        container_name: hotel-service
-        build:
-            context: backend
-            dockerfile: TripBooker.HotelService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "rabbitmq"
-            - "mongodb"
-            - "travel-agency-service"           # remove if travel agency will query the data on startup
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Hotels;Username=admin;Password=password"
-            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-
-    travel-agency-service:
-        container_name: travel-agency-service
-        build:
-            context: backend
-            dockerfile: TripBooker.TravelAgencyService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "mongodb"
-            - "rabbitmq"
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TravelAgency;Username=admin;Password=password"
-            ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017" 
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-
-    payment-service:
-        container_name: payment-service
-        build:
-            context: backend
-            dockerfile: TripBooker.PaymentService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "rabbitmq"
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-
-    tour-operator-service:
-        container_name: tour-operator-service
-        build:
-            context: backend
-            dockerfile: TripBooker.TourOperator/Dockerfile
-        depends_on:
-            - "rabbitmq"
-        environment:
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
+  frontend:
+    container_name: frontend
+    build:
+      context: frontend
+      args:
+        - WEB_API_URL=http://localhost:8081
+    ports:
+      - "8080:80"
+  
+  webapi:
+    container_name: webapi
+    build:
+      context: backend
+      dockerfile: TripBooker.WebApi/Dockerfile
+    depends_on:
+      - "rabbitmq"
+      - "travel-agency-service"
+    ports:
+      - "8081:80"
+    environment:
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  
+  transport-service:
+    container_name: transport-service
+    build:
+      context: backend
+      dockerfile: TripBooker.TransportService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "rabbitmq"
+      - "mongodb"
+      - "travel-agency-service"           # remove if travel agency will query the data on startup
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Transport;Username=admin;Password=password"
+      ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  hotel-service:
+    container_name: hotel-service
+    build:
+      context: backend
+      dockerfile: TripBooker.HotelService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "rabbitmq"
+      - "mongodb"
+      - "travel-agency-service"           # remove if travel agency will query the data on startup
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Hotels;Username=admin;Password=password"
+      ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  travel-agency-service:
+    container_name: travel-agency-service
+    build:
+      context: backend
+      dockerfile: TripBooker.TravelAgencyService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "mongodb"
+      - "rabbitmq"
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TravelAgency;Username=admin;Password=password"
+      ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  payment-service:
+    container_name: payment-service
+    build:
+      context: backend
+      dockerfile: TripBooker.PaymentService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "rabbitmq"
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Payments;Username=admin;Password=password"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  tour-operator-service:
+    container_name: tour-operator-service
+    build:
+      context: backend
+      dockerfile: TripBooker.TourOperator/Dockerfile
+    depends_on:
+      - "rabbitmq"
+    environment:
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
     
-    statistics-service:
-        container_name: statistics-service
-        build:
-            context: backend
-            dockerfile: TripBooker.StatisticsService/Dockerfile
-        depends_on:
-            - "postgres"
-            - "rabbitmq"
-        environment:
-            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Statistics;Username=admin;Password=password"
-            Logging__Console__FormatterName: simple
-            RabbitMq__Host: "rabbitmq"
-        networks:
-            - network
-
-    rabbitmq:
-        image: rabbitmq:3-management-alpine
-        container_name: rabbitmq
-        volumes:
-            - ./rabbitmq/etc/:/etc/rabbitmq/
-            - rabbitmq-data:/var/lib/rabbitmq/
-            - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
-        ports:
-            - "5672:5672"
-            - "15672:15672"
-        networks:
-            - network
-
-    postgres:
-        image: postgres
-        container_name: postgres
-        restart: always
-        env_file:
-            - postgres.env
-        volumes:
-            - postgres-data:/var/lib/postgresql/data/
-            - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
-        ports:
-            - "5432:5432"
-        networks:
-            - network
-    adminer:
-        image: adminer
-        container_name: adminer
-        restart: always
-        ports:
-            - "26016:8080"
-        networks:
-            - network
-
-    mongodb:
-        image : mongo:5.0
-        container_name: mongodb
-        env_file:
-            - mongo.env
-        volumes:
-            - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-            - mongodb-data:/data/db
-        ports:
-            - "27017:27017"
-        restart: unless-stopped
-        networks:
-            - network
-    mongo-express:
-        image: mongo-express
-        container_name: mongo-express
-        ports:
-            - "28018:8081"
-        depends_on:
-            - mongodb
-        env_file:
-            - mongo_express.env
-        volumes:
-            - mongodb-data:/data/db
-        networks:
-            - network
+  statistics-service:
+    container_name: statistics-service
+    build:
+      context: backend
+      dockerfile: TripBooker.StatisticsService/Dockerfile
+    depends_on:
+      - "postgres"
+      - "rabbitmq"
+    environment:
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Statistics;Username=admin;Password=password"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
+    networks:
+      - network
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    volumes:
+      - ./rabbitmq/etc/:/etc/rabbitmq/
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - network
+  
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    env_file:
+      - postgres.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - network
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "26016:8080"
+    networks:
+      - network
+  
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    env_file:
+      - mongo.env
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    networks:
+      - network
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "28018:8081"
+    depends_on:
+      - mongodb
+    env_file:
+      - mongo_express.env
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - network
 
 networks:
-    network: {}
+  network: { }
 
 volumes:
-    postgres-data:
-    mongodb-data:
-    rabbitmq-data:
+  postgres-data:
+  mongodb-data:
+  rabbitmq-data:

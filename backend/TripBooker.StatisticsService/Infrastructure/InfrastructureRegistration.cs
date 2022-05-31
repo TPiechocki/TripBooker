@@ -1,4 +1,7 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Quartz;
+using TripBooker.StatisticsService.Consumers;
 
 namespace TripBooker.StatisticsService.Infrastructure;
 
@@ -7,7 +10,12 @@ internal static class InfrastructureRegistration
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         return services
-            .AddBus(configuration);
+            .AddBus(configuration)
+            .AddDbContext<StatisticsDbContext>(opt =>
+                opt
+                    .UseNpgsql(configuration.GetConnectionString("SqlDbContext"))
+                    .UseLoggerFactory(LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning)))
+            );
     }
 
     private static IServiceCollection AddBus(this IServiceCollection services, IConfiguration configuration)
@@ -17,6 +25,10 @@ internal static class InfrastructureRegistration
         return services.AddMassTransit(x =>
             {
                 // PUBLIC
+                x.AddConsumer<NewReservationStatisticsConsumer>();
+                x.AddConsumer<GetDestinationCountsQueryConsumer>();
+                x.AddConsumer<PaymentAcceptedStatisticsConsumer>();
+                x.AddConsumer<PaymentTimeoutStatisticsConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                     {
@@ -25,7 +37,26 @@ internal static class InfrastructureRegistration
                     }
                 );
             })
-            .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; });
-        ;
+            .Configure<MassTransitHostOptions>(x => { x.WaitUntilStarted = true; })
+            .AddQuartz();
+    }
+
+    private static IServiceCollection AddQuartz(this IServiceCollection services)
+    {
+        //configure job to create update view event every 15s
+        return services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                var jobKey = new JobKey(nameof(StatisticsTimeoutJob));
+                q.AddJob<StatisticsTimeoutJob>(opt => opt.WithIdentity(jobKey));
+                q.AddTrigger(opt => opt
+                    .ForJob(jobKey)
+                    .WithIdentity(jobKey + "-trigger")
+                    .WithSimpleSchedule(x => x
+                        .WithIntervalInSeconds(10)
+                        .RepeatForever()));
+            })
+            .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
 }

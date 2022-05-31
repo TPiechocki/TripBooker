@@ -5,6 +5,7 @@ using TripBooker.Common.Order;
 using TripBooker.Common.Order.Hotel;
 using TripBooker.Common.Order.Payment;
 using TripBooker.Common.Order.Transport;
+using TripBooker.Common.Statistics;
 using SagaState = MassTransit.State;
 
 namespace TripBooker.TravelAgencyService.Order.State;
@@ -159,6 +160,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             {
                 x.Saga.Order.HotelPrice = x.Message.Price;
                 x.Saga.Order.HotelReservationId = x.Message.ReservationId;
+                x.Saga.Order.DestinationAirportCode = x.Message.DestinationAirportCode;
             })
             .Then(x => _logger.LogInformation(
                 $"Hotel reservation accepted (OrderId={x.Message.CorrelationId})."))
@@ -166,7 +168,9 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 (
                     x.Saga.CorrelationId, x.Saga.Order.Price, x.Saga.Order.DiscountCode
                 )
-            ));
+            ))
+            .ThenAsync(x => x.Publish(
+                _mapper.Map<NewReservationEvent>(x.Saga.Order)));
 
     private EventActivityBinder<OrderState, HotelReservationRejected> SetRejectHotelHandler() =>
         When(RejectHotel)
@@ -195,8 +199,8 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                         ))))
             .TransitionTo(Rejected);
 
-
-
+    
+    
     private EventActivityBinder<OrderState, PaymentAccepted> SetAcceptPaymentHandler() =>
         When(AcceptPayment)
             .Then(x => _logger.LogInformation($"Payment accepted (OrderId={x.Message.CorrelationId})."))
