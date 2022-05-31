@@ -93,7 +93,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x.Saga.Order.TransportReservationId = x.Message.ReservationId;
             })
             .Then(x => _logger.LogInformation($"Transport reservation accepted (OrderId={x.Message.CorrelationId})."))
-            .IfElse(x => x.Saga.Order.TransportId != null,
+            .IfElse(x => x.Saga.Order.ReturnTransportId != null,
                 x =>
                     x.ThenAsync(a => a.Publish(new NewTransportReservation
                     {
