@@ -11,12 +11,12 @@ using TripBooker.HotelService.Repositories;
 
 namespace TripBooker.HotelService.EventConsumers.Public;
 
-internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
+internal class HotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 {
     private readonly IHotelEventRepository _eventRepository;
     private readonly ILogger<NewHotelReservationEventConsumer> _logger;
 
-    public NewHotelUpdateEventConsumer(
+    public HotelUpdateEventConsumer(
         IHotelEventRepository hotelRepository,
         ILogger<NewHotelReservationEventConsumer> logger)
     {
@@ -72,6 +72,7 @@ internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 
     private async Task ValidateHotelUpdateTransaction(HotelUpdateContract contract, IEnumerable<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)
     {
+        // TODO: is the transaction needed here?
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var updateEvent = new OccupatonUpdateEvent
