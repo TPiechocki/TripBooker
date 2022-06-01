@@ -1,11 +1,14 @@
 using TripBooker.TourOperator.Infrastructure;
+using TripBooker.TourOperator.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services
-    .AddInfrastructure(builder.Configuration);
+    .AddInfrastructure(builder.Configuration)
+    .AddRepositories();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
@@ -15,6 +18,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+CreateDbIfNotExists(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -28,3 +33,20 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+static void CreateDbIfNotExists(IHost host)
+{
+    using var scope = host.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var TOContext = services.GetRequiredService<TourOperatorDbContext>();
+
+        SqlDbInitializer.Initialize(TOContext);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}

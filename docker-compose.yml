@@ -79,6 +79,7 @@ services:
         depends_on:
             - "rabbitmq"
         environment:
+            ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TourOperator;Username=admin;Password=password"
             Logging__Console__FormatterName: simple
             RabbitMq__Host: "rabbitmq"
         networks:

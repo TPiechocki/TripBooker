@@ -10,7 +10,10 @@ namespace TripBooker.TransportService.Repositories;
 internal interface ITransportEventRepository
 {
     Task AddAsync(TransportPlaceUpdateEvent placeUpdateEvent, Guid streamId, int previousVersion,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken, bool updateViews = true);
+
+    Task AddAsync(TicketPriceUpdateEvent placeUpdateEvent, Guid streamId, int previousVersion,
+        CancellationToken cancellationToken, bool updateViews = true);
 
     Task AddManyNewAsync(IEnumerable<NewTransportEventData> transportEvents, CancellationToken cancellationToken);
 
@@ -59,7 +62,8 @@ internal class TransportEventRepository : ITransportEventRepository
         TransportPlaceUpdateEvent placeUpdateEvent,
         Guid streamId,
         int previousVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, 
+        bool updateViews = true)
     {
         await _dbContext.TransportEvent.AddAsync(new TransportEvent(
                 streamId, previousVersion+1, nameof(TransportPlaceUpdateEvent), placeUpdateEvent),
@@ -73,7 +77,29 @@ internal class TransportEventRepository : ITransportEventRepository
             throw new DbUpdateException(message);
         }
 
-        await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
+        if (updateViews) await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
+    }
+
+    public async Task AddAsync(
+        TicketPriceUpdateEvent priceUpdateEvent,
+        Guid streamId,
+        int previousVersion,
+        CancellationToken cancellationToken, 
+        bool updateViews = true)
+    {
+        await _dbContext.TransportEvent.AddAsync(new TransportEvent(
+                streamId, previousVersion + 1, nameof(TransportPlaceUpdateEvent), priceUpdateEvent),
+            cancellationToken);
+
+        var status = await _dbContext.SaveChangesAsync(cancellationToken);
+        if (status == 0)
+        {
+            var message = $"Could not add a transport ticket price update event: {JsonConvert.SerializeObject(priceUpdateEvent)}";
+            _logger.LogError(message);
+            throw new DbUpdateException(message);
+        }
+
+        if (updateViews) await _bus.Publish(new TransportViewUpdateEvent(), cancellationToken);
     }
 
     public async Task<ICollection<TransportEvent>> GetTransportEventsAsync(Guid streamId, CancellationToken cancellationToken)

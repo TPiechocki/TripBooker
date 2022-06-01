@@ -20,6 +20,7 @@ internal static class HotelOccupationViewContractMapper
             AllInclusive = hotel.AllInclusive,
             AllInclusivePrice = hotel.GetPriceFor(MealOption.AllInclusive) * occupation.PriceModifier,
             Date = occupation.Date,
+            PriceModifier = occupation.PriceModifier,
             RoomsStudio = occupation.RoomsStudio,
             StudioPrice = hotel.GetPriceFor(RoomType.Studio) * occupation.PriceModifier,
             RoomsSmall = occupation.RoomsSmall,

@@ -7,7 +7,7 @@ public class HotelUpdateContract
 {
     public Guid HotelId { get; set; }
 
-    public List<DateTime> Days { get; set; } = new List<DateTime>();
+    public List<Guid> HotelDays { get; set; } = new List<Guid>();
 
     public double PriceModifierFactor { get; set; } = 1.0;
 

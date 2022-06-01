@@ -5,30 +5,28 @@ using System.Transactions;
 using TripBooker.Common;
 using TripBooker.Common.TourOperator.Contract;
 using TripBooker.HotelService.Model;
+using TripBooker.HotelService.Model.Events;
 using TripBooker.HotelService.Model.Events.Hotel;
 using TripBooker.HotelService.Repositories;
 
 namespace TripBooker.HotelService.EventConsumers.Public;
 
-internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
+internal class HotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 {
     private readonly IHotelEventRepository _eventRepository;
-    private readonly IHotelOccupationViewRepository _occupationRepository;
     private readonly ILogger<NewHotelReservationEventConsumer> _logger;
 
-    public NewHotelUpdateEventConsumer(
+    public HotelUpdateEventConsumer(
         IHotelEventRepository hotelRepository,
-        IHotelOccupationViewRepository occupationRepository,
         ILogger<NewHotelReservationEventConsumer> logger)
     {
         _eventRepository = hotelRepository;
-        _occupationRepository = occupationRepository;
         _logger = logger;
     }
 
     public async Task Consume(ConsumeContext<HotelUpdateContract> context)
     {
-        _logger.LogInformation($"Hotel Update Contract recieved (HotelId = {context.Message.HotelId}, number of days = {context.Message.Days.Count})");
+        _logger.LogInformation($"Hotel Update Contract recieved (HotelId = {context.Message.HotelId}, number of days = {context.Message.HotelDays.Count})");
 
         bool transactionSuccesfull;
         do
@@ -37,13 +35,13 @@ internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 
             var hotelOccupations = new List<HotelOccupationModel>();
 
-            foreach (var day in context.Message.Days)
+            foreach (var hotelDay in context.Message.HotelDays)
             {
-                var hotelDay = await _occupationRepository.GetByHotelIdAndDateAsync(context.Message.HotelId, day, context.CancellationToken);
-                if (hotelDay != null)
-                    hotelOccupations.Add(hotelDay);
+                var hotelEvents = await _eventRepository.GetHotelEventsAsync(hotelDay, context.CancellationToken);
+                if (hotelEvents != null && hotelEvents.Count > 0)
+                    hotelOccupations.Add(HotelOccupationBuilder.Build(hotelEvents));
                 else
-                    _logger.LogInformation($"Could not locate HotelOccupationModel for given values: HotelId = {context.Message.HotelId}, DayTime = {day}");
+                    _logger.LogInformation($"Could not locate HotelOccupationModel for given values: HotelId = {context.Message.HotelId}, HotelDay = {hotelDay}");
             }
 
             try
@@ -69,11 +67,12 @@ internal class NewHotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 
         // TODO: request/response to Rabbit with change confirmation
 
-        _logger.LogInformation($"Hotel Update Contract consumed (HotelId = {context.Message.HotelId}, number of days = {context.Message.Days.Count})");
+        _logger.LogInformation($"Hotel Update Contract consumed (HotelId = {context.Message.HotelId}, number of days = {context.Message.HotelDays.Count})");
     }
 
     private async Task ValidateHotelUpdateTransaction(HotelUpdateContract contract, IEnumerable<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)
     {
+        // TODO: is the transaction needed here?
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var updateEvent = new OccupatonUpdateEvent

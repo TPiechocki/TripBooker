@@ -18,6 +18,7 @@ public class HotelOccupationViewContract
     public string HotelCode { get; set; } = null!;
     public Guid HotelId { get; set; }
     public string HotelName { get; set; } = null!;
+    public double PriceModifier { get; set; } = 1.0;
     public double LargePrice { get; set; }
     public double MediumPrice { get; set; }
     public float Rating { get; set; }

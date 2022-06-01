@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using TripBooker.Common.Order;
 
-namespace TripBooker.TourOperator.Consumers;
+namespace TripBooker.TourOperator.EventConsumers.Public;
 
 public class TourOperatorReportConsumer : IConsumer<TourOperatorReport>
 {
