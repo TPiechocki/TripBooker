@@ -21,6 +21,10 @@ internal static class TransportBuilder
                 case nameof(TransportPlaceUpdateEvent):
                     item.ApplyPlaceUpdate(@event);
                     break;
+
+                case nameof(TicketPriceUpdateEvent):
+                    item.ApplyPriceUpdate(@event);
+                    break;
             }
         }
 
@@ -55,5 +59,14 @@ internal static class TransportBuilder
         item.Version = @event.Version;
 
         item.AvailablePlaces = data.NewPlaces;
+    }
+
+    private static void ApplyPriceUpdate(this TransportModel item, BaseEvent @event)
+    {
+        var data = JsonConvert.DeserializeObject<TicketPriceUpdateEvent>(@event.Data)!;
+
+        item.Version = @event.Version;
+
+        item.TicketPrice = data.NewPrice;
     }
 }
