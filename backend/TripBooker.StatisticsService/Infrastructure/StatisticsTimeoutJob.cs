@@ -8,21 +8,23 @@ internal class StatisticsTimeoutJob : IJob
 {
     private readonly IDestinationStatisticsService _destinationService;
     private readonly IHotelStatisticsService _hotelService;
-
     private readonly ILogger<StatisticsTimeoutJob> _logger;
     private readonly TimeSpan _range = TimeSpan.FromMinutes(15);
     private readonly IReservationRepository _repository;
+    private readonly ITransportStatisticsService _transportService;
 
     public StatisticsTimeoutJob(
         IReservationRepository repository,
         IDestinationStatisticsService destinationService,
         ILogger<StatisticsTimeoutJob> logger,
-        IHotelStatisticsService hotelService)
+        IHotelStatisticsService hotelService,
+        ITransportStatisticsService transportService)
     {
         _repository = repository;
         _destinationService = destinationService;
         _logger = logger;
         _hotelService = hotelService;
+        _transportService = transportService;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -33,7 +35,8 @@ internal class StatisticsTimeoutJob : IJob
         if (expiredStatistics.Any())
             _logger.LogInformation($"Statistics for {expiredStatistics.Count} orders have expired.");
 
-        var destinations = expiredStatistics.Select(x => x.DestinationAirportCode).Distinct();
+        var destinations = expiredStatistics.Select(x => x.DestinationAirportCode)
+            .Distinct().ToList();
         var hotelCodes = expiredStatistics.Select(x => new
         {
             Destination = x.DestinationAirportCode,
@@ -44,6 +47,9 @@ internal class StatisticsTimeoutJob : IJob
             x, context.CancellationToken)).ToList();
         tasks.AddRange(hotelCodes.Select(x => _hotelService.UpdateCount(
             x.Destination, x.HotelCode, context.CancellationToken)));
+        tasks.AddRange(destinations.Select(x => _transportService.UpdateCount(
+            x, context.CancellationToken)));
+
         await Task.WhenAll(tasks);
     }
 }

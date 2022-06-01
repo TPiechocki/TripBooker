@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.Common.Statistics.Updates;
 using TripBooker.StatisticsService.Repository;
@@ -18,7 +18,6 @@ internal class HotelStatisticsService : IHotelStatisticsService
     private readonly IBus _bus;
     private readonly ILogger<HotelStatisticsService> _logger;
     private readonly IReservationRepository _repository;
-
 
     public HotelStatisticsService(
         ILogger<HotelStatisticsService> logger,

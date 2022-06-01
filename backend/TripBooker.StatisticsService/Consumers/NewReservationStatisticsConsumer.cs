@@ -14,19 +14,22 @@ internal class NewReservationStatisticsConsumer : IConsumer<NewReservationEvent>
     private readonly ILogger<NewReservationStatisticsConsumer> _logger;
     private readonly IMapper _mapper;
     private readonly IReservationRepository _repository;
+    private readonly ITransportStatisticsService _transportService;
 
     public NewReservationStatisticsConsumer(
         ILogger<NewReservationStatisticsConsumer> logger,
         IReservationRepository repository,
         IMapper mapper,
         IDestinationStatisticsService destinationService,
-        IHotelStatisticsService hotelService)
+        IHotelStatisticsService hotelService,
+        ITransportStatisticsService transportService)
     {
         _logger = logger;
         _repository = repository;
         _mapper = mapper;
         _destinationService = destinationService;
         _hotelService = hotelService;
+        _transportService = transportService;
     }
 
     public async Task Consume(ConsumeContext<NewReservationEvent> context)
@@ -42,5 +45,6 @@ internal class NewReservationStatisticsConsumer : IConsumer<NewReservationEvent>
         await _destinationService.UpdateCount(reservation.DestinationAirportCode, context.CancellationToken);
         await _hotelService.UpdateCount(reservation.DestinationAirportCode, reservation.HotelCode,
             context.CancellationToken);
+        await _transportService.UpdateCount(reservation.DestinationAirportCode, context.CancellationToken);
     }
 }
