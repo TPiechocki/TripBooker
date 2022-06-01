@@ -16,11 +16,11 @@ internal interface ITransportStatisticsService
 internal class TransportStatisticsService : ITransportStatisticsService
 {
     private readonly IBus _bus;
-    private readonly ILogger<HotelStatisticsService> _logger;
+    private readonly ILogger<TransportStatisticsService> _logger;
     private readonly IReservationRepository _repository;
 
     public TransportStatisticsService(
-        ILogger<HotelStatisticsService> logger,
+        ILogger<TransportStatisticsService> logger,
         IReservationRepository repository,
         IBus bus)
     {
@@ -48,13 +48,13 @@ internal class TransportStatisticsService : ITransportStatisticsService
             )
             .ToListAsync(cancellationToken);
 
-        return new TransportCounts(transports, returnTransports);
+        return new TransportCounts(destination, transports, returnTransports);
     }
 
     public async Task UpdateCount(string destination, CancellationToken cancellationToken)
     {
         var newCounts = await GetForDestination(destination, cancellationToken);
         await _bus.Publish(newCounts, cancellationToken);
-        _logger.LogInformation($"New transport counters for {destination} destination.");
+        _logger.LogInformation($"New transport counters for {destination} destination");
     }
 }

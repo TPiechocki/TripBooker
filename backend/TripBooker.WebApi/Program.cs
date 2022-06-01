@@ -73,6 +73,8 @@ app.MapHub<DestinationStatisticsHub>("/destinationsHub")
     .AllowAnonymous();
 app.MapHub<HotelStatisticsHub>("/hotelsHub")
     .AllowAnonymous();
+app.MapHub<TransportStatisticsHub>("/transportsHub")
+    .AllowAnonymous();
 app.MapHub<OfferUpdatesHub>("/offerUpdatedNotifications")
     .AllowAnonymous();
 

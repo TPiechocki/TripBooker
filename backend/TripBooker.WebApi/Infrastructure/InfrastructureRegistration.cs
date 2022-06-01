@@ -23,6 +23,7 @@ internal static class ServicesRegistration
 
                     x.AddConsumer<DestinationCountUpdateConsumer>();
                     x.AddConsumer<HotelCountUpdateConsumer>();
+                    x.AddConsumer<TransportCountsUpdateConsumer>();
 
                     x.AddConsumer<TransportViewUpdatedConsumer>();
                     x.AddConsumer<HotelViewUpdatedConsumer>();

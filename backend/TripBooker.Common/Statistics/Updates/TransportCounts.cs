@@ -4,13 +4,15 @@ namespace TripBooker.Common.Statistics.Updates;
 
 public class TransportCounts
 {
-    public TransportCounts(
-        IEnumerable<TransportCount> transports,
+    public TransportCounts(string destination, IEnumerable<TransportCount> transports,
         IEnumerable<TransportCount> returnTransports)
     {
         Transports = transports;
         ReturnTransports = returnTransports;
+        Destination = destination;
     }
+
+    public string Destination { get; }
 
     public IEnumerable<TransportCount> Transports { get; }
 

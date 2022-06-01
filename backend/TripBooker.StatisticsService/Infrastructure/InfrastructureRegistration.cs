@@ -32,6 +32,7 @@ internal static class InfrastructureRegistration
 
                 x.AddConsumer<GetDestinationCountsQueryConsumer>();
                 x.AddConsumer<GetHotelCountsQueryConsumer>();
+                x.AddConsumer<GetTransportCountsQueryConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                     {

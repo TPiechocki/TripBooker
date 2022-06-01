@@ -82,7 +82,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, null
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationAccepted> SetAcceptTransportHandler() =>
@@ -105,7 +105,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
                 x => x.ThenAsync(a =>
                     a.Publish(new TransportReservationAccepted
                     (
-                        a.Saga.CorrelationId, 0, Guid.Empty, string.Empty
+                        a.Saga.CorrelationId, 0, Guid.Empty, null
                     ))));
 
     private EventActivityBinder<OrderState, TransportReservationRejected> SetRejectTransportHandler() =>
