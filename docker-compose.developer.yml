@@ -98,17 +98,17 @@ services:
   tour-operator-service:
     container_name: tour-operator-service
     build:
-        context: backend
-        dockerfile: TripBooker.TourOperator/Dockerfile
+      context: backend
+      dockerfile: TripBooker.TourOperator/Dockerfile
     depends_on:
-        - "postgres"
-        - "rabbitmq"
+      - "postgres"
+      - "rabbitmq"
     environment:
-        ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TourOperator;Username=admin;Password=password"
-        Logging__Console__FormatterName: simple
-        RabbitMq__Host: "rabbitmq"
+      ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TourOperator;Username=admin;Password=password"
+      Logging__Console__FormatterName: simple
+      RabbitMq__Host: "rabbitmq"
     networks:
-        - network
+      - network
     
   statistics-service:
     container_name: statistics-service
