@@ -77,7 +77,6 @@ services:
         container_name: tour-operator-service
         image: tpiechocki/rsww_175641_tour_operator
         depends_on:
-            - "postgres"
             - "rabbitmq"
         environment:
             ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_TourOperator;Username=admin;Password=password"
