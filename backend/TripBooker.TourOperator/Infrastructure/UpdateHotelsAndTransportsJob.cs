@@ -9,16 +9,19 @@ internal class UpdateHotelsAndTransportsJob : IJob
 {
     private readonly IBus _bus;
     private readonly IHotelOccupationViewRepository _hotelRepository;
+    private readonly ITransportViewRepository _transportRepository;
     private readonly ILogger<UpdateHotelsAndTransportsJob> _logger;
 
 
     public UpdateHotelsAndTransportsJob(
         IBus bus,
         IHotelOccupationViewRepository hotelRepository,
+        ITransportViewRepository transportRepository,
         ILogger<UpdateHotelsAndTransportsJob> logger)
     {
         _bus = bus;
         _hotelRepository = hotelRepository;
+        _transportRepository = transportRepository;
         _logger = logger;
     }
 
@@ -32,8 +35,8 @@ internal class UpdateHotelsAndTransportsJob : IJob
         var hotels = _hotelRepository.QueryAll().GroupBy(x => x.HotelId).ToList();
         var hotelDays = hotels[rnd.Next(hotels.Count)].OrderBy(x => x.Date).ToList();
 
-        var startDate = rnd.Next(hotelDays.Count);
-        var length = rnd.Next(hotelDays.Count - startDate);
+        var startDate = rnd.Next(hotelDays.Count - 1);
+        var length = rnd.Next(hotelDays.Count - startDate) + 1;
         hotelDays = hotelDays.Skip(startDate).Take(length).ToList();
 
         var minvals = hotelDays.First();

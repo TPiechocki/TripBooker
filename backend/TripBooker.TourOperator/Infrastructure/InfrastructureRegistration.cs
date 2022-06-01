@@ -29,6 +29,14 @@ internal static class InfrastructureRegistration
                 x.AddConsumer<TourOperatorReportConsumer>();
 
                 // View updates
+                x.AddConsumer<TourOperatorTransportViewContractConsumer>(cfg =>
+                {
+                    cfg.Options<BatchOptions>(opt =>
+                    {
+                        opt.ConcurrencyLimit = 1;
+                        opt.MessageLimit = 500;
+                    });
+                });
                 x.AddConsumer<TourOperatorHotelOccupationViewContractConsumer>(cfg =>
                 {
                     cfg.Options<BatchOptions>(opt =>
