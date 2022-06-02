@@ -6,6 +6,8 @@ namespace TripBooker.TourOperator.Infrastructure;
 internal class TourOperatorDbContext : DbContext
 {
     // Views
+    public DbSet<TransportModel> TransportView { get; set; } = null!;
+
     public DbSet<HotelOccupationModel> HotelOccupationView { get; set; } = null!;
 
     public TourOperatorDbContext(DbContextOptions options) : base(options)

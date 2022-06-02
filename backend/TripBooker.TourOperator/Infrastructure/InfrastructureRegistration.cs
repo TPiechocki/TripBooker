@@ -27,8 +27,18 @@ internal static class InfrastructureRegistration
             {
                 // PUBLIC
                 x.AddConsumer<TourOperatorReportConsumer>();
+                x.AddConsumer<HotelUpdateQueryConsumer>();
+                x.AddConsumer<TransportUpdateQueryConsumer>();
 
                 // View updates
+                x.AddConsumer<TourOperatorTransportViewContractConsumer>(cfg =>
+                {
+                    cfg.Options<BatchOptions>(opt =>
+                    {
+                        opt.ConcurrencyLimit = 1;
+                        opt.MessageLimit = 500;
+                    });
+                });
                 x.AddConsumer<TourOperatorHotelOccupationViewContractConsumer>(cfg =>
                 {
                     cfg.Options<BatchOptions>(opt =>
@@ -62,7 +72,7 @@ internal static class InfrastructureRegistration
                 .ForJob(jobKey)
                 .WithIdentity(jobKey + "-trigger")
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(1)
+                    .WithIntervalInSeconds(45)
                     .RepeatForever()));
         })
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
