@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Quartz;
 using TripBooker.Common.TourOperator.Contract;
+using TripBooker.TourOperator.Model.Extensions;
 using TripBooker.TourOperator.Repositories;
 
 namespace TripBooker.TourOperator.Infrastructure;
@@ -39,16 +40,7 @@ internal class UpdateHotelsAndTransportsJob : IJob
         var length = rnd.Next(hotelDays.Count - startDate) + 1;
         hotelDays = hotelDays.Skip(startDate).Take(length).ToList();
 
-        var minvals = hotelDays.First();
-        foreach (var hotelDay in hotelDays)
-        {
-            minvals.PriceModifier = Math.Min(minvals.PriceModifier, hotelDay.PriceModifier);
-            minvals.RoomsStudio = Math.Min(minvals.RoomsStudio, hotelDay.RoomsStudio);
-            minvals.RoomsSmall = Math.Min(minvals.RoomsSmall, hotelDay.RoomsSmall);
-            minvals.RoomsMedium = Math.Min(minvals.RoomsMedium, hotelDay.RoomsMedium);
-            minvals.RoomsLarge = Math.Min(minvals.RoomsLarge, hotelDay.RoomsLarge);
-            minvals.RoomsApartment = Math.Min(minvals.RoomsApartment, hotelDay.RoomsApartment);
-        }
+        var minvals = hotelDays.Reduce();
 
         var updateRoll = rnd.NextDouble();
         // If roll > 0.5 some rooms get taken and prices go up else price goes down no rooms taken

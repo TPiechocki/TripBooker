@@ -27,6 +27,8 @@ internal static class InfrastructureRegistration
             {
                 // PUBLIC
                 x.AddConsumer<TourOperatorReportConsumer>();
+                x.AddConsumer<HotelUpdateQueryConsumer>();
+                x.AddConsumer<TransportUpdateQueryConsumer>();
 
                 // View updates
                 x.AddConsumer<TourOperatorTransportViewContractConsumer>(cfg =>

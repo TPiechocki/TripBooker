@@ -12,6 +12,8 @@ internal interface ITransportViewRepository
     Task AddOrUpdateManyAsync(IEnumerable<TransportModel> transports, CancellationToken cancellationToken);
 
     IEnumerable<TransportModel> QueryAll();
+
+    Task<TransportModel> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 }
 
 internal class TransportViewRepository : ITransportViewRepository
@@ -77,5 +79,10 @@ internal class TransportViewRepository : ITransportViewRepository
     public IEnumerable<TransportModel> QueryAll()
     {
         return _dbContext.TransportView.Select(x => x).ToList();
+    }
+
+    public async Task<TransportModel> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _dbContext.TransportView.SingleAsync(x => x.Id == id, cancellationToken);
     }
 }
