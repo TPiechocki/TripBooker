@@ -7,26 +7,37 @@ namespace TripBooker.WebApi.Hubs;
 
 public interface IHotelStatisticsClient
 {
-    Task HotelCountUpdate(HotelCountUpdate update);
+    Task HotelCountUpdate(HotelCount update);
 
-    Task HotelCountsResponse(GetHotelCountsResponse update);
+    Task HotelsResponse(GetHotelCountsResponse response);
+
+    Task HotelResponse(HotelCount response);
 }
 
 public class HotelStatisticsHub : Hub<IHotelStatisticsClient>
 {
-    private readonly IRequestClient<GetHotelCountsQuery> _requestClient;
+    private readonly IRequestClient<GetHotelCount> _hotelRequestClient;
+    private readonly IRequestClient<GetHotelCountsQuery> _hotelsRequestClient;
 
     public HotelStatisticsHub(
-        IRequestClient<GetHotelCountsQuery> requestClient)
+        IRequestClient<GetHotelCountsQuery> hotelsRequestClient,
+        IRequestClient<GetHotelCount> hotelRequestClient)
     {
-        _requestClient = requestClient;
+        _hotelsRequestClient = hotelsRequestClient;
+        _hotelRequestClient = hotelRequestClient;
     }
 
     public async Task GetForDestination(GetHotelCountsQuery query)
     {
-        var counts = await _requestClient.GetResponse<GetHotelCountsResponse>(
-            query);
+        var counts = await _hotelsRequestClient.GetResponse<GetHotelCountsResponse>(query);
 
-        await Clients.Caller.HotelCountsResponse(counts.Message);
+        await Clients.Caller.HotelsResponse(counts.Message);
+    }
+
+    public async Task GetForHotel(GetHotelCount query)
+    {
+        var counts = await _hotelRequestClient.GetResponse<HotelCount>(query);
+
+        await Clients.Caller.HotelResponse(counts.Message);
     }
 }

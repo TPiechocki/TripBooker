@@ -6,7 +6,7 @@ using TripBooker.WebApi.Hubs;
 
 namespace TripBooker.WebApi.Consumers;
 
-internal class HotelCountUpdateConsumer : IConsumer<HotelCountUpdate>
+internal class HotelCountUpdateConsumer : IConsumer<HotelCount>
 {
     private readonly IHubContext<HotelStatisticsHub, IHotelStatisticsClient> _hubContext;
     private readonly ILogger<HotelCountUpdateConsumer> _logger;
@@ -19,7 +19,7 @@ internal class HotelCountUpdateConsumer : IConsumer<HotelCountUpdate>
         _logger = logger;
     }
 
-    public async Task Consume(ConsumeContext<HotelCountUpdate> context)
+    public async Task Consume(ConsumeContext<HotelCount> context)
     {
         _logger.LogInformation("Sending hotel count update: " +
                                $"{JsonConvert.SerializeObject(context.Message)}");

@@ -12,7 +12,7 @@ internal class PurchasedOfferNotificationConsumer : IConsumer<PurchasedOfferNoti
     private readonly ILogger<PurchasedOfferNotificationConsumer> _logger;
 
     public PurchasedOfferNotificationConsumer(
-        IHubContext<PurchasedOfferNotificationHub, IPurchasedOfferNotificationClient> hubContext, 
+        IHubContext<PurchasedOfferNotificationHub, IPurchasedOfferNotificationClient> hubContext,
         ILogger<PurchasedOfferNotificationConsumer> logger)
     {
         _hubContext = hubContext;
@@ -21,7 +21,7 @@ internal class PurchasedOfferNotificationConsumer : IConsumer<PurchasedOfferNoti
 
     public async Task Consume(ConsumeContext<PurchasedOfferNotification> context)
     {
-        _logger.LogInformation($"Sending notifications of purchased offer for hotel days: " +
+        _logger.LogInformation("Sending notifications of purchased offer for hotel days: " +
                                $"{JsonConvert.SerializeObject(context.Message)}");
         await _hubContext.Clients.All.SendNotification(context.Message);
     }

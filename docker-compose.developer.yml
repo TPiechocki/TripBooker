@@ -109,7 +109,7 @@ services:
       RabbitMq__Host: "rabbitmq"
     networks:
       - network
-    
+  
   statistics-service:
     container_name: statistics-service
     build:

@@ -6,6 +6,7 @@ internal static class ServicesRegistration
     {
         return services
             .AddScoped<IDestinationStatisticsService, DestinationStatisticsService>()
-            .AddScoped<IHotelStatisticsService, HotelStatisticsService>();
+            .AddScoped<IHotelStatisticsService, HotelStatisticsService>()
+            .AddScoped<ITransportStatisticsService, TransportStatisticsService>();
     }
 }

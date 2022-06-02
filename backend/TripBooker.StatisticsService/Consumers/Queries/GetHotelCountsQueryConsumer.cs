@@ -22,7 +22,7 @@ internal class GetHotelCountsQueryConsumer : IConsumer<GetHotelCountsQuery>
     {
         _logger.LogInformation("Hotel counts query received.");
 
-        var counts = await _hotelService.GetForDestination(
+        var counts = await _hotelService.GetOrderCountsForDestination(
             context.Message.Destination, context.CancellationToken);
 
         await context.RespondAsync(new GetHotelCountsResponse(counts));
