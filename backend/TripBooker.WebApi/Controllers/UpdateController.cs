@@ -21,6 +21,8 @@ public class UpdateController : ControllerBase
     [HttpPost("Hotel")]
     public async Task<IActionResult> Hotel(HotelUpdateQuery query, CancellationToken cancellationToken)
     {
+        query.StartDate = DateTime.SpecifyKind(query.StartDate, DateTimeKind.Utc);
+
         await _bus.Publish(query, cancellationToken);
 
         return Ok();
