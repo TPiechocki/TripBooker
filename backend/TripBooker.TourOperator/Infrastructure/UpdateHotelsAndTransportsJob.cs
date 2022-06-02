@@ -66,8 +66,19 @@ internal class UpdateHotelsAndTransportsJob : IJob
         _logger.LogInformation($"Updated Hotel: HotelId = {minvals.HotelId}, StartDate = {minvals.Date}, length = {hotelDays.Count}, updateRoll = {updateRoll}");
 
         // Transports
+        var transports = _transportRepository.QueryAll().ToList();
+        var transport = transports[rnd.Next(transports.Count)];
 
-        // TODO
+        updateRoll = rnd.NextDouble();
+        // if roll > 0.5 some places are taken and the price goes up else price goes down
+        _bus.Publish(new TransportUpdateContract()
+        {
+            Id = transport.Id,
+            AvailablePlacesChange = updateRoll > 0.5 ? -rnd.Next((int)((transport.AvailablePlaces - 1) * updateRoll) + 1) : 0,
+            PriceChangedFlag = true,
+            NewTicketPrice = Math.Max((int)((updateRoll + 0.5) * transport.TicketPrice), 1)
+        });
+        _logger.LogInformation($"Updated Transport: Id = {transport.Id}, updateRoll = {updateRoll}");
 
         return Task.CompletedTask;
     }

@@ -70,7 +70,7 @@ internal static class InfrastructureRegistration
                 .ForJob(jobKey)
                 .WithIdentity(jobKey + "-trigger")
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(1)
+                    .WithIntervalInSeconds(45)
                     .RepeatForever()));
         })
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
