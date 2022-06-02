@@ -236,6 +236,7 @@ internal class OrderStateMachine : MassTransitStateMachine<OrderState>
             .ThenAsync(x =>
                 x.Publish(new PurchasedOfferNotification
                 {
+                    OrderId = x.Saga.CorrelationId,
                     PurchasedHotelDays = x.Saga.Order.HotelDays
                 }))
             .TransitionTo(Confirmed);
