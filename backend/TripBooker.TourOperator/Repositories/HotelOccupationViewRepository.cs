@@ -74,6 +74,7 @@ internal class HotelOccupationViewRepository : IHotelOccupationViewRepository
     private async Task AddAsync(HotelOccupationModel hotelOccupation, CancellationToken cancellationToken)
     {
         await _dbContext.HotelOccupationView.AddAsync(hotelOccupation, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public IEnumerable<HotelOccupationModel> QueryAll()

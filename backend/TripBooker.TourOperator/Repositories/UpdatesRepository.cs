@@ -25,6 +25,7 @@ internal class UpdatesRepository : IUpdatesRepository
         await _dbContext.UpdateModel.AddAsync(
             new UpdateModel(DateTime.UtcNow, description),
             cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<UpdateModel>> QueryLast10Async(CancellationToken cancellationToken)
