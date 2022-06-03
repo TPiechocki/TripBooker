@@ -74,6 +74,7 @@ internal class TransportViewRepository : ITransportViewRepository
     private async Task AddAsync(TransportModel transport, CancellationToken cancellationToken)
     {
         await _dbContext.TransportView.AddAsync(transport, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public IEnumerable<TransportModel> QueryAll()

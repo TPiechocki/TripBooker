@@ -2,6 +2,7 @@
 using Quartz;
 using Microsoft.EntityFrameworkCore;
 using TripBooker.TourOperator.EventConsumers.Public;
+using TripBooker.TourOperator.EventConsumers.Public.Query;
 
 namespace TripBooker.TourOperator.Infrastructure;
 
@@ -29,6 +30,7 @@ internal static class InfrastructureRegistration
                 x.AddConsumer<TourOperatorReportConsumer>();
                 x.AddConsumer<HotelUpdateQueryConsumer>();
                 x.AddConsumer<TransportUpdateQueryConsumer>();
+                x.AddConsumer<UpdatesQueryConsumer>();
 
                 // View updates
                 x.AddConsumer<TourOperatorTransportViewContractConsumer>(cfg =>
