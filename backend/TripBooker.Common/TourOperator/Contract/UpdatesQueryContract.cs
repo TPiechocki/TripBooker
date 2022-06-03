@@ -26,7 +26,7 @@ public class UpdateContract
         Description = description;
     }
 
-    DateTime Timestamp { get; }
+    public DateTime Timestamp { get; }
 
-    string Description { get; }
+    public string Description { get; }
 }
