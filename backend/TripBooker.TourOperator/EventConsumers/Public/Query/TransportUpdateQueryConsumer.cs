@@ -4,7 +4,7 @@ using TripBooker.Common.TourOperator.Contract.Query;
 using TripBooker.TourOperator.Model.Extensions;
 using TripBooker.TourOperator.Repositories;
 
-namespace TripBooker.TourOperator.EventConsumers.Public;
+namespace TripBooker.TourOperator.EventConsumers.Public.Query;
 
 internal class TransportUpdateQueryConsumer : IConsumer<TransportUpdateQuery>
 {
