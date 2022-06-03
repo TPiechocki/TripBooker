@@ -5,6 +5,8 @@ namespace TripBooker.TourOperator.Infrastructure;
 
 internal class TourOperatorDbContext : DbContext
 {
+    public DbSet<UpdateModel> UpdateModel { get; set; } = null!;
+
     // Views
     public DbSet<TransportModel> TransportView { get; set; } = null!;
 

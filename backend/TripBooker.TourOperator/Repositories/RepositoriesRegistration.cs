@@ -6,6 +6,7 @@ internal static class ServicesRegistration
     {
         return services
             .AddScoped<IHotelOccupationViewRepository, HotelOccupationViewRepository>()
-            .AddScoped<ITransportViewRepository, TransportViewRepository>();
+            .AddScoped<ITransportViewRepository, TransportViewRepository>()
+            .AddScoped<IUpdatesRepository, UpdatesRepository>();
     }
 }

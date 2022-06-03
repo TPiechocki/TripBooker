@@ -8,13 +8,19 @@ namespace TripBooker.TourOperator.EventConsumers.Public;
 
 internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
 {
-    private readonly IHotelOccupationViewRepository _repository;
+    private readonly IHotelOccupationViewRepository _hotelRepository;
+    private readonly IUpdatesRepository _updatesRepository;
     private readonly ILogger<HotelUpdateQueryConsumer> _logger; 
     private readonly IBus _bus;
 
-    public HotelUpdateQueryConsumer(IHotelOccupationViewRepository repository, ILogger<HotelUpdateQueryConsumer> logger, IBus bus)
+    public HotelUpdateQueryConsumer(
+        IHotelOccupationViewRepository hotelRepository,
+        IUpdatesRepository updatesRepository,
+        ILogger<HotelUpdateQueryConsumer> logger,
+        IBus bus)
     {
-        _repository = repository;
+        _hotelRepository = hotelRepository;
+        _updatesRepository = updatesRepository;
         _logger = logger;
         _bus = bus;
     }
@@ -23,7 +29,7 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
     {
         _logger.LogInformation("Query for hotel update received");
 
-        var hotelDays = await _repository.GetByHotelIdAndDatesAsync(
+        var hotelDays = await _hotelRepository.GetByHotelIdAndDatesAsync(
             context.Message.HotelId,
             context.Message.StartDate,
             context.Message.StartDate.AddDays(context.Message.Length),
@@ -37,7 +43,7 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
 
         var minvals = hotelDays.Reduce();
 
-        await _bus.Publish(new HotelUpdateContract()
+        var update = new HotelUpdateContract()
         {
             HotelId = context.Message.HotelId,
             HotelDays = hotelDays.Select(x => x.Id).ToList(),
@@ -47,7 +53,10 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
             RoomsMediumChange = Math.Max(context.Message.RoomsMediumChange, -minvals.RoomsMedium),
             RoomsLargeChange = Math.Max(context.Message.RoomsLargeChange, -minvals.RoomsLarge),
             RoomsApartmentChange = Math.Max(context.Message.RoomsApartmentChange, -minvals.RoomsApartment),
-        }, context.CancellationToken);
+        };
+
+        await _bus.Publish(update, context.CancellationToken);
+        await _updatesRepository.AddAsync(update.Describe(), context.CancellationToken);
 
         _logger.LogInformation($"Query for hotel update consumed, update for: HotelId = {context.Message.HotelId}, StartDate = {context.Message.StartDate}, Length = {context.Message.Length}");
     }
