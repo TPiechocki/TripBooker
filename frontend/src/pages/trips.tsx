@@ -86,13 +86,13 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
   const [counts, setCounts] = useState<{ [key: string]: number }>({})
 
   useEffect(() => {
-    const purchasedNotificationsHubConnection = new HubConnectionBuilder()
+    const hotelHubConnection = new HubConnectionBuilder()
       .withUrl(process.env.WEB_API_URL + 'hotelsHub')
       .configureLogging(LogLevel.Warning)
       .withAutomaticReconnect()
       .build();
 
-    setConnection(purchasedNotificationsHubConnection);
+    setConnection(hotelHubConnection);
   }, []);
 
   useEffect(() => {

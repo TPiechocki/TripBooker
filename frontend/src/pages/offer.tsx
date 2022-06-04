@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {navigate, PageProps} from "gatsby";
 import Layout from "../components/Layout";
 import {
@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import {request} from "../api/request";
 import {UserContext} from "../context/UserContext";
-import {HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
+import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 
 interface TransportOption {
   availablePlaces: number,
@@ -85,7 +85,10 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
 
   const [purchasedNotificationConnection, setPurchasedNotificationConnection] = useState<HubConnection | null>(null);
   const [offerUpdatedNotificationsConnection, setOfferUpdatedNotificationsConnection] = useState<HubConnection | null>(null);
+  const [hotelsConnection, setHotelsConnection] = useState<HubConnection | null>(null);
+  const [transportsConnection, setTransportsConnection] = useState<HubConnection | null>(null);
   const [openNotifySnackbar, setOpenNotifySnackbar] = useState(false);
+
 
   const [orderId, setOrderId] = useState('')
 
@@ -105,18 +108,36 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       .build();
 
     setOfferUpdatedNotificationsConnection(offerUpdatedNotificationsHubConnection)
+
+    const hotelHubConnection = new HubConnectionBuilder()
+      .withUrl(process.env.WEB_API_URL + 'hotelsHub')
+      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect()
+      .build();
+
+    setHotelsConnection(hotelHubConnection);
+
+    const transportsHubConnection = new HubConnectionBuilder()
+      .withUrl(process.env.WEB_API_URL + 'transportsHub')
+      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect()
+      .build();
+
+    setTransportsConnection(transportsHubConnection);
   }, []);
 
-  const updateOptions = () => {
-    request('POST', '/Trip/Options', {
-      HotelCode: state?.trip.hotelCode,
-      DepartureDate: state?.departureDate?.toISOString().split('T')[0],
-      NumberOfDays: state?.numberOfDays,
-      NumberOfAdults: state?.numberOfAdults
-    }).then(data => {
-      setOptions(data)
-    })
-  }
+  const updateOptions = useCallback(() => {
+    if (!reservationCode) {
+      request('POST', '/Trip/Options', {
+        HotelCode: state?.trip.hotelCode,
+        DepartureDate: state?.departureDate?.toISOString().split('T')[0],
+        NumberOfDays: state?.numberOfDays,
+        NumberOfAdults: state?.numberOfAdults
+      }).then(data => {
+        setOptions(data)
+      })
+    }
+  }, [reservationCode]);
 
   useEffect(() => {
     updateOptions();
@@ -162,7 +183,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
         }
       })
     }
-  }, [purchasedNotificationConnection, offerUpdatedNotificationsConnection, options])
+  }, [purchasedNotificationConnection, offerUpdatedNotificationsConnection, options, reservationCode])
 
   useEffect(() => {
     if (orderId && purchasedNotificationConnection) {
@@ -188,6 +209,65 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
       }
     }
   }, [purchasedNotificationConnection])
+
+  const [hotelStatistics, setHotelStatistics] = useState<{
+    roomsStudio: number,
+    roomsSmall: number,
+    roomsMedium: number,
+    roomsLarge: number,
+    roomsApartment: number
+  }>();
+
+  useEffect(() => {
+    if (hotelsConnection) {
+      hotelsConnection.start()
+        .then(() => {
+          hotelsConnection.on('HotelResponse', response => {
+            setHotelStatistics(response)
+          })
+          hotelsConnection.invoke('GetForHotel', {Destination: state?.airportCode, HotelCode: state?.trip?.hotelCode})
+          hotelsConnection.on("HotelCountUpdate", (response) => {
+            setHotelStatistics(response)
+          })
+        }).catch(e => console.log('Connection failed: ', e));
+      return () => {
+        hotelsConnection.stop().then(() => {
+          console.log("Connection stopped");
+        });
+      }
+    }
+  }, [hotelsConnection])
+
+  const [transportsStatistics, setTransportStatistics] = useState<{
+    transports: {
+      count: 1
+      destinationAirportCode: string | null
+    }[],
+    returnTransports: {
+      count: 1
+      destinationAirportCode: string | null
+    }[]
+  }>({transports: [], returnTransports: []});
+
+  useEffect(() => {
+    if (transportsConnection) {
+      transportsConnection.start()
+        .then(() => {
+          transportsConnection.on('TransportCountsUpdate', response => {
+            setTransportStatistics({
+              transports: response.transports,
+              returnTransports: response.returnTransports
+            })
+          })
+          transportsConnection.invoke('GetForDestination', {Destination: state?.airportCode})
+        }).catch(e => console.log('Connection failed: ', e));
+      return () => {
+        transportsConnection.stop().then(() => {
+          console.log("Connection stopped");
+        });
+      }
+    }
+  }, [transportsConnection])
 
   const [numberOfAdults, setNumberOfAdults] = useState<string>(state?.numberOfAdults)
   const [departure, setDeparture] = useState(state && state.departure !== 'any' ? state.departure : 'individual' ?? 'individual')
@@ -366,10 +446,29 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   >
                     <MenuItem value='individual' key='individual'>
                       Individual transport
+                      <span style={{marginLeft: 'auto'}}>
+                        {(() => {
+                          const transportStatistic = transportsStatistics.transports.find(statistic => statistic.destinationAirportCode === null);
+                          if (transportStatistic) {
+                            return ` ${transportStatistic.count} just booked!`
+                          }
+                          return ''
+                        })()}
+                      </span>
                     </MenuItem>
                     {options?.transportOptions.map(transport => (
                       <MenuItem value={transport.destinationAirportCode} key={transport.destinationAirportCode}>
                         {transport.destinationAirportName} from {transport.ticketPrice}§/place
+                        <span style={{marginLeft: 'auto'}}>
+                        {(() => {
+                          const transportStatistic = transportsStatistics.transports
+                            .find(statistic => statistic.destinationAirportCode === transport.destinationAirportCode);
+                          if (transportStatistic) {
+                            return ` ${transportStatistic.count} just booked!`
+                          }
+                          return ''
+                        })()}
+                      </span>
                       </MenuItem>
                     ))}
                   </Select>
@@ -384,17 +483,35 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   >
                     <MenuItem value='individual' key='individual'>
                       Individual transport
+                      <span style={{marginLeft: 'auto'}}>
+                        {(() => {
+                          const transportStatistic = transportsStatistics.returnTransports.find(statistic => statistic.destinationAirportCode === null);
+                          if (transportStatistic) {
+                            return ` ${transportStatistic.count} just booked!`
+                          }
+                          return ''
+                        })()}
+                      </span>
                     </MenuItem>
                     {options?.returnTransportOptions.map(transport => (
                       <MenuItem value={transport.destinationAirportCode} key={transport.destinationAirportCode}>
                         {transport.destinationAirportName} from {transport.ticketPrice}§/place
+                        <span style={{marginLeft: 'auto'}}>
+                        {(() => {
+                          const transportStatistic = transportsStatistics.returnTransports
+                            .find(statistic => statistic.destinationAirportCode === transport.destinationAirportCode);
+                          if (transportStatistic) {
+                            return ` ${transportStatistic.count} just booked!`
+                          }
+                          return ''
+                        })()}
+                      </span>
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
                 <TextField
                   required
-                  id="outlined-number"
                   label="Number of adults"
                   type="number"
                   value={numberOfAdults}
@@ -402,7 +519,6 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   onChange={(event) => parseInt(event.target.value) < 1 ? setNumberOfAdults('1') : setNumberOfAdults(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
                   label="Children up to 18"
                   type="number"
                   value={numberOfChildrenUpTo18}
@@ -410,7 +526,6 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo18('0') : setNumberOfChildrenUpTo18(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
                   label="Children up to 10"
                   type="number"
                   value={numberOfChildrenUpTo10}
@@ -418,7 +533,6 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfChildrenUpTo10('0') : setNumberOfChildrenUpTo10(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
                   label="Children up to 3"
                   type="number"
                   value={numberOfChildrenUpTo3}
@@ -446,53 +560,58 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                 </FormControl>
                 <Typography variant="h6" sx={{width: '100%'}}>Choose rooms</Typography>
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number1"
                   label={`Studio rooms ${options?.hotelAvailability.studioPrice.toFixed(2)}§`}
                   type="number"
                   value={numberOfStudioRooms}
                   error={parseInt(numberOfStudioRooms) > (options?.hotelAvailability.roomsStudio || 0)}
+                  helperText={hotelStatistics?.roomsStudio ? `${hotelStatistics?.roomsStudio} ${hotelStatistics?.roomsStudio > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfStudioRooms('0') : setNumberOfStudioRooms(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number2"
                   label={`Small rooms ${options?.hotelAvailability.smallPrice.toFixed(2)}§`}
                   type="number"
                   value={numberOfSmallRooms}
-                  error={parseInt(numberOfSmallRooms) > (options?.hotelAvailability.smallPrice || 0)}
+                  error={parseInt(numberOfSmallRooms) > (options?.hotelAvailability.roomsSmall || 0)}
+                  helperText={hotelStatistics?.roomsSmall ? `${hotelStatistics?.roomsSmall} ${hotelStatistics?.roomsSmall > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfSmallRooms('0') : setNumberOfSmallRooms(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number3"
                   label={`Medium rooms ${options?.hotelAvailability.mediumPrice.toFixed(2)}§`}
                   type="number"
                   value={numberOfMediumRooms}
-                  error={parseInt(numberOfMediumRooms) > (options?.hotelAvailability.mediumPrice || 0)}
+                  error={parseInt(numberOfMediumRooms) > (options?.hotelAvailability.roomsMedium || 0)}
+                  helperText={hotelStatistics?.roomsMedium ? `${hotelStatistics?.roomsMedium} ${hotelStatistics?.roomsMedium > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfMediumRooms('0') : setNumberOfMediumRooms(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number4"
                   label={`Large rooms ${options?.hotelAvailability.largePrice.toFixed(2)}§`}
                   type="number"
                   value={numberOfLargeRooms}
-                  error={parseInt(numberOfLargeRooms) > (options?.hotelAvailability.largePrice || 0)}
+                  error={parseInt(numberOfLargeRooms) > (options?.hotelAvailability.roomsLarge || 0)}
+                  helperText={hotelStatistics?.roomsLarge ? `${hotelStatistics?.roomsLarge} ${hotelStatistics?.roomsLarge > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfLargeRooms('0') : setNumberOfLargeRooms(event.target.value)}
                 />
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number5"
                   label={`Apartment rooms ${options?.hotelAvailability.apartmentPrice.toFixed(2)}§`}
                   type="number"
                   value={numberOfApartmentRooms}
-                  error={parseInt(numberOfApartmentRooms) > (options?.hotelAvailability.apartmentPrice || 0)}
+                  error={parseInt(numberOfApartmentRooms) > (options?.hotelAvailability.roomsApartment || 0)}
+                  helperText={hotelStatistics?.roomsApartment ? `${hotelStatistics?.roomsApartment} ${hotelStatistics?.roomsApartment > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfApartmentRooms('0') : setNumberOfApartmentRooms(event.target.value)}
                 />
                 <Typography variant="h6" sx={{width: '100%'}}>Discount</Typography>
                 <TextField
-                  id="outlined-number"
+                  id="outlined-number6"
                   label="Discount code"
                   value={discount}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
@@ -647,7 +766,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
               }
               setOpenNotifySnackbar(false)
             }}
-            severity="error"
+            severity="info"
             sx={{width: '100%'}}>
             HURRY UP! Someone has just bought a similar offer.
           </Alert>
