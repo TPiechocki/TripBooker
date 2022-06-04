@@ -77,7 +77,7 @@ const IndexPage = () => {
                 {destination.name}
               </Typography>
               {counts[destination.airportCode] ? <Typography>
-                {`${counts[destination.airportCode]} ${counts[trip.hotelCode] > 1 ? 'users' : 'user'} just bought this offer!`}
+                {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'users' : 'user'} just bought this offer!`}
               </Typography> : ''}
             </CardContent>
             <CardActions>
