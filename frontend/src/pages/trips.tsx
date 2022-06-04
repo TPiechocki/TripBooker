@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {HubConnection, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
 
 
 const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: string, name: string } } | any>) => {
@@ -43,6 +44,8 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
   const [numberOfChildrenUpTo18, setNumberOfChildrenUpTo18] = useState<string>('')
   const [numberOfChildrenUpTo10, setNumberOfChildrenUpTo10] = useState<string>('')
   const [numberOfChildrenUpTo3, setNumberOfChildrenUpTo3] = useState<string>('')
+
+  const [searched, setSearched] = useState(false);
 
   const [trips, setTrips] = useState<({
     hotelCode: string
@@ -71,12 +74,54 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
       }).then((data) => {
         setLoading(false);
         setTrips(data?.trips);
-      })
+      }).finally(() => setSearched(true))
     } else {
       setError(true);
       setLoading(false);
     }
   }
+
+  const [connection, setConnection] = useState<HubConnection | null>(null);
+
+  const [counts, setCounts] = useState<{ [key: string]: number }>({})
+
+  useEffect(() => {
+    const purchasedNotificationsHubConnection = new HubConnectionBuilder()
+      .withUrl(process.env.WEB_API_URL + 'hotelsHub')
+      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(purchasedNotificationsHubConnection);
+  }, []);
+
+  useEffect(() => {
+    if (connection) {
+      connection.start()
+        .then(result => {
+          console.log('Connected!');
+          connection.on("HotelsResponse", (response: { counts: { [key: string]: number } }) => {
+            setCounts(response.counts)
+          })
+          connection.invoke("GetForDestination", {Destination: destination});
+        })
+        .catch(e => console.log('Connection failed: ', e));
+      return () => {
+        connection.stop().then(() => {
+          console.log("Connection stopped");
+        });
+      }
+    }
+  }, [connection])
+
+  useEffect(() => {
+    if (connection) {
+      connection.off("HotelCountUpdate");
+      connection.on("HotelCountUpdate", (response) => {
+        setCounts({...counts, [response.hotelCode]: response.orderCount})
+      })
+    }
+  }, [connection, counts])
 
   return (
     <Layout>
@@ -192,46 +237,50 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
             </Box>
           </Paper>
         </Box>
-        <Grid spacing={2} container>
-          {trips && trips.map((trip, i) =>
-            <Grid key={trip.hotelCode} item xs>
-              <Card sx={{minWidth: 200}}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={`https://picsum.photos/200/200?random=${i}`}
-                  alt="destination"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {trip.hotelName}
-                  </Typography>
-                  <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Typography>From:</Typography>
-                    <Typography sx={{textAlign: 'right', fontWeight: 'bold'}}>{trip.minimalPrice}§</Typography>
-                  </Box>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" onClick={() => navigate('/offer', {
-                    state: {
-                      airportCode: destination,
-                      departureDate,
-                      numberOfDays,
-                      numberOfAdults,
-                      numberOfChildrenUpTo18,
-                      numberOfChildrenUpTo10,
-                      numberOfChildrenUpTo3,
-                      departure,
-                      trip,
-                    }
-                  })}>
-                    Check Offer
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          )}
-        </Grid>
+        {trips.length ?
+          (<Grid spacing={2} container>
+            {trips.map((trip, i) =>
+              <Grid key={trip.hotelCode} item xs>
+                <Card sx={{minWidth: 200}}>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={`https://picsum.photos/200/200?random=${i}`}
+                    alt="destination"
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {trip.hotelName}
+                    </Typography>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                      <Typography>From:</Typography>
+                      <Typography sx={{textAlign: 'right', fontWeight: 'bold'}}>{trip.minimalPrice}§</Typography>
+                    </Box>
+                  {counts[trip.hotelCode] ? <Typography>
+                    {`${counts[trip.hotelCode]} ${counts[trip.hotelCode] > 1 ? 'users' : 'user'} just booked room in this hotel!`}
+                  </Typography> : ''}
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" onClick={() => navigate('/offer', {
+                      state: {
+                        airportCode: destination,
+                        departureDate,
+                        numberOfDays,
+                        numberOfAdults,
+                        numberOfChildrenUpTo18,
+                        numberOfChildrenUpTo10,
+                        numberOfChildrenUpTo3,
+                        departure,
+                        trip,
+                      }
+                    })}>
+                      Check Offer
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            )}
+          </Grid>) : searched && (<Typography variant="h4">There are no trips available for provided details</Typography>)}
       </>
     </Layout>
   );

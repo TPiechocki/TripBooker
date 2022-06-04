@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import {request} from "../api/request";
 import {UserContext} from "../context/UserContext";
-import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
 
 interface TransportOption {
   availablePlaces: number,
@@ -83,21 +83,31 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
 
   const auth = useContext(UserContext);
 
-  // TODO: code below creates correct connection to signalR websocket, however it is created on each render which is bad
-  // use it as single instance in component scope
-  //
-  // const purchasedNotificationsHubConnection = new HubConnectionBuilder()
-  //     .withUrl(process.env.WEB_API_URL + '/purchasedNotification')
-  //     .configureLogging(LogLevel.Debug)
-  //     .withAutomaticReconnect()
-  //     .build();
+  const [purchasedNotificationConnection, setPurchasedNotificationConnection] = useState<HubConnection | null>(null);
+  const [offerUpdatedNotificationsConnection, setOfferUpdatedNotificationsConnection] = useState<HubConnection | null>(null);
+  const [openNotifySnackbar, setOpenNotifySnackbar] = useState(false);
 
-  //   purchasedNotificationsHubConnection.start();
-  //   purchasedNotificationsHubConnection.on("SendNotification", notification => {
-  //     console.log(notification);
-  //   });
+  const [orderId, setOrderId] = useState('')
 
   useEffect(() => {
+    const purchasedNotificationsHubConnection = new HubConnectionBuilder()
+      .withUrl(process.env.WEB_API_URL + 'purchasedNotification')
+      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect()
+      .build();
+
+    setPurchasedNotificationConnection(purchasedNotificationsHubConnection);
+
+    const offerUpdatedNotificationsHubConnection = new HubConnectionBuilder()
+      .withUrl(process.env.WEB_API_URL + 'offerUpdatedNotifications')
+      .configureLogging(LogLevel.Warning)
+      .withAutomaticReconnect()
+      .build();
+
+    setOfferUpdatedNotificationsConnection(offerUpdatedNotificationsHubConnection)
+  }, []);
+
+  const updateOptions = () => {
     request('POST', '/Trip/Options', {
       HotelCode: state?.trip.hotelCode,
       DepartureDate: state?.departureDate?.toISOString().split('T')[0],
@@ -106,7 +116,79 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
     }).then(data => {
       setOptions(data)
     })
+  }
+
+  useEffect(() => {
+    updateOptions();
   }, [])
+
+  useEffect(() => {
+    if (offerUpdatedNotificationsConnection) {
+      offerUpdatedNotificationsConnection.start();
+      return () => {
+        offerUpdatedNotificationsConnection.stop().then(() => {
+          console.log("Connection stopped");
+        });
+      }
+    }
+  }, [offerUpdatedNotificationsConnection])
+
+  useEffect(() => {
+    if (offerUpdatedNotificationsConnection) {
+      offerUpdatedNotificationsConnection.off("HotelUpdatedNotification");
+      offerUpdatedNotificationsConnection.on("HotelUpdatedNotification", (notification) => {
+        if (options?.hotelDays.some(element => {
+          return notification.hotelDayIds.includes(element);
+        })) {
+          updateOptions();
+        }
+      })
+      offerUpdatedNotificationsConnection.off("TransportsUpdatedNotification");
+      offerUpdatedNotificationsConnection.on("TransportsUpdatedNotification", (notification) => {
+        if (options?.returnTransportOptions.concat(options?.transportOptions).some(element => {
+          return notification.transportIds.includes(element.id);
+        })) {
+          updateOptions();
+        }
+      })
+    }
+    if (purchasedNotificationConnection && options) {
+      purchasedNotificationConnection.off("SendNotification")
+      purchasedNotificationConnection.on("SendNotification", (notification: { orderId: string, purchasedHotelDays: string[] }) => {
+        if (notification.orderId !== orderId && options?.hotelDays.some(element => {
+          return notification.purchasedHotelDays.includes(element);
+        })) {
+          setOpenNotifySnackbar(true);
+        }
+      })
+    }
+  }, [purchasedNotificationConnection, offerUpdatedNotificationsConnection, options])
+
+  useEffect(() => {
+    if (orderId && purchasedNotificationConnection) {
+      purchasedNotificationConnection.off("SendNotification");
+      purchasedNotificationConnection.on("SendNotification", (notification: { orderId: string, purchasedHotelDays: string[] }) => {
+        if (notification.orderId !== orderId && options?.hotelDays.some(element => {
+          return notification.purchasedHotelDays.includes(element);
+        })) {
+          setOpenNotifySnackbar(true);
+        }
+      })
+    }
+  }, [orderId, purchasedNotificationConnection])
+
+  useEffect(() => {
+    if (purchasedNotificationConnection) {
+      purchasedNotificationConnection.start()
+        .catch(e => console.log('Connection failed: ', e));
+      return () => {
+        purchasedNotificationConnection.stop().then(() => {
+          console.log("Connection stopped");
+        });
+      }
+    }
+  }, [purchasedNotificationConnection])
+
   const [numberOfAdults, setNumberOfAdults] = useState<string>(state?.numberOfAdults)
   const [departure, setDeparture] = useState(state && state.departure !== 'any' ? state.departure : 'individual' ?? 'individual')
   const [arrival, setArrival] = useState(state && state.departure !== 'any' ? state.departure : 'individual' ?? 'individual')
@@ -178,6 +260,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
   }
 
   const checkOrder = (reservationId: string) => {
+    setOrderId(reservationId);
     setOrderLoading(true);
     request('GET', `/Order/${reservationId}`, '', auth.user)
       .then((data) => {
@@ -546,6 +629,27 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
             severity="error"
             sx={{width: '100%'}}>
             {priceData?.validationError}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={openNotifySnackbar}
+          autoHideDuration={10000}
+          onClose={(event?: React.SyntheticEvent | Event, reason?: string) => {
+            if (reason === 'clickaway') {
+              return;
+            }
+            setOpenNotifySnackbar(false)
+          }}>
+          <Alert
+            onClose={(event?: React.SyntheticEvent | Event, reason?: string) => {
+              if (reason === 'clickaway') {
+                return;
+              }
+              setOpenNotifySnackbar(false)
+            }}
+            severity="error"
+            sx={{width: '100%'}}>
+            HURRY UP! Someone has just bought a similar offer.
           </Alert>
         </Snackbar>
       </>
