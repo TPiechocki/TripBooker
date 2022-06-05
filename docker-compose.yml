@@ -26,6 +26,8 @@ services:
         image: tpiechocki/rsww_175641_transport
         depends_on:
             - "rabbitmq"
+            - "travel-agency-service"
+            - "tour-operator-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Transport;Username=postgres;Password=student"
             ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017" 
@@ -40,6 +42,7 @@ services:
         depends_on:
             - "rabbitmq"
             - "travel-agency-service"
+            - "tour-operator-service"
         environment:
             ConnectionStrings__SqlDbContext: "Host=actina15.maas;Database=RSWW_175641_Hotels;Username=postgres;Password=student"
             ConnectionStrings__MongoDb: "mongodb://root:student@actina15.maas:27017"

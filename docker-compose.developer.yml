@@ -36,7 +36,8 @@ services:
       - "postgres"
       - "rabbitmq"
       - "mongodb"
-      - "travel-agency-service"           # remove if travel agency will query the data on startup
+      - "travel-agency-service"
+      - "tour-operator-service"
     environment:
       ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Transport;Username=admin;Password=password"
       ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017"
@@ -54,7 +55,8 @@ services:
       - "postgres"
       - "rabbitmq"
       - "mongodb"
-      - "travel-agency-service"           # remove if travel agency will query the data on startup
+      - "travel-agency-service"
+      - "tour-operator-service"
     environment:
       ConnectionStrings__SqlDbContext: "Host=postgres;Database=RSWW_175641_Hotels;Username=admin;Password=password"
       ConnectionStrings__MongoDb: "mongodb://admin:password@mongodb:27017"
