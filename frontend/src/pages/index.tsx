@@ -63,6 +63,48 @@ const IndexPage = () => {
         <Typography variant="h2">
           Destinations
         </Typography>
+        {Object.keys(counts).filter(key => counts[key]).length ? (
+          <>
+            <Typography variant="h4">
+              Most popular
+            </Typography>
+            <Grid spacing={2} container sx={{mb: 2}}>
+              {Object.keys(counts).filter(key => counts[key]).sort((a, b) => counts[a] < counts[b] ? 1 : -1).slice(0, 5).map((key, i) => {
+                const destination = data?.find(element => element.airportCode === key)
+                return destination && (
+                  <Grid key={key} item xs>
+                    <Card
+                      sx={{minWidth: 200}}
+                      className="offerCard"
+                    >
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={`https://picsum.photos/200/200?random=${i}`}
+                        alt="destination"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {destination.name}
+                        </Typography>
+                        {counts[destination.airportCode] ? <Typography>
+                          {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'users' : 'user'} just booked offer for this destination!`}
+                        </Typography> : ''}
+                      </CardContent>
+                      <CardActions>
+                        <Button size="small" onClick={() => navigate('trips', {state: {destination: destination}})}>
+                          Check Offers</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            <Typography variant="h4">
+              Other destinations
+            </Typography>
+          </>
+        ) : null}
         <Grid spacing={2} container>
           {data && data.map((destination, i) => <Grid key={destination.airportCode} item xs>
             <Card
