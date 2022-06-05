@@ -29,7 +29,7 @@ internal class PaymentTimeoutStatisticsConsumer : IConsumer<PaymentTimeout>
 
     public async Task Consume(ConsumeContext<PaymentTimeout> context)
     {
-        _logger.LogInformation("Removing order with reject payment from statistics " +
+        _logger.LogInformation("Removing order with expired payment from statistics " +
                                $"(id={context.Message.CorrelationId})");
 
         var reservation =

@@ -298,7 +298,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
     setLoading(true);
     request('POST', '/Trip', {
       Flights: [
-        departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
+        departure !== 'individual' ? options?.transportOptions.find((transport) => transport.departureAirportCode === departure)?.id : null,
         arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival)?.id : null,
       ].filter(element => element != null),
       HotelDays: options == null ? [] : options.hotelDays,
@@ -388,7 +388,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
     setPaymentTimeout('');
     request('POST', '/Order/Submit', {
       Order: {
-        TransportId: departure !== 'individual' ? options?.transportOptions.find((transport) => transport.destinationAirportCode === departure)?.id : null,
+        TransportId: departure !== 'individual' ? options?.transportOptions.find((transport) => transport.departureAirportCode === departure)?.id : null,
         ReturnTransportId: arrival !== 'individual' ? options?.returnTransportOptions.find((transport) => transport.destinationAirportCode === arrival)?.id : null,
         HotelDays: options == null ? [] : options.hotelDays,
         NumberOfAdults: numberOfAdults,
@@ -457,12 +457,12 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                       </span>
                     </MenuItem>
                     {options?.transportOptions.map(transport => (
-                      <MenuItem value={transport.destinationAirportCode} key={transport.destinationAirportCode}>
-                        {transport.destinationAirportName} from {transport.ticketPrice}§/place
+                      <MenuItem value={transport.departureAirportCode} key={transport.departureAirportCode}>
+                        {transport.departureAirportName} from {transport.ticketPrice}§/place
                         <span style={{marginLeft: 'auto'}}>
                         {(() => {
                           const transportStatistic = transportsStatistics.transports
-                            .find(statistic => statistic.destinationAirportCode === transport.destinationAirportCode);
+                            .find(statistic => statistic.destinationAirportCode === transport.departureAirportCode);
                           if (transportStatistic) {
                             return ` ${transportStatistic.count} just booked!`
                           }

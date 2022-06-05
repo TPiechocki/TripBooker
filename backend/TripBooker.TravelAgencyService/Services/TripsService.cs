@@ -135,7 +135,7 @@ internal class TripsService : ITripsService
 
         // GET POSSIBLE FLIGHTS
         result.TransportOptions = await _transportRepository.QueryAll()
-            .Where(x => x.DepartureAirportCode == hotelDays.First().AirportCode &&
+            .Where(x => x.DestinationAirportCode == hotelDays.First().AirportCode &&
                         x.DepartureDate == allDates.First())
             .ToListAsync(cancellationToken);
 
