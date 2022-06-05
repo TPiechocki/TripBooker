@@ -565,7 +565,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfStudioRooms}
                   error={parseInt(numberOfStudioRooms) > (options?.hotelAvailability.roomsStudio || 0)}
-                  helperText={hotelStatistics?.roomsStudio ? `${hotelStatistics?.roomsStudio} ${hotelStatistics?.roomsStudio > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
+                  helperText={hotelStatistics?.roomsStudio ? `${hotelStatistics?.roomsStudio} ${hotelStatistics?.roomsStudio > 1 ? 'such rooms were' : 'such room was'} just booked!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfStudioRooms('0') : setNumberOfStudioRooms(event.target.value)}
                 />
@@ -575,7 +575,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfSmallRooms}
                   error={parseInt(numberOfSmallRooms) > (options?.hotelAvailability.roomsSmall || 0)}
-                  helperText={hotelStatistics?.roomsSmall ? `${hotelStatistics?.roomsSmall} ${hotelStatistics?.roomsSmall > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
+                  helperText={hotelStatistics?.roomsSmall ? `${hotelStatistics?.roomsSmall} ${hotelStatistics?.roomsSmall > 1 ? 'such rooms were' : 'such room was'} just booked!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfSmallRooms('0') : setNumberOfSmallRooms(event.target.value)}
                 />
@@ -585,7 +585,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfMediumRooms}
                   error={parseInt(numberOfMediumRooms) > (options?.hotelAvailability.roomsMedium || 0)}
-                  helperText={hotelStatistics?.roomsMedium ? `${hotelStatistics?.roomsMedium} ${hotelStatistics?.roomsMedium > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
+                  helperText={hotelStatistics?.roomsMedium ? `${hotelStatistics?.roomsMedium} ${hotelStatistics?.roomsMedium > 1 ? 'such rooms were' : 'such room was'} just booked!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfMediumRooms('0') : setNumberOfMediumRooms(event.target.value)}
                 />
@@ -595,7 +595,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfLargeRooms}
                   error={parseInt(numberOfLargeRooms) > (options?.hotelAvailability.roomsLarge || 0)}
-                  helperText={hotelStatistics?.roomsLarge ? `${hotelStatistics?.roomsLarge} ${hotelStatistics?.roomsLarge > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
+                  helperText={hotelStatistics?.roomsLarge ? `${hotelStatistics?.roomsLarge} ${hotelStatistics?.roomsLarge > 1 ? 'such rooms were' : 'such room was'} just booked!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfLargeRooms('0') : setNumberOfLargeRooms(event.target.value)}
                 />
@@ -605,7 +605,7 @@ const Offer = ({location}: PageProps<{}, any, State | any>) => {
                   type="number"
                   value={numberOfApartmentRooms}
                   error={parseInt(numberOfApartmentRooms) > (options?.hotelAvailability.roomsApartment || 0)}
-                  helperText={hotelStatistics?.roomsApartment ? `${hotelStatistics?.roomsApartment} ${hotelStatistics?.roomsApartment > 1 ? 'users' : 'user'} have just chosen this room!` : undefined}
+                  helperText={hotelStatistics?.roomsApartment ? `${hotelStatistics?.roomsApartment} ${hotelStatistics?.roomsApartment > 1 ? 'such rooms were' : 'such room was'} just booked!` : undefined}
                   disabled={(!!orderStatus || orderLoading) && orderStatus !== 'Rejected'}
                   onChange={(event) => parseInt(event.target.value) < 0 ? setNumberOfApartmentRooms('0') : setNumberOfApartmentRooms(event.target.value)}
                 />
