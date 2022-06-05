@@ -15,19 +15,22 @@ internal class HotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 {
     private readonly IHotelEventRepository _eventRepository;
     private readonly ILogger<NewHotelReservationEventConsumer> _logger;
+    private readonly IHotelOptionRepository _hotelOptionRepository;
 
     public HotelUpdateEventConsumer(
         IHotelEventRepository hotelRepository,
-        ILogger<NewHotelReservationEventConsumer> logger)
+        ILogger<NewHotelReservationEventConsumer> logger, 
+        IHotelOptionRepository hotelOptionRepository)
     {
         _eventRepository = hotelRepository;
         _logger = logger;
+        _hotelOptionRepository = hotelOptionRepository;
     }
 
     public async Task Consume(ConsumeContext<HotelUpdateContract> context)
     {
         _logger.LogInformation($"Hotel Update Contract recieved (HotelId = {context.Message.HotelId}, number of days = {context.Message.HotelDays.Count})");
-
+        
         bool transactionSuccesfull;
         do
         {
@@ -64,10 +67,13 @@ internal class HotelUpdateEventConsumer : IConsumer<HotelUpdateContract>
 
         }
         while (!transactionSuccesfull);
-
-        // TODO: request/response to Rabbit with change confirmation
-
+        
         _logger.LogInformation($"Hotel Update Contract consumed (HotelId = {context.Message.HotelId}, number of days = {context.Message.HotelDays.Count})");
+
+        var hotelOption = await _hotelOptionRepository.GetByIdAsync(context.Message.HotelId, context.CancellationToken);
+
+        var hotelDescription = $"{hotelOption!.Name} near {hotelOption.AirportCode} airport";
+        await context.RespondAsync(new HotelUpdateResponse(hotelDescription));
     }
 
     private async Task ValidateHotelUpdateTransaction(HotelUpdateContract contract, IEnumerable<HotelOccupationModel> hotelOccupations, CancellationToken cancellationToken)

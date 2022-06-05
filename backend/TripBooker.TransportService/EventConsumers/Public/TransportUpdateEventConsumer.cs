@@ -15,13 +15,16 @@ internal class TransportUpdateEventConsumer : IConsumer<TransportUpdateContract>
 {
     private readonly ILogger<NewTransportReservationEventConsumer> _logger;
     private readonly ITransportEventRepository _eventRepository;
+    private readonly ITransportOptionRepository _transportOptionRepository;
 
     public TransportUpdateEventConsumer(
         ILogger<NewTransportReservationEventConsumer> logger,
-        ITransportEventRepository eventRepository)
+        ITransportEventRepository eventRepository, 
+        ITransportOptionRepository transportOptionRepository)
     {
         _logger = logger;
         _eventRepository = eventRepository;
+        _transportOptionRepository = transportOptionRepository;
     }
 
     public async Task Consume(ConsumeContext<TransportUpdateContract> context)
@@ -29,6 +32,7 @@ internal class TransportUpdateEventConsumer : IConsumer<TransportUpdateContract>
         _logger.LogInformation($"Transport Update Contract recieved (TransportId = {context.Message.Id})");
 
         var tryTransaction = true;
+        var transportDescription = string.Empty;
         while (tryTransaction)
         {
             tryTransaction = false;
@@ -60,7 +64,17 @@ internal class TransportUpdateEventConsumer : IConsumer<TransportUpdateContract>
                     throw;
                 }
             }
+            
+            var transportOption = await _transportOptionRepository.GetById(transportItem.TransportOptionId);
+            transportDescription =
+                $"from {transportOption!.DepartureAirportName} to {transportOption.DestinationAirportName} " +
+                $"on {transportItem.DepartureDate:yyyy-MM-dd}";
+
         }
+        
+        _logger.LogInformation($"Transport Update Contract consumed (TransportId = {context.Message.Id}");
+
+        await context.RespondAsync(new TransportUpdateResponse(transportDescription));
     }
 
     private async Task ValidateTransportUpdateTransaction(TransportUpdateContract contract, TransportModel transport,

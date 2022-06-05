@@ -21,3 +21,13 @@ public class HotelUpdateContract
 
     public int RoomsApartmentChange { get; set; } = 0;
 }
+
+public class HotelUpdateResponse 
+{
+    public HotelUpdateResponse(string hotelDescription)
+    {
+        HotelDescription = hotelDescription;
+    }
+
+    public string HotelDescription { get; }
+}

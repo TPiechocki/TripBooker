@@ -11,18 +11,18 @@ internal class TransportUpdateQueryConsumer : IConsumer<TransportUpdateQuery>
     private readonly ITransportViewRepository _transportRepository;
     private readonly IUpdatesRepository _updatesRepository;
     private readonly ILogger<TransportUpdateQueryConsumer> _logger;
-    private readonly IBus _bus;
-
+    private readonly IRequestClient<TransportUpdateContract> _transportRequestClient;
+    
     public TransportUpdateQueryConsumer(
         ITransportViewRepository transportRepository,
         IUpdatesRepository updatesRepository,
         ILogger<TransportUpdateQueryConsumer> logger,
-        IBus bus)
+        IRequestClient<TransportUpdateContract> transportRequestClient)
     {
         _transportRepository = transportRepository;
         _updatesRepository = updatesRepository;
         _logger = logger;
-        _bus = bus;
+        _transportRequestClient = transportRequestClient;
     }
 
     public async Task Consume(ConsumeContext<TransportUpdateQuery> context)
@@ -45,8 +45,9 @@ internal class TransportUpdateQueryConsumer : IConsumer<TransportUpdateQuery>
             NewTicketPrice = context.Message.NewTicketPrice
         };
 
-        await _bus.Publish(update, context.CancellationToken);
-        await _updatesRepository.AddAsync(update.Describe(transport.TicketPrice), context.CancellationToken);
+        var transportUpdateResponse = await _transportRequestClient.GetResponse<TransportUpdateResponse>(update);
+        await _updatesRepository.AddAsync(update.Describe(transportUpdateResponse.Message, transport.TicketPrice),
+            context.CancellationToken);
 
         _logger.LogInformation($"Query for transport update consumed, update for tranpsort with Id = {context.Message.Id}");
     }

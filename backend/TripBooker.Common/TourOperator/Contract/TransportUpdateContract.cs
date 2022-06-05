@@ -13,3 +13,13 @@ public class TransportUpdateContract
     public int AvailablePlacesChange { get; set; } = 0;
 
 }
+
+public class TransportUpdateResponse 
+{
+    public TransportUpdateResponse(string transportDescription)
+    {
+        TransportDescription = transportDescription;
+    }
+
+    public string TransportDescription { get; }
+}

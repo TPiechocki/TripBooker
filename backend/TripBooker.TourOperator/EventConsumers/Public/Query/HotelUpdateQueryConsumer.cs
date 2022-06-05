@@ -10,19 +10,19 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
 {
     private readonly IHotelOccupationViewRepository _hotelRepository;
     private readonly IUpdatesRepository _updatesRepository;
-    private readonly ILogger<HotelUpdateQueryConsumer> _logger; 
-    private readonly IBus _bus;
-
+    private readonly ILogger<HotelUpdateQueryConsumer> _logger;
+    private readonly IRequestClient<HotelUpdateContract> _hotelRequestClient;
+    
     public HotelUpdateQueryConsumer(
         IHotelOccupationViewRepository hotelRepository,
         IUpdatesRepository updatesRepository,
-        ILogger<HotelUpdateQueryConsumer> logger,
-        IBus bus)
+        ILogger<HotelUpdateQueryConsumer> logger, 
+        IRequestClient<HotelUpdateContract> hotelRequestClient)
     {
         _hotelRepository = hotelRepository;
         _updatesRepository = updatesRepository;
         _logger = logger;
-        _bus = bus;
+        _hotelRequestClient = hotelRequestClient;
     }
 
     public async Task Consume(ConsumeContext<HotelUpdateQuery> context)
@@ -43,7 +43,7 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
 
         var minvals = hotelDays.Reduce();
 
-        var update = new HotelUpdateContract()
+        var update = new HotelUpdateContract
         {
             HotelId = context.Message.HotelId,
             HotelDays = hotelDays.Select(x => x.Id).ToList(),
@@ -55,8 +55,9 @@ internal class HotelUpdateQueryConsumer : IConsumer<HotelUpdateQuery>
             RoomsApartmentChange = Math.Max(context.Message.RoomsApartmentChange, -minvals.RoomsApartment),
         };
 
-        await _bus.Publish(update, context.CancellationToken);
-        await _updatesRepository.AddAsync(update.Describe(), context.CancellationToken);
+        var updateResponse = await _hotelRequestClient.GetResponse<HotelUpdateResponse>(update);
+        await _updatesRepository.AddAsync(update.Describe(context.Message.StartDate, updateResponse.Message),
+            context.CancellationToken);
 
         _logger.LogInformation($"Query for hotel update consumed, update for: HotelId = {context.Message.HotelId}, StartDate = {context.Message.StartDate}, Length = {context.Message.Length}");
     }

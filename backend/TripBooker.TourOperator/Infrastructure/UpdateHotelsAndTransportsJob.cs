@@ -8,25 +8,27 @@ namespace TripBooker.TourOperator.Infrastructure;
 
 internal class UpdateHotelsAndTransportsJob : IJob
 {
-    private readonly IBus _bus;
     private readonly IHotelOccupationViewRepository _hotelRepository;
     private readonly ITransportViewRepository _transportRepository;
     private readonly IUpdatesRepository _updatesRepository;
     private readonly ILogger<UpdateHotelsAndTransportsJob> _logger;
-
+    private readonly IRequestClient<HotelUpdateContract> _hotelRequestClient;
+    private readonly IRequestClient<TransportUpdateContract> _transportRequestClient;
 
     public UpdateHotelsAndTransportsJob(
-        IBus bus,
         IHotelOccupationViewRepository hotelRepository,
         ITransportViewRepository transportRepository,
         IUpdatesRepository updateRepository,
-        ILogger<UpdateHotelsAndTransportsJob> logger)
+        ILogger<UpdateHotelsAndTransportsJob> logger, 
+        IRequestClient<HotelUpdateContract> hotelRequestClient, 
+        IRequestClient<TransportUpdateContract> transportRequestClient)
     {
-        _bus = bus;
         _hotelRepository = hotelRepository;
         _transportRepository = transportRepository;
         _updatesRepository = updateRepository;
         _logger = logger;
+        _hotelRequestClient = hotelRequestClient;
+        _transportRequestClient = transportRequestClient;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -47,7 +49,7 @@ internal class UpdateHotelsAndTransportsJob : IJob
 
         var updateRoll = rnd.NextDouble();
         // If roll > 0.5 some rooms get taken and prices go up else price goes down no rooms taken
-        var hotelUpdate = new HotelUpdateContract()
+        var hotelUpdate = new HotelUpdateContract
         {
             HotelId = minvals.HotelId,
             HotelDays = hotelDays.Select(x => x.Id).ToList(),
@@ -58,8 +60,9 @@ internal class UpdateHotelsAndTransportsJob : IJob
             RoomsLargeChange = updateRoll < 0.5 ? 0 : -rnd.Next(minvals.RoomsLarge),
             RoomsApartmentChange = updateRoll < 0.5 ? 0 : -rnd.Next(minvals.RoomsApartment),
         };
-        await _bus.Publish(hotelUpdate, context.CancellationToken);
-        await _updatesRepository.AddAsync(hotelUpdate.Describe(minvals.Date), context.CancellationToken);
+        var updateResponse = await _hotelRequestClient.GetResponse<HotelUpdateResponse>(hotelUpdate);
+        await _updatesRepository.AddAsync(hotelUpdate.Describe(minvals.Date, updateResponse.Message), 
+            context.CancellationToken);
         _logger.LogInformation($"Updated Hotel: HotelId = {minvals.HotelId}, StartDate = {minvals.Date}, length = {hotelDays.Count}, updateRoll = {updateRoll}");
 
         // Transports
@@ -76,8 +79,8 @@ internal class UpdateHotelsAndTransportsJob : IJob
             PriceChangedFlag = true,
             NewTicketPrice = Math.Max((int)((updateRoll + 0.5) * transport.TicketPrice), 1)
         };
-        await _bus.Publish(transportUpdate, context.CancellationToken);
-        await _updatesRepository.AddAsync(transportUpdate.Describe(transport.TicketPrice),
+        var transportUpdateResponse = await _transportRequestClient.GetResponse<TransportUpdateResponse>(transportUpdate);
+        await _updatesRepository.AddAsync(transportUpdate.Describe(transportUpdateResponse.Message, transport.TicketPrice),
                                           context.CancellationToken);
         _logger.LogInformation($"Updated Transport: Id = {transport.Id}, updateRoll = {updateRoll}");
     }
