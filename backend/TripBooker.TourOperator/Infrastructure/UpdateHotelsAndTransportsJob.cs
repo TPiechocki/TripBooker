@@ -59,7 +59,7 @@ internal class UpdateHotelsAndTransportsJob : IJob
             RoomsApartmentChange = updateRoll < 0.5 ? 0 : -rnd.Next(minvals.RoomsApartment),
         };
         await _bus.Publish(hotelUpdate, context.CancellationToken);
-        await _updatesRepository.AddAsync(hotelUpdate.Describe(), context.CancellationToken);
+        await _updatesRepository.AddAsync(hotelUpdate.Describe(minvals.Date), context.CancellationToken);
         _logger.LogInformation($"Updated Hotel: HotelId = {minvals.HotelId}, StartDate = {minvals.Date}, length = {hotelDays.Count}, updateRoll = {updateRoll}");
 
         // Transports

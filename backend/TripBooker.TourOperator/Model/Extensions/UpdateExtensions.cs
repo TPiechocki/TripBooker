@@ -4,10 +4,13 @@ namespace TripBooker.TourOperator.Model.Extensions;
 
 internal static class UpdateExtensions
 {
-    public static string Describe(this HotelUpdateContract contract)
+    public static string Describe(this HotelUpdateContract contract, DateTime? startDate = null)
     {
         var description = new System.Text.StringBuilder();
         description.AppendLine($"Updated hotel with Id {contract.HotelId} for the duration of {contract.HotelDays.Count} hotel days.");
+        if (startDate != null)
+            description.AppendLine($"Starting on {startDate.Value.ToString("YYYY-MM-DD")} day.");
+        
         if (contract.PriceModifierFactor > 1.0)
             description.AppendLine($"Prices increased by {(int)((contract.PriceModifierFactor - 1.0) * 100)}%.");
         else
@@ -49,7 +52,7 @@ internal static class UpdateExtensions
         if (contract.PriceChangedFlag)
         {
             if (oldPrice != -1)
-                description.AppendLine($"The ticket price changed from {oldPrice} to {contract.NewTicketPrice}");
+                description.AppendLine($"The ticket price changed from {oldPrice} to {contract.NewTicketPrice}.");
             else
                 description.AppendLine($"The new ticket price is {contract.NewTicketPrice}.");
         }

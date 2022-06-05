@@ -51,8 +51,6 @@ internal class TransportViewRepository : ITransportViewRepository
         if (!transports.Any())
             return;
 
-        _dbContext.TransportView.UpdateRange(transports);
-
         foreach (var transport in transports)
         {
             if (await _dbContext.TransportView.AnyAsync(x => x.Id == transport.Id, cancellationToken))

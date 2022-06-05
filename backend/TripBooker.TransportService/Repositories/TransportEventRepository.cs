@@ -88,7 +88,7 @@ internal class TransportEventRepository : ITransportEventRepository
         bool updateViews = true)
     {
         await _dbContext.TransportEvent.AddAsync(new TransportEvent(
-                streamId, previousVersion + 1, nameof(TransportPlaceUpdateEvent), priceUpdateEvent),
+                streamId, previousVersion + 1, nameof(TicketPriceUpdateEvent), priceUpdateEvent),
             cancellationToken);
 
         var status = await _dbContext.SaveChangesAsync(cancellationToken);
