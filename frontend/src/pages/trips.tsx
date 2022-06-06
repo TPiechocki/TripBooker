@@ -237,8 +237,64 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
             </Box>
           </Paper>
         </Box>
+        {trips.length && Object.keys(counts).filter(key => counts[key]).length ? (
+          <>
+            <Typography variant="h4">
+              Most popular
+            </Typography>
+            <Grid spacing={2} container sx={{mb: 2}}>
+              {Object.keys(counts).filter(key => counts[key]).sort((a, b) => counts[a] < counts[b] ? 1 : -1).slice(0, 5).map((key, i) => {
+                const trip = trips?.find(element => element.hotelCode === key)
+                return trip && (
+                  <Grid key={trip.hotelCode} item xs>
+                    <Card sx={{minWidth: 200}}>
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={`https://picsum.photos/200/200?random=${i}`}
+                        alt="destination"
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {trip.hotelName}
+                        </Typography>
+                        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                          <Typography>From:</Typography>
+                          <Typography sx={{textAlign: 'right', fontWeight: 'bold'}}>{trip.minimalPrice}§</Typography>
+                        </Box>
+                        {counts[trip.hotelCode] ? <Typography>
+                          {`${counts[trip.hotelCode]} ${counts[trip.hotelCode] > 1 ? 'recent bookings' : 'recent booking'} in this hotel!`}
+                        </Typography> : ''}
+                      </CardContent>
+                      <CardActions>
+                        <Button size="small" onClick={() => navigate('/offer', {
+                          state: {
+                            airportCode: destination,
+                            departureDate,
+                            numberOfDays,
+                            numberOfAdults,
+                            numberOfChildrenUpTo18,
+                            numberOfChildrenUpTo10,
+                            numberOfChildrenUpTo3,
+                            departure,
+                            trip,
+                          }
+                        })}>
+                          Check Offer
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+            <Typography variant="h4">
+              Other offers
+            </Typography>
+          </>
+        ) : null}
         {trips.length ?
-          (<Grid spacing={2} container>
+          <Grid spacing={2} container>
             {trips.map((trip, i) =>
               <Grid key={trip.hotelCode} item xs>
                 <Card sx={{minWidth: 200}}>
@@ -280,7 +336,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
                 </Card>
               </Grid>
             )}
-          </Grid>) : searched && (<Typography variant="h4">There are no trips available for provided details</Typography>)}
+          </Grid> : ''}
       </>
     </Layout>
   );
