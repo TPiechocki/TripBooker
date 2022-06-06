@@ -88,7 +88,7 @@ const IndexPage = () => {
                           {destination.name}
                         </Typography>
                         {counts[destination.airportCode] ? <Typography>
-                          {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'users' : 'user'} just booked offer for this destination!`}
+                          {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'recent bookings' : 'recent booking'} for this destination!`}
                         </Typography> : ''}
                       </CardContent>
                       <CardActions>
@@ -122,7 +122,7 @@ const IndexPage = () => {
                   {destination.name}
                 </Typography>
                 {counts[destination.airportCode] ? <Typography>
-                  {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'users' : 'user'} just booked offer for this destination!`}
+                  {`${counts[destination.airportCode]} ${counts[destination.airportCode] > 1 ? 'recent bookings' : 'recent booking'} for this destination!`}
                 </Typography> : ''}
               </CardContent>
               <CardActions>
