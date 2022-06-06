@@ -5,22 +5,22 @@ import Layout from "../components/Layout";
 import {
   Box,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   TextField,
-  Typography,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions
+  Typography
 } from "@mui/material";
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
-import {HubConnection, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
+import {HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel} from "@microsoft/signalr";
 
 
 const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: string, name: string } } | any>) => {
@@ -113,6 +113,12 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
       }
     }
   }, [connection])
+
+  useEffect(() => {
+    if (connection?.state === HubConnectionState.Connected) {
+      connection.invoke("GetForDestination", {Destination: destination});
+    }
+  }, [destination, connection]);
 
   useEffect(() => {
     if (connection) {
