@@ -11,11 +11,13 @@ namespace TripBooker.WebApi.Controllers;
 public class UpdatesController : Controller
 {
     private readonly IRequestClient<UpdatesQueryContract> _client;
+    private readonly IBus _bus;
 
     public UpdatesController(
-        IRequestClient<UpdatesQueryContract> client)
+        IRequestClient<UpdatesQueryContract> client, IBus bus)
     {
         _client = client;
+        _bus = bus;
     }
 
     [HttpGet]
@@ -24,5 +26,12 @@ public class UpdatesController : Controller
         var response = await _client.GetResponse<UpdatesQueryResultContract>(
             new UpdatesQueryContract(), cancellationToken);
         return response.Message;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(UpdateSwitchQuery switchUpdate, CancellationToken cancellationToken)
+    {
+        await _bus.Publish(switchUpdate, cancellationToken);
+        return Ok();
     }
 }

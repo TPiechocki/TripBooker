@@ -31,6 +31,7 @@ internal static class InfrastructureRegistration
                 x.AddConsumer<HotelUpdateQueryConsumer>();
                 x.AddConsumer<TransportUpdateQueryConsumer>();
                 x.AddConsumer<UpdatesQueryConsumer>();
+                x.AddConsumer<UpdateSwitchQueryConsumer>();
 
                 // View updates
                 x.AddConsumer<TourOperatorTransportViewContractConsumer>(cfg =>
@@ -76,6 +77,7 @@ internal static class InfrastructureRegistration
                 .WithSimpleSchedule(x => x
                     .WithIntervalInSeconds(45)
                     .RepeatForever()));
+            q.AddTriggerListener<UpdateJobTriggerListener>();
         })
             .AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
     }
