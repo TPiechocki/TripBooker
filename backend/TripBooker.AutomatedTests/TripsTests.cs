@@ -37,8 +37,7 @@ namespace TripBooker.AutomatedTests
 
             Thread.Sleep(2000);
 
-
-            var trips = _driver.FindElement(By.ClassName("MuiGrid-container"));
+            var trips = _driver.FindElements(By.ClassName("MuiGrid-container")).Last();
             trips.FindElements(By.XPath(".//*")).Should().NotBeEmpty();
         }
 
@@ -54,7 +53,7 @@ namespace TripBooker.AutomatedTests
             Thread.Sleep(2000);
 
 
-            var trips = _driver.FindElement(By.ClassName("MuiGrid-container"));
+            var trips = _driver.FindElements(By.ClassName("MuiGrid-container")).Last();
             var prices = trips.FindElements(By.XPath("//p[contains(text(),'From:')]/following-sibling::p"));
             var pricesTexts = prices.Select(x => x.Text).ToList();
 
@@ -86,8 +85,7 @@ namespace TripBooker.AutomatedTests
 
             var trips = _driver.FindElements(By.ClassName("MuiGrid-container"));
 
-            trips.Should().ContainSingle();
-            trips.Single().FindElements(By.XPath(".//*")).Should().BeEmpty();
+            trips.Should().BeEmpty();
         }
 
         [Test]
@@ -110,11 +108,9 @@ namespace TripBooker.AutomatedTests
             button.Click();
             Thread.Sleep(2000);
 
-
             var trips = _driver.FindElements(By.ClassName("MuiGrid-container"));
 
-            trips.Should().ContainSingle();
-            trips.Single().FindElements(By.XPath(".//*")).Should().BeEmpty();
+            trips.Should().BeEmpty();
         }
 
         [OneTimeTearDown]
