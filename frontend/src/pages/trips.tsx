@@ -257,7 +257,7 @@ const Trips = ({location}: PageProps<{}, any, { destination: { airportCode: stri
                       <Typography sx={{textAlign: 'right', fontWeight: 'bold'}}>{trip.minimalPrice}§</Typography>
                     </Box>
                   {counts[trip.hotelCode] ? <Typography>
-                    {`${counts[trip.hotelCode]} ${counts[trip.hotelCode] > 1 ? 'users' : 'user'} just booked room in this hotel!`}
+                    {`${counts[trip.hotelCode]} ${counts[trip.hotelCode] > 1 ? 'recent bookings' : 'recent booking'} in this hotel!`}
                   </Typography> : ''}
                   </CardContent>
                   <CardActions>
